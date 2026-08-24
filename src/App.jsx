@@ -43,6 +43,18 @@ const canAccessViaStoredPermissions = (pathname) => {
   })
 }
 
+const getStoredDefaultPath = (user) => {
+  const perms = Array.isArray(user?.menu_permissions) ? user.menu_permissions : []
+
+  for (const perm of perms) {
+    if (!perm?.can_view) continue
+    const candidate = perm.url ? normalizePath(perm.url) : normalizePath(perm.slug)
+    if (candidate) return candidate
+  }
+
+  return null
+}
+
 const App = () => {
   const element = useRoutes(routes)
   const location = useLocation()
@@ -65,10 +77,6 @@ const App = () => {
     removeToken()
     clearStoredCurrentUser()
   }, [userStatus])
-
-  if (pathname === '/') {
-    return <Navigate to="/landing" replace />
-  }
 
   if (isCustomerUser) {
     if (pathname === '/error/404') {
@@ -146,6 +154,14 @@ const App = () => {
 
   if (hasToken && authPage === 'delete-account') {
     return <Navigate to="/" replace />
+  }
+
+  if (pathname === '/') {
+    const defaultPath = accessibleMenuUrls[0] ?? getStoredDefaultPath(storedUser)
+
+    if (!defaultPath && loading) return null
+
+    return <Navigate to={defaultPath ?? '/error/403'} replace />
   }
 
   if (hasToken && isScreenLocked() && !['lock-screen', 'login-pin'].includes(authPage)) {
