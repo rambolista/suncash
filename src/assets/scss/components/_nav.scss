@@ -1,0 +1,202 @@
+//
+// _nav.scss
+//
+
+.nav-tabs,
+.nav-pills {
+    > li {
+        > a {
+            font-weight: $font-weight-semibold;
+        }
+
+    }
+}
+
+.nav-tabs.customer-profile-tabs {
+    gap: 0.25rem;
+
+    .nav-link {
+        border-radius: $border-radius $border-radius 0 0;
+        min-height: 3.25rem;
+        padding: 0.9rem 1.25rem;
+        white-space: nowrap;
+    }
+
+    &.nav-tabs-vertical {
+        border-bottom: 0;
+        gap: 0.35rem;
+        width: max-content;
+        min-width: 100%;
+
+        .nav-item {
+            width: 100%;
+
+            .nav-link {
+                width: 100%;
+                border-radius: $border-radius;
+                text-align: left;
+                white-space: nowrap;
+                overflow-wrap: normal;
+
+                &.active {
+                    background-color: rgba(var(--#{$prefix}primary-rgb), 0.1);
+                    border-bottom: 0;
+                    border-left: 3px solid var(--#{$prefix}primary);
+                }
+            }
+        }
+    }
+}
+
+.customer-profile-tab-sidebar,
+.customer-profile-tab-content {
+    min-width: 0;
+}
+
+.customer-profile-tab-sidebar {
+    max-width: 100%;
+    border-right: 1px solid var(--#{$prefix}border-color);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-color: rgba(var(--#{$prefix}primary-rgb), 0.65) var(--#{$prefix}tertiary-bg);
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--#{$prefix}tertiary-bg);
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(var(--#{$prefix}primary-rgb), 0.65);
+        border: 2px solid var(--#{$prefix}tertiary-bg);
+        border-radius: 999px;
+    }
+}
+
+@media (min-width: 1080px) {
+    .customer-profile-tab-sidebar {
+        flex: 0 0 20%;
+        width: 20%;
+    }
+
+    .customer-profile-tab-content {
+        flex: 0 0 80%;
+        width: 80%;
+    }
+}
+
+@media (max-width: 1079.98px) {
+    .customer-profile-tab-sidebar {
+        border-right: 0;
+        border-bottom: 1px solid var(--#{$prefix}border-color);
+
+        .nav-tabs.customer-profile-tabs.nav-tabs-vertical {
+            flex-flow: row nowrap !important;
+            width: max-content;
+            min-width: 100%;
+
+            .nav-item {
+                flex: 0 0 auto;
+                width: auto;
+
+                .nav-link {
+                    width: auto;
+                    white-space: nowrap;
+                    overflow-wrap: normal;
+                }
+            }
+        }
+    }
+}
+
+.customer-profile-tabs-scroll {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 0.5rem;
+    overscroll-behavior-x: contain;
+    white-space: nowrap;
+    scrollbar-color: rgba(var(--#{$prefix}primary-rgb), 0.65) var(--#{$prefix}tertiary-bg);
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: var(--#{$prefix}tertiary-bg);
+        border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(var(--#{$prefix}primary-rgb), 0.65);
+        border: 2px solid var(--#{$prefix}tertiary-bg);
+        border-radius: 999px;
+    }
+
+    .customer-profile-tabs {
+        display: flex;
+        flex-wrap: nowrap !important;
+        width: max-content;
+        min-width: 100%;
+
+        .nav-item {
+            flex: 0 0 auto;
+        }
+
+        .nav-link {
+            white-space: nowrap !important;
+        }
+    }
+}
+
+// nav-pills Colors
+@each $color, $value in $theme-colors {
+    .nav-pills-#{$color} {
+        --#{$prefix}nav-pills-link-active-bg: #{$value};
+        --#{$prefix}nav-link-hover-color: #{$value};
+    }
+}
+
+// nav-bordered
+.nav-tabs {
+    &.nav-bordered {
+        border-bottom: 1px solid var(--#{$prefix}border-color);
+
+        .nav-item {
+            .nav-link {
+                border: 0;
+
+                &.active {
+                    border-bottom: 1px solid var(--#{$prefix}primary);
+                }
+            }
+        }
+    }
+}
+
+@each $color, $value in $theme-colors {
+    .nav-tabs {
+        &.nav-bordered-#{$color} {
+            .nav-item {
+                .nav-link {
+                    &:hover,
+                    &:focus {
+                        color: #{$value};
+                    }
+
+                    &.active {
+                        border-bottom: 1px solid $value;
+                        color: #{$value};
+                    }
+                }
+            }
+        }
+    }
+}

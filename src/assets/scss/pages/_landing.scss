@@ -1,0 +1,381 @@
+//
+// _landing.scss
+//
+
+// Section Size
+.section-custom {
+    padding: 3rem 1rem;
+}
+
+@include media-breakpoint-up(lg) {
+    .section-custom {
+        padding: 6.5rem 0;
+    }
+}
+
+// Topbar Alert
+.top-alert {
+    background-color: #1e1f27;
+    color: $white;
+}
+
+// Navbar
+#landing-navbar {
+    position: relative;
+    width: 100%;
+    transition: transform 0.3s ease;
+    background-color: var(--#{$prefix}secondary-bg);
+
+    &.top-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    &.top-fixed.top-hide {
+        transform: translateY(-100%);
+    }
+    &.top-fixed.top-scroll-up {
+        transform: translateY(0);
+        box-shadow: $box-shadow-sm;
+    }
+}
+
+// CTA Section
+.section-cta {
+    min-height: 350px;
+}
+
+// Footer
+.section-footer {
+    background-color: #1e1f27;
+    color: #858f9b;
+
+    .nav-link {
+        color: inherit;
+        font-size: 14px;
+        font-weight: $font-weight-medium;
+
+        &:hover {
+            color: $primary;
+        }
+    }
+}
+
+.rich-text-content {
+    line-height: 1.42;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    counter-reset: list-0 list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+
+    > * {
+        cursor: text;
+    }
+
+    p,
+    ol,
+    ul,
+    pre,
+    blockquote,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0 0 1rem;
+        padding: 0;
+    }
+
+    p {
+        counter-reset: list-0 list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    h3 {
+        font-size: 1.17em;
+    }
+
+    h4 {
+        font-size: 1em;
+    }
+
+    h5 {
+        font-size: 0.83em;
+    }
+
+    h6 {
+        font-size: 0.67em;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+
+    ol {
+        padding-left: 1.5em;
+    }
+
+    ul {
+        padding-left: 1.5em;
+    }
+
+    li {
+        list-style-type: none;
+        padding-left: 1.5em;
+        position: relative;
+    }
+
+    li > .ql-ui:before {
+        display: inline-block;
+        margin-left: -1.5em;
+        margin-right: 0.3em;
+        text-align: right;
+        white-space: nowrap;
+        width: 1.2em;
+    }
+
+    li > .ql-ui {
+        position: absolute;
+    }
+
+    li[data-list='bullet'] > .ql-ui:before {
+        content: '\2022';
+    }
+
+    li[data-list='checked'] > .ql-ui:before {
+        content: '\2611';
+    }
+
+    li[data-list='unchecked'] > .ql-ui:before {
+        content: '\2610';
+    }
+
+    li[data-list='checked'] > .ql-ui,
+    li[data-list='unchecked'] > .ql-ui {
+        color: #777;
+    }
+
+    li[data-list] {
+        counter-reset: list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
+    }
+
+    li[data-list='ordered'] {
+        counter-increment: list-0;
+    }
+
+    li[data-list='ordered'] > .ql-ui:before {
+        content: counter(list-0, decimal) '. ';
+    }
+
+    li.ql-direction-rtl {
+        padding-left: 0;
+        padding-right: 1.5em;
+    }
+
+    li.ql-direction-rtl > .ql-ui:before {
+        margin-left: 0.3em;
+        margin-right: -1.5em;
+        text-align: left;
+    }
+
+    @for $i from 1 through 9 {
+        li[data-list='ordered'].ql-indent-#{$i} {
+            counter-increment: list-#{$i};
+        }
+
+        li[data-list='ordered'].ql-indent-#{$i} > .ql-ui:before {
+            content: counter(list-#{$i}, if($i % 3 == 1, lower-alpha, if($i % 3 == 2, lower-roman, decimal))) '. ';
+        }
+
+        .ql-indent-#{$i}:not(.ql-direction-rtl) {
+            padding-left: 3em * $i;
+        }
+
+        li.ql-indent-#{$i}:not(.ql-direction-rtl) {
+            padding-left: calc(3em * #{$i} + 1.5em);
+        }
+
+        .ql-indent-#{$i}.ql-direction-rtl.ql-align-right {
+            padding-right: 3em * $i;
+        }
+
+        li.ql-indent-#{$i}.ql-direction-rtl.ql-align-right {
+            padding-right: calc(3em * #{$i} + 1.5em);
+        }
+    }
+
+    p:last-child,
+    li:last-child,
+    ul:last-child,
+    ol:last-child,
+    pre:last-child,
+    blockquote:last-child {
+        margin-bottom: 0;
+    }
+
+    blockquote {
+        border-left: 4px solid #ccc;
+        margin-bottom: 5px;
+        margin-top: 5px;
+        padding-left: 16px;
+    }
+
+    code,
+    .ql-code-block-container {
+        background-color: #f0f0f0;
+        border-radius: 3px;
+    }
+
+    code {
+        font-size: 85%;
+        padding: 2px 4px;
+        white-space: break-spaces;
+    }
+
+    .ql-code-block-container {
+        background-color: #23241f;
+        color: #f8f8f2;
+        font-family: monospace;
+        margin-bottom: 5px;
+        margin-top: 5px;
+        overflow: auto;
+        padding: 5px 10px;
+    }
+
+    .ql-font-serif {
+        font-family: Georgia, Times New Roman, serif;
+    }
+
+    .ql-font-monospace {
+        font-family: Monaco, Courier New, monospace;
+    }
+
+    .ql-size-small {
+        font-size: 0.75em;
+    }
+
+    .ql-size-large {
+        font-size: 1.5em;
+    }
+
+    .ql-size-huge {
+        font-size: 2.5em;
+    }
+
+    .ql-direction-rtl {
+        direction: rtl;
+        text-align: inherit;
+    }
+
+    .ql-align-center {
+        text-align: center;
+    }
+
+    .ql-align-right {
+        text-align: right;
+    }
+
+    .ql-align-justify {
+        text-align: justify;
+    }
+
+    .ql-align-left {
+        text-align: left;
+    }
+
+    .ql-bg-black {
+        background-color: rgb(0, 0, 0);
+    }
+
+    .ql-bg-red {
+        background-color: rgb(230, 0, 0);
+    }
+
+    .ql-bg-orange {
+        background-color: rgb(255, 153, 0);
+    }
+
+    .ql-bg-yellow {
+        background-color: rgb(255, 255, 0);
+    }
+
+    .ql-bg-green {
+        background-color: rgb(0, 138, 0);
+    }
+
+    .ql-bg-blue {
+        background-color: rgb(0, 102, 204);
+    }
+
+    .ql-bg-purple {
+        background-color: rgb(153, 51, 255);
+    }
+
+    .ql-color-white {
+        color: rgb(255, 255, 255);
+    }
+
+    .ql-color-red {
+        color: rgb(230, 0, 0);
+    }
+
+    .ql-color-orange {
+        color: rgb(255, 153, 0);
+    }
+
+    .ql-color-yellow {
+        color: rgb(255, 255, 0);
+    }
+
+    .ql-color-green {
+        color: rgb(0, 138, 0);
+    }
+
+    .ql-color-blue {
+        color: rgb(0, 102, 204);
+    }
+
+    .ql-color-purple {
+        color: rgb(153, 51, 255);
+    }
+
+    img {
+        display: inline-block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .ql-video {
+        display: block;
+        max-width: 100%;
+    }
+
+    .ql-video.ql-align-center {
+        margin: 0 auto;
+    }
+
+    .ql-video.ql-align-right {
+        margin: 0 0 0 auto;
+    }
+
+    iframe.ql-video {
+        min-height: 315px;
+        width: 100%;
+    }
+}
+
+// Dark Mode
+html[data-bs-theme='dark'] {
+    .top-alert {
+        background-color: var(--#{$prefix}primary);
+    }
+}
