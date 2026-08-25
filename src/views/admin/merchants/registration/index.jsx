@@ -10,20 +10,7 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 import LoadingState from '@/components/LoadingState'
 import MerchantRegistrationWizard from './components/MerchantRegistrationWizard'
 import MerchantsTable from './components/MerchantsTable'
-import MerchantActionsMenu from './components/actions/MerchantActionsMenu'
-import MerchantPrincipalInfoModal from './components/actions/MerchantPrincipalInfoModal'
-import MerchantResetPasswordModal from './components/actions/MerchantResetPasswordModal'
-import MerchantUsersModal from './components/actions/MerchantUsersModal'
-import MerchantDeactivateModal from './components/actions/MerchantDeactivateModal'
-import MerchantEzpayAccessModal from './components/actions/MerchantEzpayAccessModal'
-import MerchantServicesModal from './components/actions/MerchantServicesModal'
-import MerchantPrefundModal from './components/actions/MerchantPrefundModal'
-import MerchantAutoReplenishModal from './components/actions/MerchantAutoReplenishModal'
-import MerchantAgentCommissionModal from './components/actions/MerchantAgentCommissionModal'
-import MerchantBranchModal from './components/actions/MerchantBranchModal'
-import MerchantTerminalModal from './components/actions/MerchantTerminalModal'
-import MerchantPosUsersModal from './components/actions/MerchantPosUsersModal'
-import MerchantFloatAccountModal from './components/actions/MerchantFloatAccountModal'
+import MerchantManagePanel from './components/manage/MerchantManagePanel'
 
 const MerchantManagementPage = () => {
   const currentUser = useCurrentUser()
@@ -37,11 +24,10 @@ const MerchantManagementPage = () => {
 
   const [merchants, setMerchants] = useState([])
   const [loading, setLoading] = useState(false)
-  const [view, setView] = useState('list') // 'list' | 'create' | 'edit'
+  const [view, setView] = useState('list') // 'list' | 'create' | 'edit' | 'manage'
   const [viewMode, setViewMode] = useState(hasIncomingFilter ? 'grid' : 'list') // table layout: 'list' | 'grid'
   const [selectedMerchantId, setSelectedMerchantId] = useState(null)
-  const [actionMerchant, setActionMerchant] = useState(null)
-  const [activeAction, setActiveAction] = useState(null) // null | 'menu' | 'principal-info' | 'password' | 'users' | 'deactivate' | 'ezpay' | 'services'
+  const [manageReadOnly, setManageReadOnly] = useState(false)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -69,22 +55,17 @@ const MerchantManagementPage = () => {
     setView('edit')
   }
 
+  const openManage = (merchant, { readOnly = false } = {}) => {
+    setSelectedMerchantId(merchant.id)
+    setManageReadOnly(readOnly)
+    setView('manage')
+  }
+
   const backToList = () => {
     setSelectedMerchantId(null)
     setView('list')
+    loadData()
   }
-
-  const openActionsMenu = (merchant) => {
-    setActionMerchant(merchant)
-    setActiveAction('menu')
-  }
-
-  const closeActionModal = () => {
-    setActiveAction(null)
-    setActionMerchant(null)
-  }
-
-  const isActionMerchantActive = String(actionMerchant?.account_status || 'active').toLowerCase() !== 'inactive'
 
   const handleSaved = (result) => {
     const isEdit = view === 'edit'
@@ -94,7 +75,6 @@ const MerchantManagementPage = () => {
       variant: 'success',
     })
     backToList()
-    loadData()
   }
 
   if (view === 'create' || view === 'edit') {
@@ -110,6 +90,16 @@ const MerchantManagementPage = () => {
           onSaved={handleSaved}
         />
       </>
+    )
+  }
+
+  if (view === 'manage') {
+    return (
+      <MerchantManagePanel
+        merchantId={selectedMerchantId}
+        forceReadOnly={manageReadOnly}
+        onBack={backToList}
+      />
     )
   }
 
@@ -145,89 +135,14 @@ const MerchantManagementPage = () => {
               viewMode={viewMode}
               permissions={{ can_edit: modulePermission.can_edit }}
               onEdit={openEdit}
-              onAction={openActionsMenu}
+              onView={(merchant) => openManage(merchant, { readOnly: true })}
+              onAction={(merchant) => openManage(merchant, { readOnly: false })}
               initialStatusFilter={initialStatusFilter}
               initialRegistrationFilter={initialRegistrationFilter}
             />
           )}
         </Card.Body>
       </Card>
-
-      <MerchantActionsMenu
-        show={activeAction === 'menu'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-        isActive={isActionMerchantActive}
-        onSelect={(key) => setActiveAction(key)}
-      />
-      <MerchantPrincipalInfoModal
-        show={activeAction === 'principal-info'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantResetPasswordModal
-        show={activeAction === 'password'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantUsersModal
-        show={activeAction === 'users'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantDeactivateModal
-        show={activeAction === 'deactivate'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-        isActive={isActionMerchantActive}
-        onDone={loadData}
-      />
-      <MerchantEzpayAccessModal
-        show={activeAction === 'ezpay'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantServicesModal
-        show={activeAction === 'services'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantPrefundModal
-        show={activeAction === 'prefund'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-        onDone={loadData}
-      />
-      <MerchantAutoReplenishModal
-        show={activeAction === 'auto-replenish'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantAgentCommissionModal
-        show={activeAction === 'agent-commission'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantBranchModal
-        show={activeAction === 'branch'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantTerminalModal
-        show={activeAction === 'terminals'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantPosUsersModal
-        show={activeAction === 'pos-users'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
-      <MerchantFloatAccountModal
-        show={activeAction === 'float-account'}
-        onHide={closeActionModal}
-        merchant={actionMerchant}
-      />
     </>
   )
 }

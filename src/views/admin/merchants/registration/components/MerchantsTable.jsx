@@ -63,15 +63,15 @@ const columns = [
   { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-nowrap action-cell', render: (id) => `<div class="action-slot" data-id="${id}"></div>` },
 ]
 
-const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onAction, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
+const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
   const [searchText, setSearchText] = useState('')
   const [statusFilter, setStatusFilter] = useState(initialStatusFilter)
   const [registrationFilter, setRegistrationFilter] = useState(initialRegistrationFilter)
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
 
-  const handlers = useRef({ onEdit, onAction })
-  handlers.current = { onEdit, onAction }
+  const handlers = useRef({ onEdit, onView, onAction })
+  handlers.current = { onEdit, onView, onAction }
   const canEdit = Boolean(permissions.can_edit)
 
   const tableData = useMemo(
@@ -148,6 +148,9 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onA
       slot.__actionRoot = root
       root.render(
         <div className="d-flex gap-1">
+          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="View" aria-label="View" onClick={() => handlers.current.onView?.(item)}>
+            <Icon icon="eye" className="fs-lg" />
+          </Button>
           {canEdit && (
             <>
               <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Merchant details" aria-label="Merchant details" onClick={() => handlers.current.onEdit?.(item)}>
@@ -329,6 +332,9 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onA
                     </ul>
 
                     <div className="d-flex justify-content-end gap-1">
+                      <Button variant="light" size="sm" className="btn-icon rounded-circle" title="View" onClick={() => onView?.(merchant)}>
+                        <Icon icon="eye" className="fs-lg" />
+                      </Button>
                       {canEdit && (
                         <>
                           <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Merchant details" onClick={() => onEdit(merchant)}>

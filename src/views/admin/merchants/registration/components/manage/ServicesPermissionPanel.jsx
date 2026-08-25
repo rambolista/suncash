@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
+import { Button, Col, Form, Row, Spinner } from 'react-bootstrap'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
-const MerchantServicesModal = ({ show, onHide, merchant }) => {
+const ServicesPermissionPanel = ({ merchant, editable }) => {
   const { showNotification } = useNotificationContext()
   const [services, setServices] = useState([])
   const [granted, setGranted] = useState([])
@@ -11,7 +11,7 @@ const MerchantServicesModal = ({ show, onHide, merchant }) => {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
-    if (!show || !merchant) return
+    if (!merchant) return
 
     let active = true
     setLoading(true)
@@ -30,9 +30,10 @@ const MerchantServicesModal = ({ show, onHide, merchant }) => {
 
     return () => { active = false }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show, merchant])
+  }, [merchant])
 
   const toggle = (id) => {
+    if (!editable) return
     setGranted((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
   }
 
@@ -41,7 +42,6 @@ const MerchantServicesModal = ({ show, onHide, merchant }) => {
     try {
       await ApiService.updateMerchantServices(merchant.id, granted)
       showNotification({ title: 'Success', message: 'Services permission updated successfully.', variant: 'success' })
-      onHide()
     } catch (err) {
       showNotification({ title: 'Failed', message: err?.message || 'Failed to update services permission.', variant: 'danger' })
     } finally {
@@ -49,42 +49,35 @@ const MerchantServicesModal = ({ show, onHide, merchant }) => {
     }
   }
 
+  if (loading) return <div className="text-center py-4"><Spinner size="sm" /></div>
+
   return (
-    <Modal show={show} onHide={onHide} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Services Permission — {merchant?.dba_name || merchant?.legal_name}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {loading ? (
-          <div className="text-center py-4"><Spinner size="sm" /></div>
-        ) : (
-          <>
-            <p className="text-muted small">Select the platform services this merchant is granted access to.</p>
-            <Row className="g-2">
-              {services.map((service) => (
-                <Col md={6} key={service.id}>
-                  <Form.Check
-                    type="checkbox"
-                    id={`service-${service.id}`}
-                    label={service.name}
-                    checked={granted.includes(service.id)}
-                    onChange={() => toggle(service.id)}
-                  />
-                </Col>
-              ))}
-              {!services.length && <Col xs={12} className="text-muted text-center py-3">No services available.</Col>}
-            </Row>
-          </>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide} disabled={submitting}>Cancel</Button>
-        <Button variant="primary" onClick={handleSave} disabled={submitting || loading}>
-          {submitting ? 'Saving...' : 'Save changes'}
-        </Button>
-      </Modal.Footer>
-    </Modal>
+    <div>
+      <p className="text-muted small">Select the platform services this merchant is granted access to.</p>
+      <Row className="g-2">
+        {services.map((service) => (
+          <Col md={6} key={service.id}>
+            <Form.Check
+              type="checkbox"
+              id={`service-${service.id}`}
+              label={service.name}
+              checked={granted.includes(service.id)}
+              onChange={() => toggle(service.id)}
+              disabled={!editable}
+            />
+          </Col>
+        ))}
+        {!services.length && <Col xs={12} className="text-muted text-center py-3">No services available.</Col>}
+      </Row>
+      {editable && (
+        <div className="d-flex justify-content-end mt-3">
+          <Button variant="primary" size="sm" onClick={handleSave} disabled={submitting}>
+            {submitting ? 'Saving...' : 'Save changes'}
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }
 
-export default MerchantServicesModal
+export default ServicesPermissionPanel
