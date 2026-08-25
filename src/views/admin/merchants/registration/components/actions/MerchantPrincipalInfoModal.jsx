@@ -1,0 +1,124 @@
+import { useEffect, useState } from 'react'
+import { Button, Col, Form, Modal, Row, Spinner } from 'react-bootstrap'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import ApiService from '@/services/ApiService'
+import { useNotificationContext } from '@/context/useNotificationContext'
+
+const empty = { fname: '', lname: '', position: '', equity: '', email: '', mobile: '', address1: '', address2: '', city: '', state: '', zip: '' }
+
+const schema = Yup.object({
+  fname: Yup.string().trim().required('First name is required'),
+  lname: Yup.string().trim().required('Last name is required'),
+  position: Yup.string().trim().required('Position is required'),
+  equity: Yup.string().trim().required('Equity is required'),
+  email: Yup.string().trim().email('Enter a valid e-mail address').required('E-mail is required'),
+  mobile: Yup.string().trim().required('Mobile number is required'),
+  address1: Yup.string().trim().required('Address is required'),
+  address2: Yup.string().trim().nullable(),
+  city: Yup.string().trim().required('City is required'),
+  state: Yup.string().trim().required('State is required'),
+  zip: Yup.string().trim().required('Zip is required'),
+})
+
+const MerchantPrincipalInfoModal = ({ show, onHide, merchant }) => {
+  const { showNotification } = useNotificationContext()
+  const [loading, setLoading] = useState(false)
+
+  const formik = useFormik({
+    initialValues: empty,
+    validationSchema: schema,
+    onSubmit: async (values, { setErrors, setSubmitting }) => {
+      try {
+        await ApiService.saveMerchantPrincipalInfo(merchant.id, values)
+        showNotification({ title: 'Success', message: 'Principal info saved successfully.', variant: 'success' })
+        onHide()
+      } catch (err) {
+        setErrors(err?.errors ?? {})
+        showNotification({ title: 'Failed', message: err?.message || 'Failed to save principal info.', variant: 'danger' })
+      } finally {
+        setSubmitting(false)
+      }
+    },
+  })
+
+  useEffect(() => {
+    if (!show || !merchant) return
+
+    let active = true
+    setLoading(true)
+    formik.resetForm({ values: empty })
+
+    ApiService.getMerchantPrincipalInfo(merchant.id)
+      .then((data) => {
+        if (active && data) formik.resetForm({ values: { ...empty, ...data } })
+      })
+      .catch((err) => {
+        if (active) showNotification({ title: 'Failed', message: err?.message || 'Failed to load principal info.', variant: 'danger' })
+      })
+      .finally(() => { if (active) setLoading(false) })
+
+    return () => { active = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, merchant])
+
+  const { values: f, errors: e, touched: t } = formik
+
+  const field = (name, label, colProps = { md: 6 }) => (
+    <Col {...colProps}>
+      <Form.Group>
+        <Form.Label>{label} <span className="text-danger">*</span></Form.Label>
+        <Form.Control
+          name={name}
+          value={f[name]}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          isInvalid={t[name] && !!e[name]}
+        />
+        <Form.Control.Feedback type="invalid">{e[name]}</Form.Control.Feedback>
+      </Form.Group>
+    </Col>
+  )
+
+  return (
+    <Modal show={show} onHide={onHide} centered backdrop="static" size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>Principal Info — {merchant?.dba_name || merchant?.legal_name}</Modal.Title>
+      </Modal.Header>
+      <Form onSubmit={formik.handleSubmit} noValidate>
+        <Modal.Body>
+          {loading ? (
+            <div className="text-center py-4"><Spinner size="sm" /></div>
+          ) : (
+            <Row className="g-3">
+              {field('fname', 'First Name')}
+              {field('lname', 'Last Name')}
+              {field('position', 'Position')}
+              {field('equity', 'Equity (%)')}
+              {field('email', 'E-mail')}
+              {field('mobile', 'Mobile Number')}
+              {field('address1', 'Address Line 1')}
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Address Line 2</Form.Label>
+                  <Form.Control name="address2" value={f.address2} onChange={formik.handleChange} />
+                </Form.Group>
+              </Col>
+              {field('city', 'City')}
+              {field('state', 'State')}
+              {field('zip', 'Zip')}
+            </Row>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide} disabled={formik.isSubmitting}>Cancel</Button>
+          <Button variant="primary" type="submit" disabled={formik.isSubmitting || loading}>
+            {formik.isSubmitting ? 'Saving...' : 'Save changes'}
+          </Button>
+        </Modal.Footer>
+      </Form>
+    </Modal>
+  )
+}
+
+export default MerchantPrincipalInfoModal

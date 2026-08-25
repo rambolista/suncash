@@ -125,17 +125,14 @@
   background-image: var(--auth-background-image) !important;
 }
 
-html[data-menu-color='gradient'],
-html[data-skin][data-menu-color='gradient'] {
+html[data-menu-color='gradient'] {
   --theme-sidenav-bg: linear-gradient(135deg, var(--project-sidenav-gradient-start), var(--project-sidenav-gradient-end));
 }
 
-html[data-topbar-color='gradient'],
-html[data-skin][data-topbar-color='gradient'] {
+html[data-topbar-color='gradient'] {
   --theme-topbar-bg: linear-gradient(to bottom, var(--project-topbar-gradient-start), var(--project-topbar-gradient-end));
 }
 
-html[data-menu-color='image'],
-html[data-skin][data-menu-color='image'] {
+html[data-menu-color='image'] {
   --theme-sidenav-bg: linear-gradient(to bottom right, rgba(16, 16, 30, 0.85), rgba(24, 60, 82, 0.75)), var(--project-sidenav-image) center/cover no-repeat;
 }

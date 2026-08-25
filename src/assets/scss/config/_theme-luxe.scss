@@ -90,9 +90,11 @@ $theme-luxe-colors: (
             --#{$prefix}sidenav-item-active-bg: #2f2f3a;
         }
 
-        // Gradient Menu
+        // Gradient Menu — dynamic, driven by the Project Setup gradient colors
+        // (same formula as the default skin's gradient rule in app.scss) so
+        // this stays in sync instead of hardcoding Luxe's own palette.
         &[data-menu-color='gradient'] {
-            --#{$prefix}sidenav-bg: #{linear-gradient(to right, #2e2e40, #3d395e)};
+            --#{$prefix}sidenav-bg: #{linear-gradient(135deg, var(--project-sidenav-gradient-start), var(--project-sidenav-gradient-end))};
             --#{$prefix}sidenav-border-color: null;
             --#{$prefix}sidenav-item-color: #8782a9;
             --#{$prefix}sidenav-item-hover-color: #bccee4;
@@ -152,9 +154,12 @@ $theme-luxe-colors: (
             --#{$prefix}topbar-search-border: #484858;
         }
 
-        // Gradient Topbar
+        // Gradient Topbar — dynamic, driven by the Project Setup gradient
+        // colors (same formula as the default skin's gradient rule in
+        // app.scss) so this stays in sync instead of hardcoding Luxe's own
+        // palette.
         &[data-topbar-color='gradient'] {
-            --#{$prefix}topbar-bg: #{linear-gradient(to right, #313256, #602f70, #313256)};
+            --#{$prefix}topbar-bg: #{linear-gradient(to bottom, var(--project-topbar-gradient-start), var(--project-topbar-gradient-end))};
             --#{$prefix}topbar-item-color: rgba(255, 255, 255, 0.7);
             --#{$prefix}topbar-item-hover-color: #ffffff;
             --#{$prefix}topbar-search-bg: rgba(255, 255, 255, 0.1);

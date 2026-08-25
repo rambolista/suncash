@@ -114,12 +114,8 @@ export const routes = [
         Component: lazy(() => import('@/views/customer/error/menu-unavailable')),
       },
       {
-        path: '/dashboard/projects',
-        Component: lazy(() => import('@/views/admin/dashboard/projects')),
-      },
-      {
-        path: '/dashboard/analytics',
-        Component: lazy(() => import('@/views/admin/dashboard/analytics')),
+        path: '/dashboard/merchants',
+        Component: lazy(() => import('@/views/admin/dashboard/merchants')),
       },
       {
         path: '/pages/empty',

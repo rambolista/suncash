@@ -299,6 +299,63 @@ const ApiService = {
   deleteCustomer: (id) =>
     http.delete(`/access-management/customers/${id}`),
 
+  getMerchantDashboardStats: (period) =>
+    http.get(`/dashboard/merchants${period && period !== 'all' ? `?period=${encodeURIComponent(period)}` : ''}`),
+
+  getMerchants: () =>
+    http.get('/access-management/merchants'),
+
+  getMerchant: (id) =>
+    http.get(`/access-management/merchants/${id}`),
+
+  checkMerchantId: (clientId) =>
+    http.get(`/access-management/merchants/check-id?client_id=${encodeURIComponent(clientId)}`),
+
+  checkMerchantUsername: (username) =>
+    http.get(`/access-management/merchants/check-username?username=${encodeURIComponent(username)}`),
+
+  registerMerchant: (data) =>
+    http.post('/access-management/merchants', data),
+
+  updateMerchant: (id, data) =>
+    http.put(`/access-management/merchants/${id}`, data),
+
+  uploadMerchantLogo: (file) => {
+    const payload = new FormData()
+    payload.append('logo', file)
+    return http.post('/access-management/merchants/logo-upload', payload, true)
+  },
+
+  getMerchantPrincipalInfo: (id) =>
+    http.get(`/access-management/merchants/${id}/principal-info`),
+
+  saveMerchantPrincipalInfo: (id, data) =>
+    http.put(`/access-management/merchants/${id}/principal-info`, data),
+
+  resetMerchantPassword: (id) =>
+    http.post(`/access-management/merchants/${id}/reset-password`),
+
+  getMerchantUsers: (id) =>
+    http.get(`/access-management/merchants/${id}/users`),
+
+  addMerchantUser: (id, data) =>
+    http.post(`/access-management/merchants/${id}/users`, data),
+
+  toggleMerchantStatus: (id) =>
+    http.post(`/access-management/merchants/${id}/toggle-status`),
+
+  getMerchantEzpayAccess: (id) =>
+    http.get(`/access-management/merchants/${id}/ezpay-access`),
+
+  updateMerchantEzpayAccess: (id, access) =>
+    http.put(`/access-management/merchants/${id}/ezpay-access`, { access }),
+
+  getMerchantServices: (id) =>
+    http.get(`/access-management/merchants/${id}/services`),
+
+  updateMerchantServices: (id, serviceIds) =>
+    http.put(`/access-management/merchants/${id}/services`, { service_ids: serviceIds }),
+
   /**
    * Search available menu icons.
    * @param {string} search
