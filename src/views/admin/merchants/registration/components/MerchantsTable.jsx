@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { Button, Card, CardBody, Col, FormControl, FormSelect, Row } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
+import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
 import { entityTypeLabel } from '../data/merchantReferenceData'
 
@@ -41,12 +42,24 @@ const gridPageSizes = [4, 8, 12, 16, 20]
 
 const columns = [
   { data: 'client_id', width: '150px', className: 'text-nowrap fw-medium' },
-  { data: 'merchant_search', render: (_val, _type, row) => `<div class="merchant-cell-slot" data-id="${row.id}"></div>` },
+  { data: 'merchant_search', render: (val, type, row) => (type === 'display' ? `<div class="merchant-cell-slot" data-id="${row.id}"></div>` : val) },
   { data: 'entity_type_label', render: (value) => escapeHtml(value || '—') },
   { data: 'phone_no', render: (value) => escapeHtml(value || '—') },
-  { data: 'account_status', render: (_val, _type, row) => `<span class="badge ${accountStatusBadgeClass(row.account_status)} badge-label">${accountStatusLabel(row.account_status)}</span>` },
-  { data: 'registration_status', render: (_val, _type, row) => `<span class="badge ${registrationBadgeClass(row.registration_status)} badge-label">${registrationLabel(row.registration_status)}</span>` },
-  { data: 'creation_date', render: (value) => escapeHtml(formatDate(value)) },
+  {
+    data: 'account_status',
+    render: (_val, type, row) => {
+      const label = accountStatusLabel(row.account_status)
+      return type === 'display' ? `<span class="badge ${accountStatusBadgeClass(row.account_status)} badge-label">${label}</span>` : label
+    },
+  },
+  {
+    data: 'registration_status',
+    render: (_val, type, row) => {
+      const label = registrationLabel(row.registration_status)
+      return type === 'display' ? `<span class="badge ${registrationBadgeClass(row.registration_status)} badge-label">${label}</span>` : label
+    },
+  },
+  { data: 'creation_date', render: (value, type) => (type === 'display' ? escapeHtml(formatDate(value)) : value) },
   { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-nowrap action-cell', render: (id) => `<div class="action-slot" data-id="${id}"></div>` },
 ]
 
@@ -106,8 +119,10 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onA
   const options = useMemo(() => ({
     responsive: true,
     orderCellsTop: true,
+    columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
       bindColumnSearchInputs(this.api())
+      bindSortLabels(this.api())
     },
     language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {

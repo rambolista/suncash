@@ -18,6 +18,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      port: Number(process.env.PORT) || 5173,
       allowedHosts: [
         'localhost',
         '127.0.0.1',
