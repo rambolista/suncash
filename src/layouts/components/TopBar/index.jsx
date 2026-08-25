@@ -4,7 +4,6 @@ import clsx from 'clsx'
 import { Container } from 'react-bootstrap'
 import { Link } from 'react-router'
 import CustomizerToggler from './components/CustomizerToggler'
-import CustomerCustomizerToggler from './components/CustomerCustomizerToggler'
 import FullscreenToggler from './components/FullscreenToggler'
 import MenuToggler from './components/MenuToggler'
 import MonochromeToggler from './components/MonochromeToggler'
@@ -62,8 +61,6 @@ const TopBar = () => {
           {!isCustomerRoute && <MonochromeToggler />}
 
           <CustomizerToggler />
-
-          <CustomerCustomizerToggler />
 
           <ProjectSettingsToggler />
 
