@@ -17,6 +17,13 @@ import MerchantUsersModal from './components/actions/MerchantUsersModal'
 import MerchantDeactivateModal from './components/actions/MerchantDeactivateModal'
 import MerchantEzpayAccessModal from './components/actions/MerchantEzpayAccessModal'
 import MerchantServicesModal from './components/actions/MerchantServicesModal'
+import MerchantPrefundModal from './components/actions/MerchantPrefundModal'
+import MerchantAutoReplenishModal from './components/actions/MerchantAutoReplenishModal'
+import MerchantAgentCommissionModal from './components/actions/MerchantAgentCommissionModal'
+import MerchantBranchModal from './components/actions/MerchantBranchModal'
+import MerchantTerminalModal from './components/actions/MerchantTerminalModal'
+import MerchantPosUsersModal from './components/actions/MerchantPosUsersModal'
+import MerchantFloatAccountModal from './components/actions/MerchantFloatAccountModal'
 
 const MerchantManagementPage = () => {
   const currentUser = useCurrentUser()
@@ -182,6 +189,42 @@ const MerchantManagementPage = () => {
       />
       <MerchantServicesModal
         show={activeAction === 'services'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+      />
+      <MerchantPrefundModal
+        show={activeAction === 'prefund'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+        onDone={loadData}
+      />
+      <MerchantAutoReplenishModal
+        show={activeAction === 'auto-replenish'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+      />
+      <MerchantAgentCommissionModal
+        show={activeAction === 'agent-commission'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+      />
+      <MerchantBranchModal
+        show={activeAction === 'branch'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+      />
+      <MerchantTerminalModal
+        show={activeAction === 'terminals'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+      />
+      <MerchantPosUsersModal
+        show={activeAction === 'pos-users'}
+        onHide={closeActionModal}
+        merchant={actionMerchant}
+      />
+      <MerchantFloatAccountModal
+        show={activeAction === 'float-account'}
         onHide={closeActionModal}
         merchant={actionMerchant}
       />

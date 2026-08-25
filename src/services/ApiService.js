@@ -356,6 +356,81 @@ const ApiService = {
   updateMerchantServices: (id, serviceIds) =>
     http.put(`/access-management/merchants/${id}/services`, { service_ids: serviceIds }),
 
+  adjustMerchantPrefund: (id, data) =>
+    http.post(`/access-management/merchants/${id}/prefund`, data),
+
+  getMerchantAutoReplenish: (id) =>
+    http.get(`/access-management/merchants/${id}/auto-replenish`),
+
+  updateMerchantAutoReplenish: (id, data) =>
+    http.put(`/access-management/merchants/${id}/auto-replenish`, data),
+
+  getMerchantAgentCommission: (id) =>
+    http.get(`/access-management/merchants/${id}/agent-commission`),
+
+  updateMerchantAgentCommission: (id, data) =>
+    http.put(`/access-management/merchants/${id}/agent-commission`, data),
+
+  addMerchantAgentCommissionEmail: (id, email) =>
+    http.post(`/access-management/merchants/${id}/agent-commission/emails`, { email }),
+
+  updateMerchantAgentCommissionEmail: (id, emailId, data) =>
+    http.put(`/access-management/merchants/${id}/agent-commission/emails/${emailId}`, data),
+
+  deleteMerchantAgentCommissionEmail: (id, emailId) =>
+    http.delete(`/access-management/merchants/${id}/agent-commission/emails/${emailId}`),
+
+  getMerchantBranches: (id) =>
+    http.get(`/access-management/merchants/${id}/branches`),
+
+  getBranchIslands: () =>
+    http.get('/access-management/merchants/branches/islands'),
+
+  addMerchantBranch: (id, data) =>
+    http.post(`/access-management/merchants/${id}/branches`, data),
+
+  updateMerchantBranch: (id, branchId, data) =>
+    http.put(`/access-management/merchants/${id}/branches/${branchId}`, data),
+
+  changeMerchantBranchStatus: (id, branchId, status) =>
+    http.post(`/access-management/merchants/${id}/branches/${branchId}/status`, { status }),
+
+  getMerchantTerminals: (id) =>
+    http.get(`/access-management/merchants/${id}/terminals`),
+
+  addMerchantTerminal: (id, data) =>
+    http.post(`/access-management/merchants/${id}/terminals`, data),
+
+  updateMerchantTerminal: (id, terminalId, data) =>
+    http.put(`/access-management/merchants/${id}/terminals/${terminalId}`, data),
+
+  changeMerchantTerminalStatus: (id, terminalId, status) =>
+    http.post(`/access-management/merchants/${id}/terminals/${terminalId}/status`, { status }),
+
+  getMerchantPosUsers: (id) =>
+    http.get(`/access-management/merchants/${id}/pos-users`),
+
+  addMerchantPosUser: (id, data) =>
+    http.post(`/access-management/merchants/${id}/pos-users`, data),
+
+  updateMerchantPosUser: (id, userId, data) =>
+    http.put(`/access-management/merchants/${id}/pos-users/${userId}`, data),
+
+  deleteMerchantPosUser: (id, userId) =>
+    http.delete(`/access-management/merchants/${id}/pos-users/${userId}`),
+
+  getMerchantFloatAccount: (id) =>
+    http.get(`/access-management/merchants/${id}/float-account`),
+
+  toggleMerchantFloatAccount: (id) =>
+    http.post(`/access-management/merchants/${id}/float-account/toggle`),
+
+  requestMerchantFloatAccount: (id, data) =>
+    http.post(`/access-management/merchants/${id}/float-account/request`, data),
+
+  updateMerchantFloatAccount: (id, data) =>
+    http.put(`/access-management/merchants/${id}/float-account`, data),
+
   /**
    * Search available menu icons.
    * @param {string} search
