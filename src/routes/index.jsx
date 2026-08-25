@@ -125,6 +125,10 @@ export const routes = [
         path: '/pages/empty',
         Component: lazy(() => import('@/views/admin/pages/empty')),
       },
+      {
+        path: '/merchants/registration',
+        Component: lazy(() => import('@/views/admin/merchants/registration')),
+      },
     ],
   },
   {
