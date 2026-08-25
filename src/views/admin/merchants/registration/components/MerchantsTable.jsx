@@ -63,15 +63,15 @@ const columns = [
   { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-nowrap action-cell', render: (id) => `<div class="action-slot" data-id="${id}"></div>` },
 ]
 
-const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, onToggleStatus, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
+const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, onToggleStatus, onResetPassword, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
   const [searchText, setSearchText] = useState('')
   const [statusFilter, setStatusFilter] = useState(initialStatusFilter)
   const [registrationFilter, setRegistrationFilter] = useState(initialRegistrationFilter)
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
 
-  const handlers = useRef({ onEdit, onView, onAction, onToggleStatus })
-  handlers.current = { onEdit, onView, onAction, onToggleStatus }
+  const handlers = useRef({ onEdit, onView, onAction, onToggleStatus, onResetPassword })
+  handlers.current = { onEdit, onView, onAction, onToggleStatus, onResetPassword }
   const canEdit = Boolean(permissions.can_edit)
 
   const tableData = useMemo(
@@ -167,6 +167,9 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
                 ) : (
                   <Icon icon="ban" className="fs-lg text-danger" />
                 )}
+              </Button>
+              <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Reset password" aria-label="Reset password" onClick={() => handlers.current.onResetPassword?.(item)}>
+                <Icon icon="key" className="fs-lg" />
               </Button>
               <Button variant="light" size="sm" className="btn-icon rounded-circle" title="More actions" aria-label="More actions" onClick={() => handlers.current.onAction?.(item)}>
                 <Icon icon="dots-vertical" className="fs-lg" />
@@ -362,6 +365,9 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
                             ) : (
                               <Icon icon="ban" className="fs-lg text-danger" />
                             )}
+                          </Button>
+                          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Reset password" onClick={() => onResetPassword?.(merchant)}>
+                            <Icon icon="key" className="fs-lg" />
                           </Button>
                           <Button variant="light" size="sm" className="btn-icon rounded-circle" title="More actions" onClick={() => onAction?.(merchant)}>
                             <Icon icon="dots-vertical" className="fs-lg" />

@@ -815,9 +815,7 @@ const StepReview = ({ values, onValidate, onSubmit, submitting, formError }) => 
 // ── Edit mode: free-navigation tabs, no forced order ──
 
 const EditMerchantTabs = (props) => {
-  const {
-    formError, submitting, onCancel, onSubmit, validateStep, editable = true, embedded = false,
-  } = props
+  const { formError, submitting, onCancel, onSubmit, validateStep } = props
   const [activeTab, setActiveTab] = useState('business')
 
   // Editing is free-navigation, not a linear wizard: only the fields on the
@@ -829,44 +827,38 @@ const EditMerchantTabs = (props) => {
   }
 
   return (
-    <Card className={embedded ? 'border-0 shadow-none mb-0' : undefined}>
-      {!embedded && (
-        <Card.Header className="border-0 pb-0">
-          <h5 className="mb-1">Edit Merchant</h5>
-          <p className="text-muted small mb-3">Jump to any tab and update the fields you need — changes save together.</p>
-        </Card.Header>
-      )}
-      <Card.Header className={embedded ? 'border-0 px-0 pt-0 pb-0 bg-body' : 'px-3 pt-0 pb-0 bg-body'}>
+    <Card>
+      <Card.Header className="border-0 pb-0">
+        <h5 className="mb-1">Edit Merchant</h5>
+        <p className="text-muted small mb-3">Jump to any tab and update the fields you need — changes save together.</p>
+      </Card.Header>
+      <Card.Header className="px-3 pt-0 pb-0 bg-body">
         <EditTabsHeader activeTab={activeTab} onSelect={setActiveTab} />
       </Card.Header>
-      <Card.Body className={embedded ? 'px-0' : undefined}>
+      <Card.Body>
         {formError && <Alert variant="danger">{formError}</Alert>}
-        <fieldset disabled={!editable} className="border-0 p-0 m-0">
-          <div className="pt-2">
-            {activeTab === 'business' && <BusinessFields {...props} />}
-            {activeTab === 'fees' && <FeesFields {...props} />}
-            {activeTab === 'settlement' && <SettlementFields {...props} />}
-            {activeTab === 'delivery' && <DeliveryFields {...props} />}
-            {activeTab === 'alerts' && <AlertsFields {...props} />}
-            {activeTab === 'other' && <OtherFields {...props} />}
-          </div>
-        </fieldset>
+        <div className="pt-2">
+          {activeTab === 'business' && <BusinessFields {...props} />}
+          {activeTab === 'fees' && <FeesFields {...props} />}
+          {activeTab === 'settlement' && <SettlementFields {...props} />}
+          {activeTab === 'delivery' && <DeliveryFields {...props} />}
+          {activeTab === 'alerts' && <AlertsFields {...props} />}
+          {activeTab === 'other' && <OtherFields {...props} />}
+        </div>
       </Card.Body>
-      {editable && (
-        <Card.Footer className={embedded ? 'border-0 px-0 d-flex justify-content-between align-items-center' : 'd-flex justify-content-between align-items-center'}>
-          {!embedded && <Button variant="light" onClick={onCancel} disabled={submitting}>Cancel</Button>}
-          <Button variant="primary" onClick={handleSave} disabled={submitting} className={embedded ? 'ms-auto' : undefined}>
-            <Icon icon="check" className="me-1" /> {submitting ? 'Saving…' : 'Save Changes'}
-          </Button>
-        </Card.Footer>
-      )}
+      <Card.Footer className="d-flex justify-content-between align-items-center">
+        <Button variant="light" onClick={onCancel} disabled={submitting}>Cancel</Button>
+        <Button variant="primary" onClick={handleSave} disabled={submitting}>
+          <Icon icon="check" className="me-1" /> {submitting ? 'Saving…' : 'Save Changes'}
+        </Button>
+      </Card.Footer>
     </Card>
   )
 }
 
 // ── Root component ──
 
-const MerchantRegistrationWizard = ({ onCancel, onSaved, merchantId, editable = true, embedded = false }) => {
+const MerchantRegistrationWizard = ({ onCancel, onSaved, merchantId }) => {
   const isEdit = Boolean(merchantId)
   const [values, setValues] = useState(empty)
   const [submitting, setSubmitting] = useState(false)
@@ -1152,8 +1144,6 @@ const MerchantRegistrationWizard = ({ onCancel, onSaved, merchantId, editable = 
         submitting={submitting}
         onCancel={onCancel}
         onSubmit={handleSubmit}
-        editable={editable}
-        embedded={embedded}
       />
     )
   }

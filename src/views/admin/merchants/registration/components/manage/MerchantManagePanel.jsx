@@ -6,13 +6,11 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 
-import MerchantDetailsPanel from './MerchantDetailsPanel'
 import PrincipalInfoPanel from './PrincipalInfoPanel'
 import PrefundPanel from './PrefundPanel'
 import AutoReplenishPanel from './AutoReplenishPanel'
 import BranchPanel from './BranchPanel'
 import TerminalPanel from './TerminalPanel'
-import PasswordPanel from './PasswordPanel'
 import UserManagementPanel from './UserManagementPanel'
 import EzpayAccessPanel from './EzpayAccessPanel'
 import ServicesPermissionPanel from './ServicesPermissionPanel'
@@ -21,13 +19,11 @@ import AgentCommissionPanel from './AgentCommissionPanel'
 import FloatAccountPanel from './FloatAccountPanel'
 
 const PANEL_COMPONENTS = {
-  'merchant-details': MerchantDetailsPanel,
   'principal-info': PrincipalInfoPanel,
   prefund: PrefundPanel,
   'auto-replenish': AutoReplenishPanel,
   branch: BranchPanel,
   terminals: TerminalPanel,
-  password: PasswordPanel,
   'user-management': UserManagementPanel,
   'ezpay-access': EzpayAccessPanel,
   'services-permission': ServicesPermissionPanel,

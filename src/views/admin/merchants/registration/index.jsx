@@ -12,6 +12,7 @@ import MerchantRegistrationWizard from './components/MerchantRegistrationWizard'
 import MerchantsTable from './components/MerchantsTable'
 import MerchantManagePanel from './components/manage/MerchantManagePanel'
 import MerchantDeactivateConfirmModal from './components/MerchantDeactivateConfirmModal'
+import MerchantResetPasswordConfirmModal from './components/MerchantResetPasswordConfirmModal'
 
 const MerchantManagementPage = () => {
   const currentUser = useCurrentUser()
@@ -30,6 +31,7 @@ const MerchantManagementPage = () => {
   const [selectedMerchantId, setSelectedMerchantId] = useState(null)
   const [manageReadOnly, setManageReadOnly] = useState(false)
   const [deactivateMerchant, setDeactivateMerchant] = useState(null)
+  const [resetPasswordMerchant, setResetPasswordMerchant] = useState(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -140,6 +142,7 @@ const MerchantManagementPage = () => {
               onView={(merchant) => openManage(merchant, { readOnly: true })}
               onAction={(merchant) => openManage(merchant, { readOnly: false })}
               onToggleStatus={setDeactivateMerchant}
+              onResetPassword={setResetPasswordMerchant}
               initialStatusFilter={initialStatusFilter}
               initialRegistrationFilter={initialRegistrationFilter}
             />
@@ -151,6 +154,13 @@ const MerchantManagementPage = () => {
         show={!!deactivateMerchant}
         onHide={() => setDeactivateMerchant(null)}
         merchant={deactivateMerchant}
+        onDone={loadData}
+      />
+
+      <MerchantResetPasswordConfirmModal
+        show={!!resetPasswordMerchant}
+        onHide={() => setResetPasswordMerchant(null)}
+        merchant={resetPasswordMerchant}
         onDone={loadData}
       />
     </>
