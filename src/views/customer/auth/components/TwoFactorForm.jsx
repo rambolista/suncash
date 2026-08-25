@@ -149,7 +149,7 @@ const TwoFactorForm = () => {
   if (!authenticated) {
     return (
       <Alert variant="warning">
-        Your verification request expired. <Link to="/customer/login">Sign in again</Link>.
+        Your verification request expired. <Link to="/auth/sign-in">Sign in again</Link>.
       </Alert>
     )
   }

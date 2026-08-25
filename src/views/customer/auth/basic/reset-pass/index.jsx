@@ -6,7 +6,7 @@ const Page = () => (
     variant="basic"
     title="Reset Password"
     subtitle="Enter your email to receive a secure password reset link."
-    footerLink="/customer/login"
+    footerLink="/auth/sign-in"
     footerLinkText="Sign in"
     footerPrefix="Remembered it?"
   >

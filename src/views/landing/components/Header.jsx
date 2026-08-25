@@ -13,7 +13,7 @@ export default function Header({ page }) {
     signInLabel: page?.header_sign_in_label || 'SIGN IN',
     signInUrl: page?.header_sign_in_url || '/auth/sign-in',
     signUpLabel: page?.header_sign_up_label || 'Sign Up',
-    signUpUrl: page?.header_sign_up_url || '/auth/sign-up',
+    signUpUrl: page?.header_sign_up_url || '/auth/sign-in',
   }), [page])
   const toggleTheme = () => {
     setThemePreview(theme === 'dark' ? 'light' : 'dark')

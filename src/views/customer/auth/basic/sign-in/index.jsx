@@ -6,9 +6,9 @@ const Page = () => (
     variant="basic"
     title="Welcome Customer"
     subtitle="Let’s get you signed in. Enter your email and password to continue."
-    footerLink="/customer/register"
-    footerLinkText="Create an account"
-    footerPrefix="New here?"
+    footerLink="/auth/sign-in"
+    footerLinkText="Admin sign in"
+    footerPrefix="Continue to"
   >
     <SignInForm />
   </PageFrame>

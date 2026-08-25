@@ -11,7 +11,7 @@ const LandingHeader = ({ page, sections }) => {
   const signInLabel = page?.header_sign_in_label || 'SIGN IN'
   const signInUrl = page?.header_sign_in_url || '/auth/sign-in'
   const signUpLabel = page?.header_sign_up_label || 'Sign Up'
-  const signUpUrl = page?.header_sign_up_url || '/auth/sign-up'
+  const signUpUrl = page?.header_sign_up_url || '/auth/sign-in'
   const toggleTheme = () => {
     setThemePreview(theme === 'dark' ? 'light' : 'dark')
   }

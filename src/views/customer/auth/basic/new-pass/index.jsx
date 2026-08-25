@@ -6,7 +6,7 @@ const Page = () => (
     variant="basic"
     title="Set New Password"
     subtitle="Choose a new password for your customer account."
-    footerLink="/customer/login"
+    footerLink="/auth/sign-in"
     footerLinkText="Sign in"
     footerPrefix="Back to"
   >

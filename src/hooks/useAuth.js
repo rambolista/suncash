@@ -63,21 +63,6 @@ export const useAuth = () => {
     }
   }
 
-  const register = async (payload) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const data = await ApiService.register(payload)
-      await establishSession(data)
-    } catch (err) {
-      setError(err.message ?? 'Registration failed. Please try again.')
-      // Return validation errors so the form can display them per-field
-      return err.errors ?? null
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const verifyTwoFactor = async (code) => {
     const challenge = getTwoFactorChallenge()
     if (!challenge) {
@@ -147,7 +132,6 @@ export const useAuth = () => {
 
   return {
     login,
-    register,
     logout,
     forgotPassword,
     resetPassword,

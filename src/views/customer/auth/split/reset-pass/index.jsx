@@ -5,7 +5,7 @@ const Page = () => (
   <AuthShell
     title="Forgot Password?"
     subtitle="Enter your email address and we'll send you a link to reset your password."
-    footerLink="/customer/login"
+    footerLink="/auth/sign-in"
     footerLinkText="Sign in"
     footerPrefix="Return to"
   >

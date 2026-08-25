@@ -2,7 +2,6 @@ import auth from '@/assets/images/auth.jpg'
 import AuthLogo from '@/components/AuthLogo'
 import { useProjectSettingsContext } from '@/context/useProjectSettingsContext'
 import { Card, CardBody, Col, Container, Row } from 'react-bootstrap'
-import { Link } from 'react-router'
 import LoginForm from './components/LoginForm'
 const Page = () => {
   const { settings } = useProjectSettingsContext()
@@ -23,13 +22,6 @@ const Page = () => {
                       </div>
 
                       <LoginForm />
-
-                      <p className="text-muted text-center mt-4 mb-0">
-                        New here?&nbsp;
-                        <Link to="/auth/sign-up" className="text-decoration-underline link-offset-3 fw-semibold">
-                          Create an account
-                        </Link>
-                      </p>
                       <p className="text-center text-muted mt-4 mb-0">
                         © {settings.year} {settings.name} — by <span className="fw-bold">{settings.author}</span>
                       </p>

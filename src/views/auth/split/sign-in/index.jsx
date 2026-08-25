@@ -30,12 +30,6 @@ const Page = () => {
                   <p className="text-muted auth-sub-text mx-auto">Let’s get you signed in. Enter your email and password to continue.</p>
                   <LoginForm />
                 </div>
-                <p className="text-muted text-center mt-4 mb-0">
-                  New here?&nbsp;
-                  <a href="/auth/sign-up" className="text-decoration-underline link-offset-3 fw-semibold">
-                    Create an account
-                  </a>
-                </p>
                 <p className="text-center text-muted mt-auto mb-0">
                   © {settings.year} {settings.name} — by&nbsp;
                   <span className="fw-bold">{settings.author}</span>

@@ -8,15 +8,12 @@ import {
   DynamicNewPassword,
   DynamicResetPassword,
   DynamicSignIn,
-  DynamicSignUp,
   DynamicSuccessMail,
   DynamicTwoFactor,
 } from '@/views/auth/DynamicAuthPage'
 import {
   DynamicCustomerNewPassword,
   DynamicCustomerResetPassword,
-  DynamicCustomerSignIn,
-  DynamicCustomerSignUp,
   DynamicCustomerSuccessMail,
   DynamicCustomerTwoFactor,
 } from '@/views/customer/auth/DynamicCustomerAuthPage'
@@ -155,10 +152,6 @@ export const routes = [
     Component: lazy(() => import('@/views/auth/card/sign-in')),
   },
   {
-    path: '/auth/card/sign-up',
-    Component: lazy(() => import('@/views/auth/card/sign-up')),
-  },
-  {
     path: '/auth/card/success-mail',
     Component: lazy(() => import('@/views/auth/card/success-mail')),
   },
@@ -191,10 +184,6 @@ export const routes = [
     Component: DynamicSignIn,
   },
   {
-    path: '/auth/sign-up',
-    Component: DynamicSignUp,
-  },
-  {
     path: '/auth/split/delete-account',
     Component: lazy(() => import('@/views/auth/split/delete-account')),
   },
@@ -219,10 +208,6 @@ export const routes = [
     Component: lazy(() => import('@/views/auth/split/sign-in')),
   },
   {
-    path: '/auth/split/sign-up',
-    Component: lazy(() => import('@/views/auth/split/sign-up')),
-  },
-  {
     path: '/auth/split/success-mail',
     Component: lazy(() => import('@/views/auth/split/success-mail')),
   },
@@ -244,15 +229,15 @@ export const routes = [
   },
   {
     path: '/customer/login',
-    Component: DynamicCustomerSignIn,
+    Component: () => <Navigate to="/error/404" replace />,
   },
   {
     path: '/customer/sign-up',
-    Component: DynamicCustomerSignUp,
+    Component: () => <Navigate to="/error/404" replace />,
   },
   {
     path: '/customer/register',
-    Component: DynamicCustomerSignUp,
+    Component: () => <Navigate to="/error/404" replace />,
   },
   {
     path: '/customer/reset-pass',

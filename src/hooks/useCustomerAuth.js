@@ -71,7 +71,7 @@ const useCustomerAuth = () => {
       setLoading(true)
       setError(null)
       const data = await ApiService.customerResetPassword(token, email, password, password_confirmation)
-      navigate('/customer/login', { replace: true })
+      navigate('/auth/sign-in', { replace: true })
       return data.message
     } catch (err) {
       setError(err.message ?? 'Password reset failed. Please try again.')
@@ -85,7 +85,7 @@ const useCustomerAuth = () => {
     const challenge = getTwoFactorChallenge()
     if (!challenge) {
       setError('Your verification challenge expired. Please sign in again.')
-      navigate('/customer/login', { replace: true })
+      navigate('/auth/sign-in', { replace: true })
       return false
     }
 
@@ -109,7 +109,7 @@ const useCustomerAuth = () => {
     resetCurrentUserCache()
     removeToken()
     clearStoredCurrentUser()
-    navigate('/customer/login', { replace: true })
+    navigate('/auth/sign-in', { replace: true })
   }
 
   return {

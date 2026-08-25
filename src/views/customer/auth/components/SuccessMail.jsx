@@ -42,14 +42,14 @@ const SuccessMail = () => {
               <h4 className="fw-bold text-center mb-2">Check Your Email</h4>
               <p className="text-muted text-center mb-4">Follow the secure link in your email to choose a new password.</p>
               <div className="d-grid">
-                <Button as={Link} to="/customer/login" variant="primary" className="fw-semibold py-2">
+                <Button as={Link} to="/auth/sign-in" variant="primary" className="fw-semibold py-2">
                   Return to Sign In
                 </Button>
               </div>
             </div>
             <p className="text-muted text-center mt-4 mb-0">
               Return to&nbsp;
-              <Link to="/customer/login" className="text-decoration-underline link-offset-3 fw-semibold">
+              <Link to="/auth/sign-in" className="text-decoration-underline link-offset-3 fw-semibold">
                 Sign in
               </Link>
             </p>

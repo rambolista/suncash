@@ -9,7 +9,7 @@ const emptyForm = {
   header_sign_in_label: 'SIGN IN',
   header_sign_in_url: '/auth/sign-in',
   header_sign_up_label: 'Sign Up',
-  header_sign_up_url: '/auth/sign-up',
+  header_sign_up_url: '/auth/sign-in',
   is_navigation_fixed: false,
   status: 'draft',
   is_active: true,
@@ -26,7 +26,7 @@ const LandingPageModal = ({ show, page, saving, errors = {}, onHide, onSave }) =
       header_sign_in_label: page.header_sign_in_label ?? 'SIGN IN',
       header_sign_in_url: page.header_sign_in_url ?? '/auth/sign-in',
       header_sign_up_label: page.header_sign_up_label ?? 'Sign Up',
-      header_sign_up_url: page.header_sign_up_url ?? '/auth/sign-up',
+      header_sign_up_url: page.header_sign_up_url ?? '/auth/sign-in',
       is_navigation_fixed: page.is_navigation_fixed ?? false,
       status: page.status ?? 'draft',
       is_active: page.is_active ?? true,
@@ -88,7 +88,7 @@ const LandingPageModal = ({ show, page, saving, errors = {}, onHide, onSave }) =
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label>Sign up URL</Form.Label>
-            <Form.Control name="header_sign_up_url" value={form.header_sign_up_url} onChange={updateField} placeholder="/auth/sign-up" isInvalid={Boolean(errors.header_sign_up_url)} />
+            <Form.Control name="header_sign_up_url" value={form.header_sign_up_url} onChange={updateField} placeholder="/auth/sign-in" isInvalid={Boolean(errors.header_sign_up_url)} />
             <Form.Control.Feedback type="invalid">{errors.header_sign_up_url?.[0]}</Form.Control.Feedback>
           </Form.Group>
           <Form.Check

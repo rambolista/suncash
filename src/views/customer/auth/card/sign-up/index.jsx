@@ -6,7 +6,7 @@ const Page = () => (
     variant="card"
     title="Create Customer Account"
     subtitle="Fill in your details to create a customer account."
-    footerLink="/customer/login"
+    footerLink="/auth/sign-in"
     footerLinkText="Sign in"
     footerPrefix="Already have an account?"
   >

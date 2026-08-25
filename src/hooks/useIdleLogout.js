@@ -52,7 +52,7 @@ const useIdleLogout = (enabled) => {
         clearStoredCurrentUser()
 
         if (location.pathname.startsWith('/customer')) {
-          navigate('/customer/login', { replace: true })
+          navigate('/auth/sign-in', { replace: true })
         } else {
           navigate('/auth/sign-in', { replace: true })
         }

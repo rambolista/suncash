@@ -33,11 +33,6 @@ const pageLoaders = {
     card: lazy(() => import('@/views/auth/card/sign-in')),
     split: lazy(() => import('@/views/auth/split/sign-in')),
   },
-  'sign-up': {
-    basic: lazy(() => import('@/views/auth/basic/sign-up')),
-    card: lazy(() => import('@/views/auth/card/sign-up')),
-    split: lazy(() => import('@/views/auth/split/sign-up')),
-  },
   'success-mail': {
     basic: lazy(() => import('@/views/auth/basic/success-mail')),
     card: lazy(() => import('@/views/auth/card/success-mail')),
@@ -81,7 +76,6 @@ export const DynamicLoginPin = () => <DynamicAuthPage page="login-pin" />
 export const DynamicNewPassword = () => <DynamicAuthPage page="new-pass" />
 export const DynamicResetPassword = () => <DynamicAuthPage page="reset-pass" />
 export const DynamicSignIn = () => <DynamicAuthPage page="sign-in" />
-export const DynamicSignUp = () => <DynamicAuthPage page="sign-up" />
 export const DynamicSuccessMail = () => <DynamicAuthPage page="success-mail" />
 export const DynamicTwoFactor = () => <DynamicAuthPage page="two-factor" />
 

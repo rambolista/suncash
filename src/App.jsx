@@ -10,8 +10,9 @@ import useIdleLogout from '@/hooks/useIdleLogout'
 import { useEffect } from 'react'
 
 const PUBLIC_PATHS = new Set(['/error/403', '/error/404', '/error/401', '/error/400', '/error/408', '/error/500', '/error/maintenance', '/landing'])
-const PUBLIC_AUTH_PAGES = new Set(['sign-in', 'sign-up', 'reset-pass', 'new-pass', 'success-mail', 'two-factor'])
-const PUBLIC_CUSTOMER_AUTH_PATHS = new Set(['/customer/login', '/customer/sign-up', '/customer/register', '/customer/reset-pass', '/customer/forgot-password', '/customer/new-pass', '/customer/success-mail', '/customer/two-factor'])
+const PUBLIC_AUTH_PAGES = new Set(['sign-in', 'reset-pass', 'new-pass', 'success-mail', 'two-factor'])
+const BLOCKED_CUSTOMER_AUTH_PATHS = new Set(['/customer/login', '/customer/sign-up', '/customer/register'])
+const PUBLIC_CUSTOMER_AUTH_PATHS = new Set(['/customer/reset-pass', '/customer/forgot-password', '/customer/new-pass', '/customer/success-mail', '/customer/two-factor'])
 const CUSTOMER_APP_PATHS = new Set(['/customer', '/customer/dashboard', '/customer/overview', '/customer/view-customer-details', '/customer/my-bills', '/customer/payments', '/customer/my-portal-account', '/customer/enroll-account', '/customer/manage-enrolled-accounts'])
 const CUSTOMER_PUBLIC_PATHS = new Set(['/customer/error/404', '/customer/error/menu-unavailable'])
 
@@ -78,6 +79,10 @@ const App = () => {
     clearStoredCurrentUser()
   }, [userStatus])
 
+  if (BLOCKED_CUSTOMER_AUTH_PATHS.has(pathname)) {
+    return <Navigate to="/error/404" replace />
+  }
+
   if (isCustomerUser) {
     if (pathname === '/error/404') {
       return <Navigate to="/customer/error/404" replace />
@@ -105,7 +110,7 @@ const App = () => {
       }
 
       if (!hasToken) {
-        return <Navigate to="/customer/login" replace />
+        return <Navigate to="/auth/sign-in" replace />
       }
 
       if (loading) return null
@@ -122,7 +127,7 @@ const App = () => {
     }
 
     if (!hasToken) {
-      return <Navigate to="/customer/login" replace />
+      return <Navigate to="/auth/sign-in" replace />
     }
 
     return <Navigate to="/customer/dashboard" replace />
@@ -141,7 +146,7 @@ const App = () => {
       return element
     }
 
-    return <Navigate to="/customer/login" replace />
+    return <Navigate to="/auth/sign-in" replace />
   }
 
   if (userStatus === 'suspended') {
