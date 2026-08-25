@@ -11,6 +11,7 @@ import LoadingState from '@/components/LoadingState'
 import MerchantRegistrationWizard from './components/MerchantRegistrationWizard'
 import MerchantsTable from './components/MerchantsTable'
 import MerchantManagePanel from './components/manage/MerchantManagePanel'
+import MerchantDeactivateConfirmModal from './components/MerchantDeactivateConfirmModal'
 
 const MerchantManagementPage = () => {
   const currentUser = useCurrentUser()
@@ -28,6 +29,7 @@ const MerchantManagementPage = () => {
   const [viewMode, setViewMode] = useState(hasIncomingFilter ? 'grid' : 'list') // table layout: 'list' | 'grid'
   const [selectedMerchantId, setSelectedMerchantId] = useState(null)
   const [manageReadOnly, setManageReadOnly] = useState(false)
+  const [deactivateMerchant, setDeactivateMerchant] = useState(null)
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -137,12 +139,20 @@ const MerchantManagementPage = () => {
               onEdit={openEdit}
               onView={(merchant) => openManage(merchant, { readOnly: true })}
               onAction={(merchant) => openManage(merchant, { readOnly: false })}
+              onToggleStatus={setDeactivateMerchant}
               initialStatusFilter={initialStatusFilter}
               initialRegistrationFilter={initialRegistrationFilter}
             />
           )}
         </Card.Body>
       </Card>
+
+      <MerchantDeactivateConfirmModal
+        show={!!deactivateMerchant}
+        onHide={() => setDeactivateMerchant(null)}
+        merchant={deactivateMerchant}
+        onDone={loadData}
+      />
     </>
   )
 }

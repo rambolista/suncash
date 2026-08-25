@@ -63,15 +63,15 @@ const columns = [
   { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-nowrap action-cell', render: (id) => `<div class="action-slot" data-id="${id}"></div>` },
 ]
 
-const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
+const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, onToggleStatus, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
   const [searchText, setSearchText] = useState('')
   const [statusFilter, setStatusFilter] = useState(initialStatusFilter)
   const [registrationFilter, setRegistrationFilter] = useState(initialRegistrationFilter)
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
 
-  const handlers = useRef({ onEdit, onView, onAction })
-  handlers.current = { onEdit, onView, onAction }
+  const handlers = useRef({ onEdit, onView, onAction, onToggleStatus })
+  handlers.current = { onEdit, onView, onAction, onToggleStatus }
   const canEdit = Boolean(permissions.can_edit)
 
   const tableData = useMemo(
@@ -155,6 +155,18 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
             <>
               <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Merchant details" aria-label="Merchant details" onClick={() => handlers.current.onEdit?.(item)}>
                 <Icon icon="edit" className="fs-lg" />
+              </Button>
+              <Button
+                variant="light" size="sm" className="btn-icon rounded-circle"
+                title={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+                aria-label={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+                onClick={() => handlers.current.onToggleStatus?.(item)}
+              >
+                {String(item.account_status || 'active').toLowerCase() === 'inactive' ? (
+                  <Icon icon="circle-check" className="fs-lg text-success" />
+                ) : (
+                  <Icon icon="ban" className="fs-lg text-danger" />
+                )}
               </Button>
               <Button variant="light" size="sm" className="btn-icon rounded-circle" title="More actions" aria-label="More actions" onClick={() => handlers.current.onAction?.(item)}>
                 <Icon icon="dots-vertical" className="fs-lg" />
@@ -339,6 +351,17 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
                         <>
                           <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Merchant details" onClick={() => onEdit(merchant)}>
                             <Icon icon="edit" className="fs-lg" />
+                          </Button>
+                          <Button
+                            variant="light" size="sm" className="btn-icon rounded-circle"
+                            title={String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+                            onClick={() => onToggleStatus?.(merchant)}
+                          >
+                            {String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? (
+                              <Icon icon="circle-check" className="fs-lg text-success" />
+                            ) : (
+                              <Icon icon="ban" className="fs-lg text-danger" />
+                            )}
                           </Button>
                           <Button variant="light" size="sm" className="btn-icon rounded-circle" title="More actions" onClick={() => onAction?.(merchant)}>
                             <Icon icon="dots-vertical" className="fs-lg" />
