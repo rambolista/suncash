@@ -543,6 +543,32 @@ const ApiService = {
 
   updateThemePreference: (theme) =>
     http.put('/user/theme-preference', { theme }),
+
+  // ── Settings ───────────────────────────────────────────────────────────────
+
+  getNotificationSettings: (type) =>
+    http.get(`/settings/notifications?type=${encodeURIComponent(type)}`),
+
+  getNotificationSetting: (id) =>
+    http.get(`/settings/notifications/${id}`),
+
+  updateNotificationSetting: (id, data) =>
+    http.put(`/settings/notifications/${id}`, data),
+
+  toggleNotificationSetting: (id, isEnabled) =>
+    http.post(`/settings/notifications/${id}/toggle`, { is_enabled: isEnabled }),
+
+  getCustomerAppSettings: () =>
+    http.get('/settings/customer-app'),
+
+  toggleCustomerAppSetting: (id, isEnabled) =>
+    http.post(`/settings/customer-app/${id}/toggle`, { is_enabled: isEnabled }),
+
+  getWuSettings: () =>
+    http.get('/settings/wu'),
+
+  toggleWuSetting: (id, isEnabled) =>
+    http.post(`/settings/wu/${id}/toggle`, { is_enabled: isEnabled }),
 }
 
 export default ApiService

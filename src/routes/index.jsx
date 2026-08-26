@@ -125,6 +125,18 @@ export const routes = [
         path: '/merchants/registration',
         Component: lazy(() => import('@/views/admin/merchants/registration')),
       },
+      {
+        path: '/settings/notifications',
+        Component: lazy(() => import('@/views/admin/settings/notifications')),
+      },
+      {
+        path: '/settings/customer-app',
+        Component: lazy(() => import('@/views/admin/settings/customer-app')),
+      },
+      {
+        path: '/settings/wu',
+        Component: lazy(() => import('@/views/admin/settings/wu')),
+      },
     ],
   },
   {
