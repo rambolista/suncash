@@ -76,7 +76,15 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
   )
 
   const tabContent = !merchant ? null : PanelComponent ? (
-    <PanelComponent merchant={merchant} editable={editable} onMerchantChanged={loadMerchant} />
+    <>
+      <Alert variant="info" className="d-flex align-items-center gap-2 py-2">
+        <Icon icon="info-circle" className="flex-shrink-0" />
+        <span className="small mb-0">
+          Looking for Business Information, Fees &amp; Revenue Share, Settlement, Report Delivery, or Alert Settings? Use the <strong>Edit</strong> button on the merchant list instead.
+        </span>
+      </Alert>
+      <PanelComponent merchant={merchant} editable={editable} onMerchantChanged={loadMerchant} />
+    </>
   ) : null
 
   return (
@@ -98,8 +106,10 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
       ) : (
         <Card>
           <Card.Header>
-            <h5 className="mb-0">{merchant?.dba_name || merchant?.legal_name || merchant?.client_id}</h5>
-            <p className="text-muted mb-0 small">{merchant?.client_id}</p>
+            <div>
+              <h5 className="mb-0">{merchant?.dba_name || merchant?.legal_name || merchant?.client_id}</h5>
+              <p className="text-muted mb-0 small">{merchant?.client_id}</p>
+            </div>
           </Card.Header>
           {tabLayout === 'vertical' ? (
             <Card.Body className="p-0">

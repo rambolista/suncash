@@ -839,12 +839,6 @@ const EditMerchantTabs = (props) => {
       </Card.Header>
       <Card.Body>
         {formError && <Alert variant="danger">{formError}</Alert>}
-        <Alert variant="info" className="d-flex align-items-center gap-2 py-2">
-          <Icon icon="info-circle" className="flex-shrink-0" />
-          <span className="small mb-0">
-            Looking for Principal Info, Merchant Prefund, Branch, and other merchant settings? Open the <strong>More actions</strong> (⋮) button on the merchant list instead.
-          </span>
-        </Alert>
         <div className="pt-2">
           {activeTab === 'business' && <BusinessFields {...props} />}
           {activeTab === 'fees' && <FeesFields {...props} />}
