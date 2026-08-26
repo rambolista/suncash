@@ -29,9 +29,11 @@ const WuSettingsPage = () => {
   const handleToggle = async (setting) => {
     if (!modulePermission.can_edit) return
     setTogglingId(setting.id)
+    const nextEnabled = !setting.is_enabled
     try {
-      await ApiService.toggleWuSetting(setting.id, !setting.is_enabled)
-      setSettings((prev) => prev.map((item) => (item.id === setting.id ? { ...item, is_enabled: !item.is_enabled } : item)))
+      await ApiService.toggleWuSetting(setting.id, nextEnabled)
+      setSettings((prev) => prev.map((item) => (item.id === setting.id ? { ...item, is_enabled: nextEnabled } : item)))
+      showNotification({ title: 'Success', message: `${setting.label || 'Setting'} ${nextEnabled ? 'enabled' : 'disabled'}.`, variant: 'success' })
     } catch (err) {
       showNotification({ title: 'Failed', message: err?.message || 'Failed to update setting.', variant: 'danger' })
     } finally {
