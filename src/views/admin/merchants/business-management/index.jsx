@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, Card, Nav } from 'react-bootstrap'
+import { Alert, Badge, Button, Card, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -108,6 +108,14 @@ const BusinessManagementPage = () => {
           </div>
         </Card.Header>
         <Card.Body>
+          {tab === 'approved' && (
+            <Alert variant="info" className="d-flex align-items-center gap-2 py-2">
+              <Icon icon="info-circle" className="flex-shrink-0" />
+              <span className="small mb-0">
+                Looking for password reset, services permission, Smartpay permission, credit/debit card, or other merchant settings? Open the <strong>More actions</strong> (⋮) button on the list instead.
+              </span>
+            </Alert>
+          )}
           <div className="d-flex justify-content-end gap-2 mb-3">
             <Button variant="outline-secondary" size="sm" disabled={exporting !== ''} onClick={() => handleExport('pdf')}>
               <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
