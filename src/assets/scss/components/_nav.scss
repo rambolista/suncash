@@ -200,3 +200,17 @@
         }
     }
 }
+
+// Pill-style tab switcher (e.g. Notifications' Email/SMS toggle): the
+// active tab gets a full rounded-rect background instead of a bottom
+// border, reading as a raised chip sitting in the row.
+.nav-tabs.notification-type-tabs {
+    .nav-link {
+        border-radius: $border-radius $border-radius 0 0;
+        padding: 0.5rem 0.9rem;
+
+        &.active {
+            background-color: var(--#{$prefix}tertiary-bg);
+        }
+    }
+}

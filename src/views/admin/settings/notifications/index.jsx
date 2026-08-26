@@ -228,9 +228,9 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
 
   return (
     <Card>
-      <Card.Header className="border-top-0 pt-0">
+      <Card.Header className="border-top-0 pt-0 pb-3">
         <div className="customer-profile-tabs-scroll">
-          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs notification-type-tabs flex-nowrap">
             {TYPE_TABS.map((tab) => {
               const isActive = tab.key === type
               return (
