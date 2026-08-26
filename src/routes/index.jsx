@@ -137,6 +137,18 @@ export const routes = [
         path: '/settings/wu',
         Component: lazy(() => import('@/views/admin/settings/wu')),
       },
+      {
+        path: '/promotions/ticket-reports',
+        Component: lazy(() => import('@/views/admin/promotions/ticket-reports')),
+      },
+      {
+        path: '/promotions/settings',
+        Component: lazy(() => import('@/views/admin/promotions/settings')),
+      },
+      {
+        path: '/promotions/signup',
+        Component: lazy(() => import('@/views/admin/promotions/signup')),
+      },
     ],
   },
   {

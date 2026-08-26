@@ -569,6 +569,68 @@ const ApiService = {
 
   toggleWuSetting: (id, isEnabled) =>
     http.post(`/settings/wu/${id}/toggle`, { is_enabled: isEnabled }),
+
+  // ── Promotions ─────────────────────────────────────────────────────────────
+
+  getPromoIslands: () =>
+    http.get('/promotions/islands'),
+
+  getPromoCountries: () =>
+    http.get('/promotions/countries'),
+
+  getPromoMerchants: () =>
+    http.get('/promotions/merchants'),
+
+  getPromoBranches: (merchantId) =>
+    http.get(`/promotions/branches?merchant_id=${encodeURIComponent(merchantId)}`),
+
+  getPromoTicketReports: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/promotions/ticket-reports${query ? `?${query}` : ''}`)
+  },
+
+  getCashPromoSettings: () =>
+    http.get('/promotions/cash-promos'),
+
+  createCashPromoSetting: (data) =>
+    http.post('/promotions/cash-promos', data),
+
+  updateCashPromoSetting: (id, data) =>
+    http.put(`/promotions/cash-promos/${id}`, data),
+
+  deleteCashPromoSetting: (id) =>
+    http.delete(`/promotions/cash-promos/${id}`),
+
+  getPromoItems: () =>
+    http.get('/promotions/promo-items'),
+
+  createPromoItem: (data) =>
+    isFormDataPayload(data)
+      ? http.post('/promotions/promo-items', data, true)
+      : http.post('/promotions/promo-items', data),
+
+  updatePromoItem: (id, data) =>
+    isFormDataPayload(data)
+      ? http.post(`/promotions/promo-items/${id}`, data, true)
+      : http.post(`/promotions/promo-items/${id}`, data),
+
+  deletePromoItem: (id) =>
+    http.delete(`/promotions/promo-items/${id}`),
+
+  getGeoPromos: () =>
+    http.get('/promotions/geo-promo'),
+
+  getGeoPromo: (id) =>
+    http.get(`/promotions/geo-promo/${id}`),
+
+  createGeoPromo: (data) =>
+    http.post('/promotions/geo-promo', data),
+
+  updateGeoPromo: (id, data) =>
+    http.put(`/promotions/geo-promo/${id}`, data),
+
+  deleteGeoPromo: (id) =>
+    http.delete(`/promotions/geo-promo/${id}`),
 }
 
 export default ApiService
