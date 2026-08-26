@@ -82,10 +82,10 @@ const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onAppr
               <Icon icon="dots-vertical" className="fs-lg" />
             </Dropdown.Toggle>
             <Dropdown.Menu align="end">
-              <Dropdown.Item onClick={() => handlers.current.businessActions.onResetPassword(item)}><Icon icon="key" className="me-2" />password</Dropdown.Item>
-              <Dropdown.Item onClick={() => handlers.current.businessActions.onServicesPermission(item)}><Icon icon="toggle-right" className="me-2" />services permission</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onResetPassword(item)}><Icon icon="key" className="me-2" />Password</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onServicesPermission(item)}><Icon icon="toggle-right" className="me-2" />Services permission</Dropdown.Item>
               <Dropdown.Item onClick={() => handlers.current.businessActions.onSmartpayAccess(item)}><Icon icon="bolt" className="me-2" />Smartpay permission</Dropdown.Item>
-              <Dropdown.Item onClick={() => handlers.current.businessActions.onLinkedCards(item)}><Icon icon="credit-card" className="me-2" />credit/debit card</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onLinkedCards(item)}><Icon icon="credit-card" className="me-2" />Credit/debit card</Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item onClick={() => handlers.current.businessActions.onCardHoldSettings(item)}><Icon icon="clock-pause" className="me-2" />Card Hold Settings</Dropdown.Item>
               <Dropdown.Item onClick={() => handlers.current.businessActions.onTransactionFee(item)}><Icon icon="percentage" className="me-2" />Suncash Transaction Fee</Dropdown.Item>
