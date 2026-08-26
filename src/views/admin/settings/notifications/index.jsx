@@ -1,5 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Card, Form, Nav, Table } from 'react-bootstrap'
+import DT from 'datatables.net-bs5'
+import DataTable from 'datatables.net-react'
+import 'datatables.net-responsive'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { Alert, Button, Card, Form, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -7,6 +11,24 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
+import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+
+DataTable.use(DT)
+
+const escapeHtml = (value) =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+
+const columns = [
+  { data: 'name', render: (value) => escapeHtml(value || '—') },
+  { data: 'description', className: 'text-muted', render: (value) => escapeHtml(value || '—') },
+  { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-end', render: (id) => `<div class="enabled-slot" data-id="${id}"></div>` },
+  { data: 'id', orderable: false, searchable: false, width: '70px', className: 'text-end', render: (id) => `<div class="action-slot" data-id="${id}"></div>` },
+]
 
 const NotificationSettingEdit = ({ id, editable, onCancel, onSaved }) => {
   const { showNotification } = useNotificationContext()
@@ -106,7 +128,10 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
   const [type, setType] = useState('email')
   const [settings, setSettings] = useState([])
   const [loading, setLoading] = useState(true)
-  const [togglingId, setTogglingId] = useState(null)
+
+  const handlers = useRef({ editable, onEdit, onToggle: null })
+  const rowMapRef = useRef({})
+  const dtApiRef = useRef(null)
 
   const load = (activeType) => {
     setLoading(true)
@@ -118,18 +143,72 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
 
   useEffect(() => { load(type) }, [type])
 
-  const handleToggle = async (setting) => {
-    if (!editable) return
-    setTogglingId(setting.id)
+  const handleToggle = async (id) => {
+    if (!handlers.current.editable) return
+    const current = rowMapRef.current[id]
+    if (!current) return
     try {
-      await ApiService.toggleNotificationSetting(setting.id, !setting.is_enabled)
-      setSettings((prev) => prev.map((item) => (item.id === setting.id ? { ...item, is_enabled: !item.is_enabled } : item)))
+      await ApiService.toggleNotificationSetting(id, !current.is_enabled)
+      setSettings((prev) => prev.map((item) => (item.id === id ? { ...item, is_enabled: !item.is_enabled } : item)))
+      // `options`/its closures are only read by the underlying DataTables
+      // instance at creation time, so a redraw is forced explicitly here
+      // rather than relying on the data prop change alone.
+      dtApiRef.current?.draw(false)
     } catch (err) {
       showNotification({ title: 'Failed', message: err?.message || 'Failed to update setting.', variant: 'danger' })
-    } finally {
-      setTogglingId(null)
     }
   }
+
+  handlers.current = { editable, onEdit, onToggle: handleToggle }
+
+  const rowMap = useMemo(() => {
+    const map = {}
+    settings.forEach((item) => { map[item.id] = item })
+    return map
+  }, [settings])
+  rowMapRef.current = rowMap
+
+  // `options` is created once and never recreated — the underlying
+  // DataTables instance only reads it at construction time, so anything
+  // the callbacks need must come from refs (read fresh on every call)
+  // rather than values closed over here.
+  const options = useMemo(() => ({
+    responsive: true,
+    language: { paginate: paginationIcons },
+    drawCallback: function () {
+      dtApiRef.current = this.api()
+      const container = this.api().table().container()
+
+      container.querySelectorAll('.enabled-slot').forEach((slot) => {
+        const item = rowMapRef.current[Number(slot.dataset.id)]
+        if (!item) return
+        const root = slot.__enabledRoot || createRoot(slot)
+        slot.__enabledRoot = root
+        root.render(
+          <Form.Check
+            type="switch"
+            id={`notification-${item.id}`}
+            checked={Boolean(item.is_enabled)}
+            disabled={!handlers.current.editable}
+            onChange={() => handlers.current.onToggle?.(item.id)}
+            className="d-inline-block"
+          />
+        )
+      })
+
+      container.querySelectorAll('.action-slot').forEach((slot) => {
+        const item = rowMapRef.current[Number(slot.dataset.id)]
+        if (!item) return
+        const root = slot.__actionRoot || createRoot(slot)
+        slot.__actionRoot = root
+        root.render(
+          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Edit" aria-label="Edit" onClick={() => handlers.current.onEdit?.(item.id)}>
+            <Icon icon="edit" className="fs-lg" />
+          </Button>
+        )
+      })
+    },
+  }), [])
 
   return (
     <Card>
@@ -143,44 +222,16 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
         {loading ? (
           <LoadingState />
         ) : (
-          <div className="table-responsive">
-            <Table className="align-middle mb-0">
-              <thead className="thead-sm text-uppercase fs-xxs">
-                <tr>
-                  <th>Name</th>
-                  <th>Description</th>
-                  <th className="text-end">Enabled</th>
-                  <th className="text-end">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {settings.map((setting) => (
-                  <tr key={setting.id}>
-                    <td className="fw-medium">{setting.name}</td>
-                    <td className="text-muted">{setting.description || '—'}</td>
-                    <td className="text-end">
-                      <Form.Check
-                        type="switch"
-                        id={`notification-${setting.id}`}
-                        checked={Boolean(setting.is_enabled)}
-                        disabled={!editable || togglingId === setting.id}
-                        onChange={() => handleToggle(setting)}
-                        className="d-inline-block"
-                      />
-                    </td>
-                    <td className="text-end">
-                      <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Edit" aria-label="Edit" onClick={() => onEdit(setting.id)}>
-                        <Icon icon="edit" className="fs-lg" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-                {!settings.length && (
-                  <tr><td colSpan={4} className="text-center text-muted py-4">No settings found.</td></tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
+          <DataTable data={settings} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
+            <thead className="thead-sm text-uppercase fs-xxs">
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th className="text-end">Enabled</th>
+                <th className="text-end">Action</th>
+              </tr>
+            </thead>
+          </DataTable>
         )}
       </Card.Body>
     </Card>
