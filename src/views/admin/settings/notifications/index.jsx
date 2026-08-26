@@ -228,17 +228,24 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
 
   return (
     <Card>
-      <Card.Header className="border-top-0 pt-0">
-        <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary mb-0 fs-5">
-          {TYPE_TABS.map((tab) => (
-            <Nav.Item key={tab.key}>
-              <Nav.Link eventKey={tab.key} className="px-4 py-3">
-                <Icon icon={tab.icon} className="fs-4 me-2 align-middle" />
-                {tab.label}
-              </Nav.Link>
-            </Nav.Item>
-          ))}
-        </Nav>
+      <Card.Header className="px-3 pt-3 pb-0 bg-body">
+        <div className="customer-profile-tabs-scroll">
+          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+            {TYPE_TABS.map((tab) => (
+              <Nav.Item key={tab.key}>
+                <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
+                  <span
+                    className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle"
+                    style={{ width: 32, height: 32 }}
+                  >
+                    <Icon icon={tab.icon} className="text-primary" style={{ fontSize: '1rem' }} />
+                  </span>
+                  <span className="fw-semibold text-nowrap">{tab.label}</span>
+                </Nav.Link>
+              </Nav.Item>
+            ))}
+          </Nav>
+        </div>
       </Card.Header>
       <Card.Body>
         {loading ? (
