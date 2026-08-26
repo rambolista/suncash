@@ -229,11 +229,11 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
   return (
     <Card>
       <Card.Header className="border-top-0 pt-0">
-        <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary mb-0">
+        <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary mb-0 fs-5">
           {TYPE_TABS.map((tab) => (
             <Nav.Item key={tab.key}>
-              <Nav.Link eventKey={tab.key}>
-                <Icon icon={tab.icon} className="fs-lg me-md-1 align-middle" />
+              <Nav.Link eventKey={tab.key} className="px-4 py-3">
+                <Icon icon={tab.icon} className="fs-4 me-2 align-middle" />
                 {tab.label}
               </Nav.Link>
             </Nav.Item>
