@@ -119,6 +119,38 @@ class HttpService {
     return this.request('GET', endpoint)
   }
 
+  /**
+   * Downloads a file (CSV/PDF export, etc). Returns the raw blob plus the
+   * filename from the response's Content-Disposition header, so the caller
+   * can trigger a browser save without HttpService needing to know about DOM.
+   */
+  async download(endpoint) {
+    const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`
+    const url = `${this.#baseURL}${normalizedEndpoint}`
+
+    const response = await fetch(url, { method: 'GET', headers: this.#buildHeaders() })
+
+    if (response.status === 401) {
+      throw { status: 401, message: 'Unauthorized' }
+    }
+
+    if (!response.ok) {
+      let json = null
+      try {
+        json = await response.json()
+      } catch {
+        json = null
+      }
+      throw { status: response.status, ...(json ?? { message: response.statusText }) }
+    }
+
+    const blob = await response.blob()
+    const disposition = response.headers.get('Content-Disposition') ?? ''
+    const match = disposition.match(/filename="?([^"]+)"?/)
+
+    return { blob, filename: match ? match[1] : 'download' }
+  }
+
   post(endpoint, data = null, isFormData = false) {
     return this.request('POST', endpoint, data, isFormData)
   }

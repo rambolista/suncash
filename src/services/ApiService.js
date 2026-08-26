@@ -589,6 +589,11 @@ const ApiService = {
     return http.get(`/promotions/ticket-reports${query ? `?${query}` : ''}`)
   },
 
+  exportPromoTicketReports: (params = {}, format) => {
+    const query = new URLSearchParams({ ...params, format }).toString()
+    return http.download(`/promotions/ticket-reports/export?${query}`)
+  },
+
   getCashPromoSettings: () =>
     http.get('/promotions/cash-promos'),
 

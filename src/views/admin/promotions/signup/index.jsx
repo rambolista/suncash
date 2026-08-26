@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, Table } from 'react-bootstrap'
+import { Button, Card } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -7,7 +7,9 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
-import GeoPromoModal from './components/GeoPromoModal'
+import GeoPromoTable from './components/GeoPromoTable'
+import GeoPromoForm from './components/GeoPromoForm'
+import GeoPromoDeleteConfirmModal from './components/GeoPromoDeleteConfirmModal'
 
 const SignUpPromotionPage = () => {
   const currentUser = useCurrentUser()
@@ -17,9 +19,9 @@ const SignUpPromotionPage = () => {
   const [promos, setPromos] = useState([])
   const [countries, setCountries] = useState([])
   const [loading, setLoading] = useState(true)
-  const [modalPromo, setModalPromo] = useState(undefined)
-  const [modalReadOnly, setModalReadOnly] = useState(false)
-  const [showModal, setShowModal] = useState(false)
+  const [view, setView] = useState('list') // 'list' | 'create' | 'edit' | 'view'
+  const [selectedPromo, setSelectedPromo] = useState(null)
+  const [deletePromo, setDeletePromo] = useState(null)
 
   const load = () => {
     setLoading(true)
@@ -35,22 +37,34 @@ const SignUpPromotionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const openAdd = () => { setModalPromo(null); setModalReadOnly(false); setShowModal(true) }
-  const openView = (promo) => { setModalPromo(promo); setModalReadOnly(true); setShowModal(true) }
-  const openEdit = (promo) => { setModalPromo(promo); setModalReadOnly(false); setShowModal(true) }
-
-  const handleDelete = async (promo) => {
-    try {
-      await ApiService.deleteGeoPromo(promo.id)
-      showNotification({ title: 'Success', message: 'Sign up promotion zone removed successfully.', variant: 'success' })
-      load()
-    } catch (err) {
-      showNotification({ title: 'Failed', message: err?.message || 'Failed to remove zone.', variant: 'danger' })
-    }
-  }
-
+  const canAdd = Boolean(modulePermission.can_add)
   const canEdit = Boolean(modulePermission.can_edit)
   const canDelete = Boolean(modulePermission.can_delete)
+
+  const openAdd = () => { setSelectedPromo(null); setView('create') }
+  const openView = (promo) => { setSelectedPromo(promo); setView('view') }
+  const openEdit = (promo) => { setSelectedPromo(promo); setView('edit') }
+
+  const backToList = () => {
+    setSelectedPromo(null)
+    setView('list')
+    load()
+  }
+
+  if (view === 'create' || view === 'edit' || view === 'view') {
+    return (
+      <>
+        <PageBreadcrumb title={view === 'view' ? 'View Zone' : view === 'edit' ? 'Edit Zone' : 'Add Zone'} subtitle="Sign Up Promotion" />
+        <GeoPromoForm
+          promo={view === 'create' ? null : selectedPromo}
+          readOnly={view === 'view'}
+          countries={countries}
+          onBack={backToList}
+          onSaved={backToList}
+        />
+      </>
+    )
+  }
 
   return (
     <>
@@ -61,7 +75,7 @@ const SignUpPromotionPage = () => {
             <h5 className="mb-1">Sign Up Promotion Zones</h5>
             <p className="text-muted mb-0 small">New customers who sign up with a location inside one of these zones automatically receive the zone&apos;s bonus.</p>
           </div>
-          {canEdit && (
+          {canAdd && (
             <Button onClick={openAdd}><Icon icon="plus" className="me-1" /> Add Zone</Button>
           )}
         </Card.Header>
@@ -69,64 +83,23 @@ const SignUpPromotionPage = () => {
           {loading ? (
             <LoadingState />
           ) : (
-            <div className="table-responsive">
-              <Table className="align-middle mb-0">
-                <thead className="thead-sm text-uppercase fs-xxs">
-                  <tr>
-                    <th>Created</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Country</th>
-                    <th>Date From</th>
-                    <th>Date To</th>
-                    <th className="text-end">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {promos.map((promo) => (
-                    <tr key={promo.id}>
-                      <td className="text-nowrap">{promo.create_date}</td>
-                      <td>{promo.promo_description}</td>
-                      <td>${Number(promo.promo_amount).toLocaleString()}</td>
-                      <td>{promo.promo_country}</td>
-                      <td className="text-nowrap">{promo.date_from}</td>
-                      <td className="text-nowrap">{promo.date_to}</td>
-                      <td className="text-end">
-                        <div className="d-flex gap-1 justify-content-end">
-                          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="View" onClick={() => openView(promo)}>
-                            <Icon icon="eye" className="fs-lg" />
-                          </Button>
-                          {canEdit && (
-                            <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Edit" onClick={() => openEdit(promo)}>
-                              <Icon icon="edit" className="fs-lg" />
-                            </Button>
-                          )}
-                          {canDelete && (
-                            <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Remove" onClick={() => handleDelete(promo)}>
-                              <Icon icon="trash" className="fs-lg text-danger" />
-                            </Button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {!promos.length && (
-                    <tr><td colSpan={7} className="text-center text-muted py-4">No sign up promotion zones found.</td></tr>
-                  )}
-                </tbody>
-              </Table>
-            </div>
+            <GeoPromoTable
+              data={promos}
+              canEdit={canEdit}
+              canDelete={canDelete}
+              onView={openView}
+              onEdit={openEdit}
+              onDelete={setDeletePromo}
+            />
           )}
         </Card.Body>
       </Card>
 
-      <GeoPromoModal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        promo={modalPromo}
-        readOnly={modalReadOnly}
-        countries={countries}
-        onSaved={load}
+      <GeoPromoDeleteConfirmModal
+        show={!!deletePromo}
+        onHide={() => setDeletePromo(null)}
+        promo={deletePromo}
+        onDone={load}
       />
     </>
   )

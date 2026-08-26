@@ -1,9 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Card, Form, Table } from 'react-bootstrap'
+import { Button, Card, Form, Table } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
+import Icon from '@/components/wrappers/Icon'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
+
+const triggerDownload = (blob, filename) => {
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
 
 const STATUS_OPTIONS = ['ALL', 'ACTIVE', 'CLAIMED', 'WON']
 
@@ -18,6 +30,15 @@ const statusBadgeClass = (status) => {
 
 const today = () => new Date().toISOString().slice(0, 10)
 
+const formatDateTime = (value) => {
+  if (!value) return '—'
+  const parsed = new Date(String(value).replace(' ', 'T'))
+  if (Number.isNaN(parsed.getTime())) return String(value)
+  const date = parsed.toLocaleDateString()
+  const time = parsed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return `${date} ${time}`
+}
+
 const TicketReportsPage = () => {
   const { showNotification } = useNotificationContext()
   const [dateFrom, setDateFrom] = useState(today())
@@ -28,6 +49,7 @@ const TicketReportsPage = () => {
   const [lastPage, setLastPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState('')
 
   const load = () => {
     setLoading(true)
@@ -53,14 +75,37 @@ const TicketReportsPage = () => {
     if (page === 1) load()
   }
 
+  const handleExport = async (format) => {
+    setExporting(format)
+    try {
+      const { blob, filename } = await ApiService.exportPromoTicketReports(
+        { date_from: dateFrom, date_to: dateTo, status: status === 'ALL' ? '' : status },
+        format,
+      )
+      triggerDownload(blob, filename)
+    } catch (err) {
+      showNotification({ title: 'Failed', message: err?.message || `Failed to export ${format.toUpperCase()}.`, variant: 'danger' })
+    } finally {
+      setExporting('')
+    }
+  }
+
   return (
     <>
       <PageBreadcrumb title="Ticket Reports" subtitle="Promotions" />
       <Card>
-        <Card.Header>
+        <Card.Header className="d-flex align-items-center justify-content-between flex-wrap gap-2">
           <div>
             <h5 className="mb-1">Summer Cool Down Reloaded Ticket Reports</h5>
             <p className="text-muted mb-0 small">Raffle tickets earned across the active promotion, one row per ticket.</p>
+          </div>
+          <div className="d-flex gap-2">
+            <Button variant="outline-secondary" size="sm" disabled={exporting !== ''} onClick={() => handleExport('pdf')}>
+              <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+            </Button>
+            <Button variant="outline-success" size="sm" disabled={exporting !== ''} onClick={() => handleExport('csv')}>
+              <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
+            </Button>
           </div>
         </Card.Header>
         <Card.Body>
@@ -109,7 +154,7 @@ const TicketReportsPage = () => {
                     {rows.map((row) => (
                       <tr key={row.id}>
                         <td>{row.id}</td>
-                        <td className="text-nowrap">{row.create_date}</td>
+                        <td className="text-nowrap">{formatDateTime(row.create_date)}</td>
                         <td>{row.customer_name}</td>
                         <td>{row.mobile_number}</td>
                         <td>{row.island || '—'}</td>
@@ -117,7 +162,7 @@ const TicketReportsPage = () => {
                         <td><span className={`badge ${statusBadgeClass(row.status)} badge-label`}>{row.status}</span></td>
                         <td>{row.type || '—'}</td>
                         <td>{row.prize || '—'}</td>
-                        <td className="text-nowrap">{row.redeemed_date || '—'}</td>
+                        <td className="text-nowrap">{row.redeemed_date ? formatDateTime(row.redeemed_date) : '—'}</td>
                       </tr>
                     ))}
                     {!rows.length && (
