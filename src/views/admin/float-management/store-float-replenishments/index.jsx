@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, Card, Nav, OverlayTrigger, Table, Tooltip } from 'react-bootstrap'
+import { Badge, Card, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -8,6 +8,8 @@ import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import ConfirmActionModal from '../components/ConfirmActionModal'
+import { money } from '../components/format'
+import StoreFloatReplenishmentsTable from './components/StoreFloatReplenishmentsTable'
 
 const TABS = [
   { key: 'pending', label: 'Pending', icon: 'clock' },
@@ -15,17 +17,7 @@ const TABS = [
   { key: 'rejected', label: 'Rejected', icon: 'circle-x' },
 ]
 
-const money = (value) => `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-
 const merchantName = (row) => row?.merchant?.dba_name || row?.merchant?.legal_name || `Merchant #${row?.merchant_id}`
-
-const ActionButton = ({ label, icon, iconClassName, onClick }) => (
-  <OverlayTrigger placement="top" delay={{ show: 250, hide: 0 }} overlay={<Tooltip>{label}</Tooltip>}>
-    <Button variant="light" size="sm" className="btn-icon rounded-circle" aria-label={label} onClick={onClick}>
-      <Icon icon={icon} className={`fs-lg${iconClassName ? ` ${iconClassName}` : ''}`} />
-    </Button>
-  </OverlayTrigger>
-)
 
 const StoreFloatReplenishmentsPage = () => {
   const currentUser = useCurrentUser()
@@ -82,60 +74,15 @@ const StoreFloatReplenishmentsPage = () => {
             <LoadingState />
           ) : (
             <div className="table-responsive">
-              <Table className="align-middle mb-0">
-                <thead className="thead-sm text-uppercase fs-xxs">
-                  <tr>
-                    <th>Created</th>
-                    <th>Merchant</th>
-                    <th>Amount</th>
-                    <th>Created By</th>
-                    {tab === 'approved' && (<><th>Approved</th><th>Approved By</th><th>Status</th></>)}
-                    {tab === 'rejected' && (<><th>Rejected</th><th>Rejected By</th></>)}
-                    <th className="text-end">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeRows.map((row) => (
-                    <tr key={row.id}>
-                      <td className="text-nowrap">{row.create_date}</td>
-                      <td>{merchantName(row)}</td>
-                      <td>{money(row.amount)}</td>
-                      <td>{row.create_by}</td>
-                      {tab === 'approved' && (
-                        <>
-                          <td className="text-nowrap">{row.approve_date}</td>
-                          <td>{row.approve_by}</td>
-                          <td>
-                            {row.status === 'CONFIRMED'
-                              ? <Badge bg="success-subtle" text="success">CONFIRMED</Badge>
-                              : <Badge bg="warning-subtle" text="warning">FOR CONFIRMATION</Badge>}
-                          </td>
-                        </>
-                      )}
-                      {tab === 'rejected' && (<><td className="text-nowrap">{row.rejected_date}</td><td>{row.rejected_by}</td></>)}
-                      <td className="text-end">
-                        <div className="d-flex gap-1 justify-content-end">
-                          {tab === 'pending' && canApprove && (
-                            <>
-                              <ActionButton label="Approve" icon="check" iconClassName="text-success" onClick={() => setConfirmAction({ type: 'approve', row })} />
-                              <ActionButton label="Reject" icon="x" iconClassName="text-danger" onClick={() => setConfirmAction({ type: 'reject', row })} />
-                            </>
-                          )}
-                          {tab === 'approved' && row.status !== 'CONFIRMED' && canApprove && (
-                            <>
-                              <ActionButton label="Confirm" icon="check" iconClassName="text-success" onClick={() => setConfirmAction({ type: 'confirm', row })} />
-                              <ActionButton label="Reject" icon="x" iconClassName="text-danger" onClick={() => setConfirmAction({ type: 'reject', row })} />
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {!activeRows.length && (
-                    <tr><td colSpan={8} className="text-center text-muted py-4">No {tab} records found.</td></tr>
-                  )}
-                </tbody>
-              </Table>
+              <StoreFloatReplenishmentsTable
+                key={tab}
+                tab={tab}
+                data={activeRows}
+                canApprove={canApprove}
+                onApprove={(row) => setConfirmAction({ type: 'approve', row })}
+                onReject={(row) => setConfirmAction({ type: 'reject', row })}
+                onConfirm={(row) => setConfirmAction({ type: 'confirm', row })}
+              />
             </div>
           )}
         </Card.Body>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, Card, Nav, OverlayTrigger, Table, Tooltip } from 'react-bootstrap'
+import { Badge, Button, Card, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -9,22 +9,14 @@ import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import ConfirmActionModal from '../components/ConfirmActionModal'
 import AmountPromptModal from '../components/AmountPromptModal'
+import { money } from '../components/format'
+import MainReserveTable from './components/MainReserveTable'
 
 const TABS = [
   { key: 'pending', label: 'Pending', icon: 'clock' },
   { key: 'approved', label: 'Approved', icon: 'circle-check' },
   { key: 'rejected', label: 'Rejected', icon: 'circle-x' },
 ]
-
-const money = (value) => `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-
-const ActionButton = ({ label, icon, iconClassName, onClick }) => (
-  <OverlayTrigger placement="top" delay={{ show: 250, hide: 0 }} overlay={<Tooltip>{label}</Tooltip>}>
-    <Button variant="light" size="sm" className="btn-icon rounded-circle" aria-label={label} onClick={onClick}>
-      <Icon icon={icon} className={`fs-lg${iconClassName ? ` ${iconClassName}` : ''}`} />
-    </Button>
-  </OverlayTrigger>
-)
 
 const MainReserveAccountPage = () => {
   const currentUser = useCurrentUser()
@@ -92,53 +84,15 @@ const MainReserveAccountPage = () => {
                   {canAdd && <Button variant="outline-primary" size="sm" onClick={() => setShowRequest(true)}><Icon icon="cash" className="me-1" /> Request Replenishment</Button>}
                 </div>
               )}
-              <Table className="align-middle mb-0">
-                <thead className="thead-sm text-uppercase fs-xxs">
-                  <tr>
-                    <th>Created</th>
-                    <th>Minimum</th>
-                    <th>Maximum</th>
-                    <th>Repl. Amount</th>
-                    <th>Created By</th>
-                    {tab === 'approved' && (<><th>Approved</th><th>Approved By</th></>)}
-                    {tab === 'rejected' && (<><th>Rejected</th><th>Rejected By</th></>)}
-                    {tab !== 'rejected' && <th className="text-end">Action</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeRows.map((row) => (
-                    <tr key={row.id}>
-                      <td className="text-nowrap">{row.create_date}</td>
-                      <td>{money(row.minimum_account)}</td>
-                      <td>{money(row.maximum_account)}</td>
-                      <td>{money(row.repl_amount)}</td>
-                      <td>{row.create_by}</td>
-                      {tab === 'approved' && (<><td className="text-nowrap">{row.approve_date}</td><td>{row.approve_by}</td></>)}
-                      {tab === 'rejected' && (<><td className="text-nowrap">{row.rejected_date}</td><td>{row.rejected_by}</td></>)}
-                      {tab === 'pending' && canApprove && (
-                        <td className="text-end">
-                          <div className="d-flex gap-1 justify-content-end">
-                            <ActionButton label="Approve" icon="check" iconClassName="text-success" onClick={() => setConfirmAction({ type: 'approve', row })} />
-                            <ActionButton label="Reject" icon="x" iconClassName="text-danger" onClick={() => setConfirmAction({ type: 'reject', row })} />
-                          </div>
-                        </td>
-                      )}
-                      {tab === 'approved' && (
-                        <td className="text-end">
-                          {Number(row.is_confirm) === 1 ? (
-                            <Badge bg="success-subtle" text="success">CONFIRMED</Badge>
-                          ) : canApprove && (
-                            <Button variant="outline-success" size="sm" onClick={() => setConfirmAction({ type: 'confirm', row })}>Confirm</Button>
-                          )}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                  {!activeRows.length && (
-                    <tr><td colSpan={7} className="text-center text-muted py-4">No {tab} records found.</td></tr>
-                  )}
-                </tbody>
-              </Table>
+              <MainReserveTable
+                key={tab}
+                tab={tab}
+                data={activeRows}
+                canApprove={canApprove}
+                onApprove={(row) => setConfirmAction({ type: 'approve', row })}
+                onReject={(row) => setConfirmAction({ type: 'reject', row })}
+                onConfirm={(row) => setConfirmAction({ type: 'confirm', row })}
+              />
             </div>
           )}
         </Card.Body>
