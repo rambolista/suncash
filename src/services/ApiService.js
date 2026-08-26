@@ -690,6 +690,63 @@ const ApiService = {
 
   requestStoreFloatReplenishment: (id, amount) =>
     http.post(`/float-management/current-store-float-amounts/${id}/request-replenishment`, { amount }),
+
+  // Business Management / Charity Management — shared lookups
+  getMerchantTypeSoleProprietorships: (type) =>
+    http.get(`/merchant-type-lookups/sole-proprietorships?type=${encodeURIComponent(type)}`),
+
+  getMerchantTypeBusinessCategories: () =>
+    http.get('/merchant-type-lookups/business-categories'),
+
+  getMerchantTypeIdTypes: () =>
+    http.get('/merchant-type-lookups/id-types'),
+
+  getMerchantTypePositionLevels: () =>
+    http.get('/merchant-type-lookups/position-levels'),
+
+  getMerchantTypeIslands: () =>
+    http.get('/merchant-type-lookups/islands'),
+
+  getMerchantTypeCountries: () =>
+    http.get('/merchant-type-lookups/countries'),
+
+  // Business Management
+  getBusinesses: () =>
+    http.get('/business-management'),
+
+  getBusiness: (id) =>
+    http.get(`/business-management/${id}`),
+
+  updateBusiness: (id, data) =>
+    http.put(`/business-management/${id}`, data),
+
+  approveBusiness: (id) =>
+    http.post(`/business-management/${id}/approve`),
+
+  rejectBusiness: (id) =>
+    http.post(`/business-management/${id}/reject`),
+
+  addBusinessOwner: (merchantId, data) =>
+    http.post(`/business-management/${merchantId}/owners`, data),
+
+  updateBusinessOwner: (merchantId, ownerId, data) =>
+    http.put(`/business-management/${merchantId}/owners/${ownerId}`, data),
+
+  // Charity Management
+  getCharities: () =>
+    http.get('/charity-management'),
+
+  getCharity: (id) =>
+    http.get(`/charity-management/${id}`),
+
+  updateCharity: (id, data) =>
+    http.put(`/charity-management/${id}`, data),
+
+  approveCharity: (id) =>
+    http.post(`/charity-management/${id}/approve`),
+
+  rejectCharity: (id) =>
+    http.post(`/charity-management/${id}/reject`),
 }
 
 export default ApiService
