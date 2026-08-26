@@ -17,6 +17,7 @@ import LinkedCardsModal from './components/LinkedCardsModal'
 import NumericFieldModal from './components/NumericFieldModal'
 import AuthorizedAuthModal from './components/AuthorizedAuthModal'
 import VoucherSettingModal from './components/VoucherSettingModal'
+import SubAccountModal from './components/SubAccountModal'
 
 const TABS = [
   { key: 'pending', label: 'Pending', icon: 'clock' },
@@ -147,6 +148,7 @@ const BusinessManagementPage = () => {
                 onAuthorizedAuth: (row) => setSettingsModal({ type: 'auth', row }),
                 onGcFee: (row) => setSettingsModal({ type: 'gcFee', row }),
                 onVoucherSetting: (row) => setSettingsModal({ type: 'voucher', row }),
+                onSubAccount: (row) => setSettingsModal({ type: 'subAccount', row }),
               } : undefined}
             />
           )}
@@ -256,6 +258,11 @@ const BusinessManagementPage = () => {
       />
       <VoucherSettingModal
         show={settingsModal?.type === 'voucher'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
+      />
+      <SubAccountModal
+        show={settingsModal?.type === 'subAccount'}
         onHide={() => setSettingsModal(null)}
         merchant={settingsModal?.row}
       />

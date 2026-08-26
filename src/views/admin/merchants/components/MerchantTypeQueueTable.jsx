@@ -92,6 +92,7 @@ const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onAppr
               <Dropdown.Item onClick={() => handlers.current.businessActions.onAuthorizedAuth(item)}><Icon icon="shield-lock" className="me-2" />Authorized Auth</Dropdown.Item>
               <Dropdown.Item onClick={() => handlers.current.businessActions.onGcFee(item)}><Icon icon="gift" className="me-2" />GC Fee</Dropdown.Item>
               <Dropdown.Item onClick={() => handlers.current.businessActions.onVoucherSetting(item)}><Icon icon="ticket" className="me-2" />Voucher Setting</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onSubAccount(item)}><Icon icon="school" className="me-2" />Sub Account</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         )}

@@ -756,6 +756,15 @@ const ApiService = {
   rejectBusinessLinkedCard: (id, cardId, reason) =>
     http.post(`/business-management/${id}/linked-cards/${cardId}/reject`, { reason }),
 
+  downloadBusinessSubAccountTemplate: () =>
+    http.download('/business-management/sub-accounts/template'),
+
+  importBusinessSubAccounts: (id, file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post(`/business-management/${id}/sub-accounts/import`, formData, true)
+  },
+
   addBusinessOwner: (merchantId, data) =>
     http.post(`/business-management/${merchantId}/owners`, data),
 
