@@ -3,7 +3,7 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Alert, Button, Card, Form, Nav } from 'react-bootstrap'
+import { Alert, Badge, Button, Card, Form, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -231,19 +231,25 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
       <Card.Header className="px-3 pt-3 pb-0 bg-body">
         <div className="customer-profile-tabs-scroll">
           <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
-            {TYPE_TABS.map((tab) => (
-              <Nav.Item key={tab.key}>
-                <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
-                  <span
-                    className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle"
-                    style={{ width: 32, height: 32 }}
-                  >
-                    <Icon icon={tab.icon} className="text-primary" style={{ fontSize: '1rem' }} />
-                  </span>
-                  <span className="fw-semibold text-nowrap">{tab.label}</span>
-                </Nav.Link>
-              </Nav.Item>
-            ))}
+            {TYPE_TABS.map((tab) => {
+              const isActive = tab.key === type
+              return (
+                <Nav.Item key={tab.key}>
+                  <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
+                    <span
+                      className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle"
+                      style={{ width: 32, height: 32 }}
+                    >
+                      <Icon icon={tab.icon} className="text-primary" style={{ fontSize: '1rem' }} />
+                    </span>
+                    <span className="fw-semibold text-nowrap">{tab.label}</span>
+                    <Badge bg={isActive ? 'primary' : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
+                      {settingsByType[tab.key].length}
+                    </Badge>
+                  </Nav.Link>
+                </Nav.Item>
+              )
+            })}
           </Nav>
         </div>
       </Card.Header>
