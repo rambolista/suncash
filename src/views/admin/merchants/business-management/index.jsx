@@ -78,38 +78,36 @@ const BusinessManagementPage = () => {
       <PageBreadcrumb title="Business Management" subtitle="Merchants" />
       <Card>
         <Card.Header className="px-3 pt-3 pb-0 bg-body">
-          <div className="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-2">
-            <div className="customer-profile-tabs-scroll">
-              <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && setTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
-                {TABS.map((t) => {
-                  const isActive = t.key === tab
-                  return (
-                    <Nav.Item key={t.key}>
-                      <Nav.Link eventKey={t.key} className="d-flex align-items-center gap-2">
-                        <span className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle" style={{ width: 32, height: 32 }}>
-                          <Icon icon={t.icon} className="text-primary" style={{ fontSize: '1rem' }} />
-                        </span>
-                        <span className="fw-semibold text-nowrap">{t.label}</span>
-                        <Badge bg={isActive ? 'primary' : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
-                          {rows[t.key].length}
-                        </Badge>
-                      </Nav.Link>
-                    </Nav.Item>
-                  )
-                })}
-              </Nav>
-            </div>
-            <div className="d-flex gap-2">
-              <Button variant="outline-secondary" size="sm" disabled={exporting !== ''} onClick={() => handleExport('pdf')}>
-                <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
-              </Button>
-              <Button variant="outline-success" size="sm" disabled={exporting !== ''} onClick={() => handleExport('csv')}>
-                <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
-              </Button>
-            </div>
+          <div className="customer-profile-tabs-scroll">
+            <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && setTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+              {TABS.map((t) => {
+                const isActive = t.key === tab
+                return (
+                  <Nav.Item key={t.key}>
+                    <Nav.Link eventKey={t.key} className="d-flex align-items-center gap-2">
+                      <span className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle" style={{ width: 32, height: 32 }}>
+                        <Icon icon={t.icon} className="text-primary" style={{ fontSize: '1rem' }} />
+                      </span>
+                      <span className="fw-semibold text-nowrap">{t.label}</span>
+                      <Badge bg={isActive ? 'primary' : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
+                        {rows[t.key].length}
+                      </Badge>
+                    </Nav.Link>
+                  </Nav.Item>
+                )
+              })}
+            </Nav>
           </div>
         </Card.Header>
         <Card.Body>
+          <div className="d-flex justify-content-end gap-2 mb-3">
+            <Button variant="outline-secondary" size="sm" disabled={exporting !== ''} onClick={() => handleExport('pdf')}>
+              <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+            </Button>
+            <Button variant="outline-success" size="sm" disabled={exporting !== ''} onClick={() => handleExport('csv')}>
+              <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
+            </Button>
+          </div>
           {loading ? (
             <LoadingState />
           ) : (
