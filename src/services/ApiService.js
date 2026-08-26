@@ -636,6 +636,60 @@ const ApiService = {
 
   deleteGeoPromo: (id) =>
     http.delete(`/promotions/geo-promo/${id}`),
+
+  // Float Management
+  getMainReserveAccounts: () =>
+    http.get('/float-management/main-reserve-account'),
+
+  approveMainReserveAccount: (id) =>
+    http.post(`/float-management/main-reserve-account/${id}/approve`),
+
+  rejectMainReserveAccount: (id) =>
+    http.post(`/float-management/main-reserve-account/${id}/reject`),
+
+  confirmMainReserveAccount: (id) =>
+    http.post(`/float-management/main-reserve-account/${id}/confirm`),
+
+  topupMainReserveAccount: (amount) =>
+    http.post('/float-management/main-reserve-account/topup', { amount }),
+
+  requestMainReserveReplenishment: (amount) =>
+    http.post('/float-management/main-reserve-account/request-replenishment', { amount }),
+
+  getMainReserveAccountSettings: () =>
+    http.get('/float-management/set-main-reserve-account'),
+
+  setupMainReserveAccount: (data) =>
+    http.post('/float-management/set-main-reserve-account', data),
+
+  updateMainReserveAccountSettings: (data) =>
+    http.put('/float-management/set-main-reserve-account', data),
+
+  getStoreFloatReplenishments: () =>
+    http.get('/float-management/store-float-replenishments'),
+
+  approveStoreFloatReplenishment: (id) =>
+    http.post(`/float-management/store-float-replenishments/${id}/approve`),
+
+  rejectStoreFloatReplenishment: (id) =>
+    http.post(`/float-management/store-float-replenishments/${id}/reject`),
+
+  confirmStoreFloatReplenishment: (id) =>
+    http.post(`/float-management/store-float-replenishments/${id}/confirm`),
+
+  getCurrentStoreFloatAmounts: (params = {}) => {
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/float-management/current-store-float-amounts${query ? `?${query}` : ''}`)
+  },
+
+  createStoreFloatAccount: (data) =>
+    http.post('/float-management/current-store-float-amounts/create-account', data),
+
+  topupStoreFloatAccount: (id, amount) =>
+    http.post(`/float-management/current-store-float-amounts/${id}/topup`, { amount }),
+
+  requestStoreFloatReplenishment: (id, amount) =>
+    http.post(`/float-management/current-store-float-amounts/${id}/request-replenishment`, { amount }),
 }
 
 export default ApiService

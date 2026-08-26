@@ -149,6 +149,22 @@ export const routes = [
         path: '/promotions/signup',
         Component: lazy(() => import('@/views/admin/promotions/signup')),
       },
+      {
+        path: '/float-management/main-reserve-account',
+        Component: lazy(() => import('@/views/admin/float-management/main-reserve-account')),
+      },
+      {
+        path: '/float-management/store-float-replenishments',
+        Component: lazy(() => import('@/views/admin/float-management/store-float-replenishments')),
+      },
+      {
+        path: '/float-management/current-store-float-amounts',
+        Component: lazy(() => import('@/views/admin/float-management/current-store-float-amounts')),
+      },
+      {
+        path: '/float-management/set-main-reserve-account',
+        Component: lazy(() => import('@/views/admin/float-management/set-main-reserve-account')),
+      },
     ],
   },
   {
