@@ -14,6 +14,35 @@ const statusBadgeClass = (status) => {
   }
 }
 
+const DRAW_TYPE_LABELS = {
+  weekly_draw: 'WEEKLY DRAW',
+  instant_prize: 'INSTANT PRIZE',
+}
+
+const resolveTargetGroup = (setting, islands) => {
+  const islandName = (id) => islands.find((island) => island.id === Number(id))?.name || `Island #${id}`
+
+  if (setting.target_group_type === 'island' || setting.target_group_type === 'multiple') {
+    const ids = String(setting.target_group || '').split(',').filter(Boolean)
+    return ids.map(islandName).join(', ') || '—'
+  }
+
+  if (setting.target_group_type === 'percentage') {
+    const totalQuantity = Number(setting.quantity) || 0
+    return String(setting.target_group || '').split(',').filter(Boolean)
+      .map((pair) => {
+        const [islandId, quantity] = pair.split('-')
+        if (Number(islandId) === 0) return null
+        const pct = totalQuantity > 0 ? Math.round((Number(quantity) / totalQuantity) * 100) : 0
+        return `${islandName(islandId)} (${pct}%)`
+      })
+      .filter(Boolean)
+      .join(', ') || '—'
+  }
+
+  return 'All Islands'
+}
+
 const CashPromoTab = ({ editable, islands }) => {
   const { showNotification } = useNotificationContext()
   const [settings, setSettings] = useState([])
@@ -77,8 +106,8 @@ const CashPromoTab = ({ editable, islands }) => {
                 <td>${Number(setting.price).toLocaleString()}</td>
                 <td>{setting.remaining_quantity}/{setting.quantity}</td>
                 <td>{setting.description}</td>
-                <td className="text-nowrap">{setting.draw_type}</td>
-                <td className="text-nowrap">{setting.target_group_type}</td>
+                <td className="text-nowrap">{DRAW_TYPE_LABELS[setting.draw_type] || setting.draw_type}</td>
+                <td>{resolveTargetGroup(setting, islands)}</td>
                 <td className="text-nowrap">{setting.draw_date || '—'}</td>
                 <td><span className={`badge ${statusBadgeClass(setting.status)} badge-label`}>{setting.status}</span></td>
                 {editable && (

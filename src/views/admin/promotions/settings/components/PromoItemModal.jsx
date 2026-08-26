@@ -56,6 +56,11 @@ const PromoItemModal = ({ show, onHide, item, onSaved }) => {
   const set = (name, value) => setValues((prev) => ({ ...prev, [name]: value }))
 
   const handleSave = async () => {
+    if (!item && !imageFile) {
+      setErrors({ image: 'An item image is required.' })
+      return
+    }
+
     setSubmitting(true)
     setFormError('')
     setErrors({})
@@ -118,15 +123,22 @@ const PromoItemModal = ({ show, onHide, item, onSaved }) => {
           <Col md={6}>
             <Form.Group>
               <Form.Label>Quantity *</Form.Label>
-              <Form.Control type="number" value={values.quantity} onChange={(e) => set('quantity', e.target.value)} isInvalid={!!errors.quantity} disabled={!!item} />
+              <Form.Control type="number" value={values.quantity} onChange={(e) => set('quantity', e.target.value)} isInvalid={!!errors.quantity} disabled={['weekly_draw', 'wu_draw'].includes(values.draw_type)} />
               <Form.Control.Feedback type="invalid">{errors.quantity}</Form.Control.Feedback>
-              {item && <div className="form-text">Quantity can&apos;t be changed after creation (remaining: {item.remaining_quantity}).</div>}
+              {['weekly_draw', 'wu_draw'].includes(values.draw_type) && <div className="form-text">This draw type is always a single prize.</div>}
             </Form.Group>
           </Col>
           <Col md={6}>
             <Form.Group>
               <Form.Label>Draw Type *</Form.Label>
-              <Form.Select value={values.draw_type} onChange={(e) => set('draw_type', e.target.value)} isInvalid={!!errors.draw_type}>
+              <Form.Select
+                value={values.draw_type}
+                onChange={(e) => {
+                  set('draw_type', e.target.value)
+                  if (['weekly_draw', 'wu_draw'].includes(e.target.value)) set('quantity', 1)
+                }}
+                isInvalid={!!errors.draw_type}
+              >
                 {DRAW_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </Form.Select>
             </Form.Group>
@@ -150,8 +162,10 @@ const PromoItemModal = ({ show, onHide, item, onSaved }) => {
           )}
           <Col md={12}>
             <Form.Group>
-              <Form.Label>Item Image</Form.Label>
-              <Form.Control type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+              <Form.Label>Item Image {!item && '*'}</Form.Label>
+              <Form.Control type="file" accept="image/*" onChange={(e) => setImageFile(e.target.files?.[0] || null)} isInvalid={!!errors.image} />
+              <Form.Control.Feedback type="invalid">{errors.image}</Form.Control.Feedback>
+              {!item && <div className="form-text">An image is required when adding a new promo item.</div>}
               {item?.image_url && !imageFile && (
                 <div className="mt-2">
                   <img src={item.image_url} alt="Current" style={{ width: 64, height: 64, objectFit: 'cover' }} className="rounded border" />

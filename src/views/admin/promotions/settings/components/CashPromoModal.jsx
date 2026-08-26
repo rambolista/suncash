@@ -41,11 +41,20 @@ const CashPromoModal = ({ show, onHide, setting, islands, onSaved }) => {
       const islandIds = setting.target_group_type === 'island' || setting.target_group_type === 'multiple'
         ? String(setting.target_group || '').split(',').filter(Boolean).map(Number)
         : []
+      // Legacy stores percentage allocations as per-island QUANTITY pairs (plus a trailing
+      // "0-<remainder>" sentinel), not literal percentages — convert back for display/editing.
+      const totalQuantity = Number(setting.quantity) || 0
       const allocations = setting.target_group_type === 'percentage'
-        ? String(setting.target_group || '').split(',').filter(Boolean).map((pair) => {
-          const [islandId, percentage] = pair.split('-')
-          return { island_id: Number(islandId), percentage: Number(percentage) }
-        })
+        ? String(setting.target_group || '').split(',').filter(Boolean)
+          .map((pair) => {
+            const [islandId, quantity] = pair.split('-')
+            return { island_id: Number(islandId), quantity: Number(quantity) }
+          })
+          .filter((row) => row.island_id !== 0)
+          .map((row) => ({
+            island_id: row.island_id,
+            percentage: totalQuantity > 0 ? Math.round((row.quantity / totalQuantity) * 100) : 0,
+          }))
         : []
       setValues({
         price: setting.price ?? '',
@@ -66,6 +75,9 @@ const CashPromoModal = ({ show, onHide, setting, islands, onSaved }) => {
   }, [show, setting])
 
   const set = (name, value) => setValues((prev) => ({ ...prev, [name]: value }))
+
+  // Legacy hides Multiple/Percentage island targeting until a quantity > 1 is entered — there's nothing to split otherwise.
+  const canSplitByIsland = Number(values.quantity) > 1
 
   const toggleIsland = (islandId) => {
     setValues((prev) => ({
@@ -136,10 +148,10 @@ const CashPromoModal = ({ show, onHide, setting, islands, onSaved }) => {
           </Col>
           <Col md={6}>
             <Form.Group>
-              <Form.Label>Quantity *</Form.Label>
-              <Form.Control type="number" value={values.quantity} onChange={(e) => set('quantity', e.target.value)} isInvalid={!!errors.quantity} disabled={!!setting} />
+              <Form.Label>Quantity {values.draw_type !== 'instant_prize' && '*'}</Form.Label>
+              <Form.Control type="number" value={values.quantity} onChange={(e) => set('quantity', e.target.value)} isInvalid={!!errors.quantity} />
               <Form.Control.Feedback type="invalid">{errors.quantity}</Form.Control.Feedback>
-              {setting && <div className="form-text">Quantity can&apos;t be changed after creation (remaining: {setting.remaining_quantity}).</div>}
+              {values.draw_type === 'instant_prize' && <div className="form-text">Leave blank for an open/unlimited instant-prize pool.</div>}
             </Form.Group>
           </Col>
           <Col md={12}>
@@ -178,8 +190,10 @@ const CashPromoModal = ({ show, onHide, setting, islands, onSaved }) => {
             <Form.Group>
               <Form.Label>Target Group</Form.Label>
               <Form.Select value={values.target_group_type} onChange={(e) => set('target_group_type', e.target.value)}>
-                {TARGET_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
+                {TARGET_TYPES.filter((t) => canSplitByIsland || t.value === values.target_group_type || !['multiple', 'percentage'].includes(t.value))
+                  .map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </Form.Select>
+              {!canSplitByIsland && <div className="form-text">Enter a quantity greater than 1 to split this promo across multiple islands.</div>}
             </Form.Group>
           </Col>
 

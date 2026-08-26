@@ -14,6 +14,14 @@ const statusBadgeClass = (status) => {
   }
 }
 
+const DRAW_TYPE_LABELS = {
+  weekly_draw: 'WEEKLY DRAW',
+  grand_draw: 'GRAND DRAW',
+  instant_prize: 'INSTANT PRIZE',
+  wu_draw: 'AC PRIZE',
+  ps5_draw: 'PS5 PRIZE',
+}
+
 const PhysicalItemsTab = ({ editable }) => {
   const { showNotification } = useNotificationContext()
   const [items, setItems] = useState([])
@@ -80,7 +88,7 @@ const PhysicalItemsTab = ({ editable }) => {
                 <td className="text-nowrap">{item.merchant_name || '—'}</td>
                 <td>{item.item_description}</td>
                 <td>{item.remaining_quantity}/{item.quantity}</td>
-                <td className="text-nowrap">{item.draw_type}</td>
+                <td className="text-nowrap">{DRAW_TYPE_LABELS[item.draw_type] || item.draw_type}</td>
                 <td className="text-nowrap">{item.draw_date || '—'}</td>
                 <td><span className={`badge ${statusBadgeClass(item.status)} badge-label`}>{item.status}</span></td>
                 {editable && (
