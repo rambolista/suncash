@@ -3,7 +3,7 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Alert, Badge, Button, Card, Form, Nav } from 'react-bootstrap'
+import { Alert, Button, Card, Form, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -24,8 +24,8 @@ const escapeHtml = (value) =>
     .replace(/'/g, '&#039;')
 
 const TYPE_TABS = [
-  { key: 'email', label: 'Email Settings', icon: 'mail', color: 'primary' },
-  { key: 'sms', label: 'SMS Settings', icon: 'message', color: 'success' },
+  { key: 'email', label: 'Email Settings', icon: 'mail' },
+  { key: 'sms', label: 'SMS Settings', icon: 'message' },
 ]
 
 const columns = [
@@ -228,30 +228,17 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
 
   return (
     <Card>
-      <Card.Header className="border-top-0 pt-0 pb-3">
-        <div className="customer-profile-tabs-scroll">
-          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs notification-type-tabs flex-nowrap">
-            {TYPE_TABS.map((tab) => {
-              const isActive = tab.key === type
-              return (
-                <Nav.Item key={tab.key}>
-                  <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
-                    <span
-                      className={`rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-${tab.color}-subtle`}
-                      style={{ width: 32, height: 32 }}
-                    >
-                      <Icon icon={tab.icon} className={`text-${tab.color}`} style={{ fontSize: '1rem' }} />
-                    </span>
-                    <span className="fw-semibold text-nowrap">{tab.label}</span>
-                    <Badge bg={isActive ? tab.color : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
-                      {settingsByType[tab.key].length}
-                    </Badge>
-                  </Nav.Link>
-                </Nav.Item>
-              )
-            })}
-          </Nav>
-        </div>
+      <Card.Header className="border-top-0 pt-0">
+        <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary mb-0">
+          {TYPE_TABS.map((tab) => (
+            <Nav.Item key={tab.key}>
+              <Nav.Link eventKey={tab.key}>
+                <Icon icon={tab.icon} className="fs-lg me-md-1 align-middle" />
+                {tab.label}
+              </Nav.Link>
+            </Nav.Item>
+          ))}
+        </Nav>
       </Card.Header>
       <Card.Body>
         {loading ? (
