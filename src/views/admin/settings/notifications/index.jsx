@@ -221,7 +221,7 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
     <Card>
       <Card.Header className="border-top-0 pt-0">
         <div className="customer-profile-tabs-scroll">
-          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs notification-type-tabs flex-nowrap">
             {TYPE_TABS.map((tab) => (
               <Nav.Item key={tab.key}>
                 <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
