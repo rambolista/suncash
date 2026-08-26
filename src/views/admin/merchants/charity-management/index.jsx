@@ -121,6 +121,7 @@ const CharityManagementPage = () => {
               onApprove={(row) => setConfirmAction({ type: 'approve', row })}
               onReject={(row) => setConfirmAction({ type: 'reject', row })}
               onActivate={(row) => setConfirmAction({ type: 'activate', row })}
+              activateAlways
             />
           )}
         </Card.Body>
@@ -156,7 +157,7 @@ const CharityManagementPage = () => {
         confirmLabel="Activate"
         confirmVariant="success"
         successMessage="Charity activated successfully."
-        onConfirm={() => ApiService.toggleMerchantStatus(confirmAction.row.id)}
+        onConfirm={() => ApiService.activateCharity(confirmAction.row.id)}
         onDone={load}
       />
     </>

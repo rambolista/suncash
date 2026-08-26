@@ -726,6 +726,9 @@ const ApiService = {
   rejectBusiness: (id) =>
     http.post(`/business-management/${id}/reject`),
 
+  activateBusiness: (id) =>
+    http.post(`/business-management/${id}/activate`),
+
   addBusinessOwner: (merchantId, data) =>
     http.post(`/business-management/${merchantId}/owners`, data),
 
@@ -752,6 +755,9 @@ const ApiService = {
 
   rejectCharity: (id) =>
     http.post(`/charity-management/${id}/reject`),
+
+  activateCharity: (id) =>
+    http.post(`/charity-management/${id}/activate`),
 
   exportCharities: (status, format) => {
     const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()

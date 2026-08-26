@@ -156,7 +156,7 @@ const BusinessManagementPage = () => {
         confirmLabel="Activate"
         confirmVariant="success"
         successMessage="Business activated successfully."
-        onConfirm={() => ApiService.toggleMerchantStatus(confirmAction.row.id)}
+        onConfirm={() => ApiService.activateBusiness(confirmAction.row.id)}
         onDone={load}
       />
     </>

@@ -46,7 +46,7 @@ const columns = [
 const headers = ['Created', 'Client ID', 'Name', 'Phone', 'Island', 'Short Code', 'Action']
 
 /** Shared pending/approved/rejected DataTable list for Business Management and Charity Management — same shape, only the filter and approve/reject wording differ per caller. */
-const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onApprove, onReject, onActivate }) => {
+const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onApprove, onReject, onActivate, activateAlways = false }) => {
   const handlers = useRef({ onView, onApprove, onReject, onActivate })
   handlers.current = { onView, onApprove, onReject, onActivate }
 
@@ -72,13 +72,13 @@ const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onAppr
             <ActionButton label="Reject" icon="x" iconClassName="text-danger" onClick={() => handlers.current.onReject(item)} />
           </>
         )}
-        {tab === 'approved' && canEdit && Number(item.client_status_id) === -1 && (
+        {tab === 'approved' && canEdit && (activateAlways || Number(item.client_status_id) === -1) && (
           <ActionButton label="Activate" icon="circle-check" iconClassName="text-success" onClick={() => handlers.current.onActivate(item)} />
         )}
       </div>
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, canApprove, canEdit, rowMap])
+  }, [tab, canApprove, canEdit, activateAlways, rowMap])
 
   const options = useMemo(() => ({
     responsive: true,
