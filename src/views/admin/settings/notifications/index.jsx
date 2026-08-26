@@ -3,7 +3,7 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Alert, Button, Card, Form, Nav } from 'react-bootstrap'
+import { Alert, Badge, Button, Card, Form, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -24,8 +24,8 @@ const escapeHtml = (value) =>
     .replace(/'/g, '&#039;')
 
 const TYPE_TABS = [
-  { key: 'email', label: 'Email Settings', icon: 'mail' },
-  { key: 'sms', label: 'SMS Settings', icon: 'message' },
+  { key: 'email', label: 'Email Settings', icon: 'mail', color: 'primary' },
+  { key: 'sms', label: 'SMS Settings', icon: 'message', color: 'success' },
 ]
 
 const columns = [
@@ -131,22 +131,28 @@ const NotificationSettingEdit = ({ id, editable, onCancel, onSaved }) => {
 const NotificationSettingsList = ({ editable, onEdit }) => {
   const { showNotification } = useNotificationContext()
   const [type, setType] = useState('email')
-  const [settings, setSettings] = useState([])
+  const [settingsByType, setSettingsByType] = useState({ email: [], sms: [] })
   const [loading, setLoading] = useState(true)
 
   const handlers = useRef({ editable, onEdit, onToggle: null })
   const rowMapRef = useRef({})
   const dtApiRef = useRef(null)
 
-  const load = (activeType) => {
+  useEffect(() => {
+    let active = true
     setLoading(true)
-    ApiService.getNotificationSettings(activeType)
-      .then((data) => setSettings(Array.isArray(data) ? data : []))
-      .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load notification settings.', variant: 'danger' }))
-      .finally(() => setLoading(false))
-  }
+    Promise.all([ApiService.getNotificationSettings('email'), ApiService.getNotificationSettings('sms')])
+      .then(([email, sms]) => {
+        if (!active) return
+        setSettingsByType({ email: Array.isArray(email) ? email : [], sms: Array.isArray(sms) ? sms : [] })
+      })
+      .catch((err) => active && showNotification({ title: 'Failed', message: err?.message || 'Failed to load notification settings.', variant: 'danger' }))
+      .finally(() => active && setLoading(false))
+    return () => { active = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  useEffect(() => { load(type) }, [type])
+  const settings = settingsByType[type]
 
   const handleToggle = async (id) => {
     if (!handlers.current.editable) return
@@ -155,7 +161,10 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
     const nextEnabled = !current.is_enabled
     try {
       await ApiService.toggleNotificationSetting(id, nextEnabled)
-      setSettings((prev) => prev.map((item) => (item.id === id ? { ...item, is_enabled: nextEnabled } : item)))
+      setSettingsByType((prev) => ({
+        ...prev,
+        [type]: prev[type].map((item) => (item.id === id ? { ...item, is_enabled: nextEnabled } : item)),
+      }))
       // `options`/its closures are only read by the underlying DataTables
       // instance at creation time, so a redraw is forced explicitly here
       // rather than relying on the data prop change alone.
@@ -221,20 +230,26 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
     <Card>
       <Card.Header className="border-top-0 pt-0">
         <div className="customer-profile-tabs-scroll">
-          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs notification-type-tabs flex-nowrap">
-            {TYPE_TABS.map((tab) => (
-              <Nav.Item key={tab.key}>
-                <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
-                  <span
-                    className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle"
-                    style={{ width: 32, height: 32 }}
-                  >
-                    <Icon icon={tab.icon} className="text-primary" style={{ fontSize: '1rem' }} />
-                  </span>
-                  <span className="fw-semibold text-nowrap">{tab.label}</span>
-                </Nav.Link>
-              </Nav.Item>
-            ))}
+          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+            {TYPE_TABS.map((tab) => {
+              const isActive = tab.key === type
+              return (
+                <Nav.Item key={tab.key}>
+                  <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
+                    <span
+                      className={`rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-${tab.color}-subtle`}
+                      style={{ width: 32, height: 32 }}
+                    >
+                      <Icon icon={tab.icon} className={`text-${tab.color}`} style={{ fontSize: '1rem' }} />
+                    </span>
+                    <span className="fw-semibold text-nowrap">{tab.label}</span>
+                    <Badge bg={isActive ? tab.color : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
+                      {settingsByType[tab.key].length}
+                    </Badge>
+                  </Nav.Link>
+                </Nav.Item>
+              )
+            })}
           </Nav>
         </div>
       </Card.Header>
