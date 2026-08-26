@@ -3,7 +3,7 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, Card, CardBody, Col, FormControl, FormSelect, Row } from 'react-bootstrap'
+import { Button, Card, CardBody, Col, FormControl, FormSelect, OverlayTrigger, Row, Tooltip } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
@@ -31,6 +31,14 @@ const formatDate = (value) => {
   const parsed = new Date(value)
   return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleDateString()
 }
+
+const ActionButton = ({ label, icon, iconClassName, onClick }) => (
+  <OverlayTrigger placement="top" delay={{ show: 250, hide: 0 }} overlay={<Tooltip>{label}</Tooltip>}>
+    <Button variant="light" size="sm" className="btn-icon rounded-circle" aria-label={label} onClick={onClick}>
+      <Icon icon={icon} className={`fs-lg${iconClassName ? ` ${iconClassName}` : ''}`} />
+    </Button>
+  </OverlayTrigger>
+)
 
 const MerchantAvatar = ({ size = 32 }) => (
   <div className="rounded-circle bg-light d-flex align-items-center justify-content-center text-muted flex-shrink-0" style={{ width: size, height: size }}>
@@ -148,32 +156,18 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
       slot.__actionRoot = root
       root.render(
         <div className="d-flex gap-1">
-          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="View" aria-label="View" onClick={() => handlers.current.onView?.(item)}>
-            <Icon icon="eye" className="fs-lg" />
-          </Button>
+          <ActionButton label="View" icon="eye" onClick={() => handlers.current.onView?.(item)} />
           {canEdit && (
             <>
-              <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Merchant details" aria-label="Merchant details" onClick={() => handlers.current.onEdit?.(item)}>
-                <Icon icon="edit" className="fs-lg" />
-              </Button>
-              <Button
-                variant="light" size="sm" className="btn-icon rounded-circle"
-                title={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
-                aria-label={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+              <ActionButton label="Merchant details" icon="edit" onClick={() => handlers.current.onEdit?.(item)} />
+              <ActionButton
+                label={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+                icon={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'circle-check' : 'ban'}
+                iconClassName={String(item.account_status || 'active').toLowerCase() === 'inactive' ? 'text-success' : 'text-danger'}
                 onClick={() => handlers.current.onToggleStatus?.(item)}
-              >
-                {String(item.account_status || 'active').toLowerCase() === 'inactive' ? (
-                  <Icon icon="circle-check" className="fs-lg text-success" />
-                ) : (
-                  <Icon icon="ban" className="fs-lg text-danger" />
-                )}
-              </Button>
-              <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Reset password" aria-label="Reset password" onClick={() => handlers.current.onResetPassword?.(item)}>
-                <Icon icon="key" className="fs-lg" />
-              </Button>
-              <Button variant="light" size="sm" className="btn-icon rounded-circle" title="More actions" aria-label="More actions" onClick={() => handlers.current.onAction?.(item)}>
-                <Icon icon="dots-vertical" className="fs-lg" />
-              </Button>
+              />
+              <ActionButton label="Reset password" icon="key" onClick={() => handlers.current.onResetPassword?.(item)} />
+              <ActionButton label="More actions" icon="dots-vertical" onClick={() => handlers.current.onAction?.(item)} />
             </>
           )}
         </div>
@@ -347,31 +341,18 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
                     </ul>
 
                     <div className="d-flex justify-content-end gap-1">
-                      <Button variant="light" size="sm" className="btn-icon rounded-circle" title="View" onClick={() => onView?.(merchant)}>
-                        <Icon icon="eye" className="fs-lg" />
-                      </Button>
+                      <ActionButton label="View" icon="eye" onClick={() => onView?.(merchant)} />
                       {canEdit && (
                         <>
-                          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Merchant details" onClick={() => onEdit(merchant)}>
-                            <Icon icon="edit" className="fs-lg" />
-                          </Button>
-                          <Button
-                            variant="light" size="sm" className="btn-icon rounded-circle"
-                            title={String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+                          <ActionButton label="Merchant details" icon="edit" onClick={() => onEdit(merchant)} />
+                          <ActionButton
+                            label={String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? 'Activate' : 'Deactivate'}
+                            icon={String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? 'circle-check' : 'ban'}
+                            iconClassName={String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? 'text-success' : 'text-danger'}
                             onClick={() => onToggleStatus?.(merchant)}
-                          >
-                            {String(merchant.account_status || 'active').toLowerCase() === 'inactive' ? (
-                              <Icon icon="circle-check" className="fs-lg text-success" />
-                            ) : (
-                              <Icon icon="ban" className="fs-lg text-danger" />
-                            )}
-                          </Button>
-                          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Reset password" onClick={() => onResetPassword?.(merchant)}>
-                            <Icon icon="key" className="fs-lg" />
-                          </Button>
-                          <Button variant="light" size="sm" className="btn-icon rounded-circle" title="More actions" onClick={() => onAction?.(merchant)}>
-                            <Icon icon="dots-vertical" className="fs-lg" />
-                          </Button>
+                          />
+                          <ActionButton label="Reset password" icon="key" onClick={() => onResetPassword?.(merchant)} />
+                          <ActionButton label="More actions" icon="dots-vertical" onClick={() => onAction?.(merchant)} />
                         </>
                       )}
                     </div>
