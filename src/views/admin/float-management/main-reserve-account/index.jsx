@@ -183,6 +183,7 @@ const MainReserveAccountPage = () => {
         onHide={() => setShowTopup(false)}
         title="Top Up Main Reserve Account"
         helpText="Credits the approved main reserve account's running balance directly, up to its maximum threshold."
+        currentBalance={rows.approved[0]?.amount}
         submitLabel="Top Up"
         successMessage="Main reserve account topped up successfully."
         onSubmit={(amount) => ApiService.topupMainReserveAccount(amount)}

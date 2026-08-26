@@ -150,6 +150,7 @@ const CurrentStoreFloatAmountsPage = () => {
         onHide={() => setAmountAction(null)}
         title="Account Topup"
         helpText={amountAction ? `Immediately credits ${amountAction.row.merchant?.dba_name || amountAction.row.merchant?.legal_name || 'this merchant'}'s store float balance. No approval required.` : ''}
+        currentBalance={amountAction?.row?.amount}
         submitLabel="Top Up"
         successMessage="Store float account topped up successfully."
         onSubmit={(amount) => ApiService.topupStoreFloatAccount(amountAction.row.id, amount)}

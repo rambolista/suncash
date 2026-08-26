@@ -3,7 +3,7 @@ import { Alert, Button, Form, Modal } from 'react-bootstrap'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
 /** Generic single-amount-field modal shared by every "Top Up" / "Request Replenishment" action. */
-const AmountPromptModal = ({ show, onHide, title, helpText, submitLabel, successMessage, onSubmit, onDone }) => {
+const AmountPromptModal = ({ show, onHide, title, helpText, currentBalance, submitLabel, successMessage, onSubmit, onDone }) => {
   const { showNotification } = useNotificationContext()
   const [amount, setAmount] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -41,6 +41,12 @@ const AmountPromptModal = ({ show, onHide, title, helpText, submitLabel, success
         <Modal.Body>
           {error && <Alert variant="danger" className="py-2 small mb-3">{error}</Alert>}
           {helpText && <p className="text-muted small">{helpText}</p>}
+          {currentBalance !== undefined && currentBalance !== null && (
+            <Form.Group className="mb-3">
+              <Form.Label>Current Balance</Form.Label>
+              <Form.Control value={`BSD ${Number(currentBalance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} disabled readOnly />
+            </Form.Group>
+          )}
           <Form.Group>
             <Form.Label>Amount (BSD) *</Form.Label>
             <Form.Control type="number" step="0.01" min="0" value={amount} onChange={(e) => setAmount(e.target.value)} autoFocus required />
