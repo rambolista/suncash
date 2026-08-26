@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Button, Card } from 'react-bootstrap'
+import { Alert, Button, Card } from 'react-bootstrap'
 import { useSearchParams } from 'react-router'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Icon from '@/components/wrappers/Icon'
@@ -131,6 +131,12 @@ const MerchantManagementPage = () => {
           )}
         </Card.Header>
         <Card.Body>
+          <Alert variant="info" className="d-flex align-items-center gap-2 py-2">
+            <Icon icon="info-circle" className="flex-shrink-0" />
+            <span className="small mb-0">
+              Looking for Principal Info, Merchant Prefund, Branch, and other merchant settings? Open the <strong>More actions</strong> (⋮) button on the merchant list instead.
+            </span>
+          </Alert>
           {loading ? (
             <LoadingState />
           ) : (

@@ -32,6 +32,20 @@ const PANEL_COMPONENTS = {
   'float-account': FloatAccountPanel,
 }
 
+const TAB_DESCRIPTIONS = {
+  'principal-info': "Manage the merchant's authorized officer details.",
+  prefund: 'Credit or debit the merchant prefund balance.',
+  'auto-replenish': 'Configure automatic prefund top-ups.',
+  branch: "Manage this merchant's branch locations.",
+  terminals: "Manage this merchant's registered devices.",
+  'user-management': 'View and add portal sub-users for this merchant.',
+  'ezpay-access': 'Control which Ezpay card transactions this merchant may perform.',
+  'services-permission': 'Grant or revoke access to individual platform services.',
+  'pos-users': 'Manage branch/POS portal logins for this merchant.',
+  'agent-commission': 'Set agent commission rates and notification e-mails.',
+  'float-account': 'Enable, request, or edit the store float account.',
+}
+
 const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
   const currentUser = useCurrentUser()
   const modulePermission = useMemo(() => getModulePermission(currentUser, '/merchants/registration'), [currentUser])
@@ -63,12 +77,21 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
       variant="tabs"
       activeKey={activeTab}
       className={`nav-bordered nav-bordered-primary customer-profile-tabs${tabLayout === 'vertical' ? ' nav-tabs-vertical flex-column' : ' flex-nowrap'}`}
+      style={tabLayout === 'vertical' ? { width: '100%' } : undefined}
     >
       {visibleTabs.map((tab) => (
         <Nav.Item key={tab.tab_id || tab.key}>
-          <Nav.Link eventKey={tab.key} onClick={() => setActiveTab(tab.key)}>
-            {tab.icon && <Icon icon={tab.icon} className="me-2" />}
-            {tab.label}
+          <Nav.Link
+            eventKey={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className="d-flex align-items-start gap-2 text-start"
+            style={{ whiteSpace: 'normal' }}
+          >
+            {tab.icon && <Icon icon={tab.icon} className="mt-1 flex-shrink-0" />}
+            <span>
+              <span className="d-block">{tab.label}</span>
+              {TAB_DESCRIPTIONS[tab.key] && <span className="d-block text-muted fs-xs fw-normal">{TAB_DESCRIPTIONS[tab.key]}</span>}
+            </span>
           </Nav.Link>
         </Nav.Item>
       ))}
