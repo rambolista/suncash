@@ -829,14 +829,22 @@ const EditMerchantTabs = (props) => {
   return (
     <Card>
       <Card.Header className="border-0 pb-0">
-        <h5 className="mb-1">Edit Merchant</h5>
-        <p className="text-muted small mb-3">Jump to any tab and update the fields you need — changes save together.</p>
+        <div>
+          <h5 className="mb-1">Edit Merchant</h5>
+          <p className="text-muted small mb-3">Jump to any tab and update the fields you need — changes save together.</p>
+        </div>
       </Card.Header>
       <Card.Header className="px-3 pt-0 pb-0 bg-body">
         <EditTabsHeader activeTab={activeTab} onSelect={setActiveTab} />
       </Card.Header>
       <Card.Body>
         {formError && <Alert variant="danger">{formError}</Alert>}
+        <Alert variant="info" className="d-flex align-items-center gap-2 py-2">
+          <Icon icon="info-circle" className="flex-shrink-0" />
+          <span className="small mb-0">
+            Looking for Principal Info, Merchant Prefund, Branch, and other merchant settings? Open the <strong>More actions</strong> (⋮) button on the merchant list instead.
+          </span>
+        </Alert>
         <div className="pt-2">
           {activeTab === 'business' && <BusinessFields {...props} />}
           {activeTab === 'fees' && <FeesFields {...props} />}
@@ -1151,8 +1159,10 @@ const MerchantRegistrationWizard = ({ onCancel, onSaved, merchantId }) => {
   return (
     <Card>
       <Card.Header className="border-0 pb-0">
-        <h5 className="mb-1">Register a New Merchant</h5>
-        <p className="text-muted small mb-3">Walk through business info, fees, settlement, and delivery preferences before saving.</p>
+        <div>
+          <h5 className="mb-1">Register a New Merchant</h5>
+          <p className="text-muted small mb-3">Walk through business info, fees, settlement, and delivery preferences before saving.</p>
+        </div>
       </Card.Header>
       <Card.Body>
         <div className="ins-wizard" data-wizard>
