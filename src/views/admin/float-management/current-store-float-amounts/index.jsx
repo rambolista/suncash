@@ -51,15 +51,13 @@ const CurrentStoreFloatAmountsPage = () => {
           {loading ? (
             <LoadingState />
           ) : (
-            <div className="table-responsive">
-              <CurrentStoreFloatTable
-                data={rows}
-                canEdit={canEdit}
-                canAdd={canAdd}
-                onTopup={(row) => setAmountAction({ type: 'topup', row })}
-                onRequestReplenishment={(row) => setAmountAction({ type: 'request', row })}
-              />
-            </div>
+            <CurrentStoreFloatTable
+              data={rows}
+              canEdit={canEdit}
+              canAdd={canAdd}
+              onTopup={(row) => setAmountAction({ type: 'topup', row })}
+              onRequestReplenishment={(row) => setAmountAction({ type: 'request', row })}
+            />
           )}
         </Card.Body>
       </Card>

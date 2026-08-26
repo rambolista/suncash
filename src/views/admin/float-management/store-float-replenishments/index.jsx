@@ -73,17 +73,15 @@ const StoreFloatReplenishmentsPage = () => {
           {loading ? (
             <LoadingState />
           ) : (
-            <div className="table-responsive">
-              <StoreFloatReplenishmentsTable
-                key={tab}
-                tab={tab}
-                data={activeRows}
-                canApprove={canApprove}
-                onApprove={(row) => setConfirmAction({ type: 'approve', row })}
-                onReject={(row) => setConfirmAction({ type: 'reject', row })}
-                onConfirm={(row) => setConfirmAction({ type: 'confirm', row })}
-              />
-            </div>
+            <StoreFloatReplenishmentsTable
+              key={tab}
+              tab={tab}
+              data={activeRows}
+              canApprove={canApprove}
+              onApprove={(row) => setConfirmAction({ type: 'approve', row })}
+              onReject={(row) => setConfirmAction({ type: 'reject', row })}
+              onConfirm={(row) => setConfirmAction({ type: 'confirm', row })}
+            />
           )}
         </Card.Body>
       </Card>

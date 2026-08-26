@@ -76,7 +76,7 @@ const MainReserveAccountPage = () => {
           {loading ? (
             <LoadingState />
           ) : (
-            <div className="table-responsive">
+            <>
               {/* Legacy shows these two actions only on the Approved tab, and only once at least one account has been approved. */}
               {tab === 'approved' && rows.approved.length > 0 && (
                 <div className="d-flex justify-content-end gap-2 mb-3">
@@ -93,7 +93,7 @@ const MainReserveAccountPage = () => {
                 onReject={(row) => setConfirmAction({ type: 'reject', row })}
                 onConfirm={(row) => setConfirmAction({ type: 'confirm', row })}
               />
-            </div>
+            </>
           )}
         </Card.Body>
       </Card>
