@@ -23,6 +23,11 @@ const escapeHtml = (value) =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;')
 
+const TYPE_TABS = [
+  { key: 'email', label: 'Email Settings', icon: 'mail' },
+  { key: 'sms', label: 'SMS Settings', icon: 'message' },
+]
+
 const columns = [
   { data: 'name', render: (value) => escapeHtml(value || '—') },
   { data: 'description', className: 'text-muted', render: (value) => escapeHtml(value || '—') },
@@ -147,13 +152,15 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
     if (!handlers.current.editable) return
     const current = rowMapRef.current[id]
     if (!current) return
+    const nextEnabled = !current.is_enabled
     try {
-      await ApiService.toggleNotificationSetting(id, !current.is_enabled)
-      setSettings((prev) => prev.map((item) => (item.id === id ? { ...item, is_enabled: !item.is_enabled } : item)))
+      await ApiService.toggleNotificationSetting(id, nextEnabled)
+      setSettings((prev) => prev.map((item) => (item.id === id ? { ...item, is_enabled: nextEnabled } : item)))
       // `options`/its closures are only read by the underlying DataTables
       // instance at creation time, so a redraw is forced explicitly here
       // rather than relying on the data prop change alone.
       dtApiRef.current?.draw(false)
+      showNotification({ title: 'Success', message: `${current.name || 'Setting'} ${nextEnabled ? 'enabled' : 'disabled'}.`, variant: 'success' })
     } catch (err) {
       showNotification({ title: 'Failed', message: err?.message || 'Failed to update setting.', variant: 'danger' })
     }
@@ -213,10 +220,23 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
   return (
     <Card>
       <Card.Header className="border-top-0 pt-0">
-        <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary">
-          <Nav.Item><Nav.Link eventKey="email">Email Settings</Nav.Link></Nav.Item>
-          <Nav.Item><Nav.Link eventKey="sms">SMS Settings</Nav.Link></Nav.Item>
-        </Nav>
+        <div className="customer-profile-tabs-scroll">
+          <Nav variant="tabs" activeKey={type} onSelect={(key) => key && setType(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+            {TYPE_TABS.map((tab) => (
+              <Nav.Item key={tab.key}>
+                <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
+                  <span
+                    className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle"
+                    style={{ width: 32, height: 32 }}
+                  >
+                    <Icon icon={tab.icon} className="text-primary" style={{ fontSize: '1rem' }} />
+                  </span>
+                  <span className="fw-semibold text-nowrap">{tab.label}</span>
+                </Nav.Link>
+              </Nav.Item>
+            ))}
+          </Nav>
+        </div>
       </Card.Header>
       <Card.Body>
         {loading ? (
