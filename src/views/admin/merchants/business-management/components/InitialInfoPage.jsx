@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Alert, Badge, Button, Card, Col, Form, Row } from 'react-bootstrap'
+import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
+import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Icon from '@/components/wrappers/Icon'
 import LoadingState from '@/components/LoadingState'
 import ApiService from '@/services/ApiService'
@@ -132,6 +133,7 @@ const InitialInfoPage = ({ merchantId, canEdit, onBack }) => {
 
   return (
     <>
+      <PageBreadcrumb title="Business Initial Info" subtitle="Business Management" />
       <Button variant="light" size="sm" className="mb-3" onClick={onBack}>
         <Icon icon="arrow-left" className="me-1" /> Back to list
       </Button>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Card, Nav } from 'react-bootstrap'
+import { Badge, Button, Card, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -17,6 +17,19 @@ const TABS = [
   { key: 'rejected', label: 'Rejected', icon: 'circle-x' },
 ]
 
+const STATUS_BY_TAB = { pending: 'P', approved: 'A', rejected: 'V' }
+
+const triggerDownload = (blob, filename) => {
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
 const CharityManagementPage = () => {
   const currentUser = useCurrentUser()
   const { showNotification } = useNotificationContext()
@@ -27,9 +40,22 @@ const CharityManagementPage = () => {
   const [loading, setLoading] = useState(true)
   const [confirmAction, setConfirmAction] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
+  const [exporting, setExporting] = useState('')
 
   const canApprove = Boolean(modulePermission.can_approve)
   const canEdit = Boolean(modulePermission.can_edit)
+
+  const handleExport = async (format) => {
+    setExporting(format)
+    try {
+      const { blob, filename } = await ApiService.exportCharities(STATUS_BY_TAB[tab], format)
+      triggerDownload(blob, filename)
+    } catch (err) {
+      showNotification({ title: 'Failed', message: err?.message || `Failed to export ${format.toUpperCase()}.`, variant: 'danger' })
+    } finally {
+      setExporting('')
+    }
+  }
 
   const load = () => {
     setLoading(true)
@@ -52,25 +78,35 @@ const CharityManagementPage = () => {
       <PageBreadcrumb title="Charity Management" subtitle="Merchants" />
       <Card>
         <Card.Header className="px-3 pt-3 pb-0 bg-body">
-          <div className="customer-profile-tabs-scroll">
-            <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && setTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
-              {TABS.map((t) => {
-                const isActive = t.key === tab
-                return (
-                  <Nav.Item key={t.key}>
-                    <Nav.Link eventKey={t.key} className="d-flex align-items-center gap-2">
-                      <span className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle" style={{ width: 32, height: 32 }}>
-                        <Icon icon={t.icon} className="text-primary" style={{ fontSize: '1rem' }} />
-                      </span>
-                      <span className="fw-semibold text-nowrap">{t.label}</span>
-                      <Badge bg={isActive ? 'primary' : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
-                        {rows[t.key].length}
-                      </Badge>
-                    </Nav.Link>
-                  </Nav.Item>
-                )
-              })}
-            </Nav>
+          <div className="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-2">
+            <div className="customer-profile-tabs-scroll">
+              <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && setTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+                {TABS.map((t) => {
+                  const isActive = t.key === tab
+                  return (
+                    <Nav.Item key={t.key}>
+                      <Nav.Link eventKey={t.key} className="d-flex align-items-center gap-2">
+                        <span className="rounded-circle d-inline-flex align-items-center justify-content-center flex-shrink-0 bg-primary-subtle" style={{ width: 32, height: 32 }}>
+                          <Icon icon={t.icon} className="text-primary" style={{ fontSize: '1rem' }} />
+                        </span>
+                        <span className="fw-semibold text-nowrap">{t.label}</span>
+                        <Badge bg={isActive ? 'primary' : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
+                          {rows[t.key].length}
+                        </Badge>
+                      </Nav.Link>
+                    </Nav.Item>
+                  )
+                })}
+              </Nav>
+            </div>
+            <div className="d-flex gap-2">
+              <Button variant="outline-secondary" size="sm" disabled={exporting !== ''} onClick={() => handleExport('pdf')}>
+                <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+              </Button>
+              <Button variant="outline-success" size="sm" disabled={exporting !== ''} onClick={() => handleExport('csv')}>
+                <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
+              </Button>
+            </div>
           </div>
         </Card.Header>
         <Card.Body>

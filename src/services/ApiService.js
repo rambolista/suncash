@@ -732,6 +732,11 @@ const ApiService = {
   updateBusinessOwner: (merchantId, ownerId, data) =>
     http.put(`/business-management/${merchantId}/owners/${ownerId}`, data),
 
+  exportBusinesses: (status, format) => {
+    const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
+    return http.download(`/business-management/export?${query}`)
+  },
+
   // Charity Management
   getCharities: () =>
     http.get('/charity-management'),
@@ -747,6 +752,11 @@ const ApiService = {
 
   rejectCharity: (id) =>
     http.post(`/charity-management/${id}/reject`),
+
+  exportCharities: (status, format) => {
+    const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
+    return http.download(`/charity-management/export?${query}`)
+  },
 }
 
 export default ApiService

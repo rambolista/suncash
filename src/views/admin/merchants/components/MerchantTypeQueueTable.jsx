@@ -21,8 +21,20 @@ const escapeHtml = (value) =>
 
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
 
+const formatDateTime = (value) => {
+  if (!value) return '—'
+  const date = new Date(String(value).replace(' ', 'T'))
+  if (Number.isNaN(date.getTime())) return escapeHtml(value)
+  return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+}
+
+const dateCol = (key) => ({
+  data: key,
+  render: (value, type) => (type === 'display' ? formatDateTime(value) : value || ''),
+})
+
 const columns = [
-  textCol('creation_date'),
+  dateCol('creation_date'),
   textCol('client_id'),
   textCol('dba_name'),
   textCol('phone_no'),
