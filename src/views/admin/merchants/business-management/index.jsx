@@ -10,6 +10,13 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 import ConfirmActionModal from '../components/ConfirmActionModal'
 import MerchantTypeQueueTable from '../components/MerchantTypeQueueTable'
 import InitialInfoPage from './components/InitialInfoPage'
+import MerchantResetPasswordConfirmModal from '../registration/components/MerchantResetPasswordConfirmModal'
+import ServicesPermissionModal from './components/ServicesPermissionModal'
+import EzpayAccessModal from './components/EzpayAccessModal'
+import LinkedCardsModal from './components/LinkedCardsModal'
+import NumericFieldModal from './components/NumericFieldModal'
+import AuthorizedAuthModal from './components/AuthorizedAuthModal'
+import VoucherSettingModal from './components/VoucherSettingModal'
 
 const TABS = [
   { key: 'pending', label: 'Pending', icon: 'clock' },
@@ -41,6 +48,7 @@ const BusinessManagementPage = () => {
   const [confirmAction, setConfirmAction] = useState(null) // { type: 'approve'|'reject'|'activate', row }
   const [selectedId, setSelectedId] = useState(null)
   const [exporting, setExporting] = useState('')
+  const [settingsModal, setSettingsModal] = useState(null) // { type, row }
 
   const canApprove = Boolean(modulePermission.can_approve)
   const canEdit = Boolean(modulePermission.can_edit)
@@ -121,6 +129,17 @@ const BusinessManagementPage = () => {
               onApprove={(row) => setConfirmAction({ type: 'approve', row })}
               onReject={(row) => setConfirmAction({ type: 'reject', row })}
               onActivate={(row) => setConfirmAction({ type: 'activate', row })}
+              businessActions={canEdit ? {
+                onResetPassword: (row) => setSettingsModal({ type: 'password', row }),
+                onServicesPermission: (row) => setSettingsModal({ type: 'services', row }),
+                onSmartpayAccess: (row) => setSettingsModal({ type: 'ezpay', row }),
+                onLinkedCards: (row) => setSettingsModal({ type: 'cards', row }),
+                onCardHoldSettings: (row) => setSettingsModal({ type: 'cardHold', row }),
+                onTransactionFee: (row) => setSettingsModal({ type: 'txnFee', row }),
+                onAuthorizedAuth: (row) => setSettingsModal({ type: 'auth', row }),
+                onGcFee: (row) => setSettingsModal({ type: 'gcFee', row }),
+                onVoucherSetting: (row) => setSettingsModal({ type: 'voucher', row }),
+              } : undefined}
             />
           )}
         </Card.Body>
@@ -158,6 +177,79 @@ const BusinessManagementPage = () => {
         successMessage="Business activated successfully."
         onConfirm={() => ApiService.activateBusiness(confirmAction.row.id)}
         onDone={load}
+      />
+
+      <MerchantResetPasswordConfirmModal
+        show={settingsModal?.type === 'password'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
+      />
+      <ServicesPermissionModal
+        show={settingsModal?.type === 'services'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
+        editable={canEdit}
+      />
+      <EzpayAccessModal
+        show={settingsModal?.type === 'ezpay'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
+        editable={canEdit}
+      />
+      <LinkedCardsModal
+        show={settingsModal?.type === 'cards'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
+      />
+      <NumericFieldModal
+        show={settingsModal?.type === 'cardHold'}
+        onHide={() => setSettingsModal(null)}
+        title="Card Hold Settings"
+        label="Card Hold Days"
+        suffix="days"
+        step="1"
+        errorKey="card_hold_days"
+        initialValue={settingsModal?.row?.card_hold_days}
+        successMessage="Card hold settings updated successfully."
+        onSubmit={(value) => ApiService.updateBusinessCardHoldSettings(settingsModal.row.id, value)}
+        onDone={load}
+      />
+      <NumericFieldModal
+        show={settingsModal?.type === 'txnFee'}
+        onHide={() => setSettingsModal(null)}
+        title="Suncash Transaction Fee"
+        label="Suncash Transaction Fee"
+        suffix="%"
+        max={100}
+        errorKey="suncash_transaction_fee"
+        initialValue={settingsModal?.row?.suncash_transaction_fee}
+        successMessage="Suncash transaction fee updated successfully."
+        onSubmit={(value) => ApiService.updateBusinessTransactionFee(settingsModal.row.id, value)}
+        onDone={load}
+      />
+      <AuthorizedAuthModal
+        show={settingsModal?.type === 'auth'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
+        onDone={load}
+      />
+      <NumericFieldModal
+        show={settingsModal?.type === 'gcFee'}
+        onHide={() => setSettingsModal(null)}
+        title="GC Fee"
+        label="GC Fee"
+        suffix="%"
+        max={100}
+        errorKey="gc_fee"
+        initialValue={settingsModal?.row?.gc_fee}
+        successMessage="GC fee updated successfully."
+        onSubmit={(value) => ApiService.updateBusinessGcFee(settingsModal.row.id, value)}
+        onDone={load}
+      />
+      <VoucherSettingModal
+        show={settingsModal?.type === 'voucher'}
+        onHide={() => setSettingsModal(null)}
+        merchant={settingsModal?.row}
       />
     </>
   )

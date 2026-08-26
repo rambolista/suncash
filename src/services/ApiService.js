@@ -729,6 +729,33 @@ const ApiService = {
   activateBusiness: (id) =>
     http.post(`/business-management/${id}/activate`),
 
+  updateBusinessCardHoldSettings: (id, cardHoldDays) =>
+    http.put(`/business-management/${id}/card-hold-settings`, { card_hold_days: cardHoldDays }),
+
+  updateBusinessTransactionFee: (id, fee) =>
+    http.put(`/business-management/${id}/transaction-fee`, { suncash_transaction_fee: fee }),
+
+  updateBusinessAuthorizedAuth: (id, limit, holdDays) =>
+    http.put(`/business-management/${id}/authorized-auth`, { reauth_amount_limit: limit, reauth_card_hold_days: holdDays }),
+
+  updateBusinessGcFee: (id, fee) =>
+    http.put(`/business-management/${id}/gc-fee`, { gc_fee: fee }),
+
+  getBusinessVoucherSettings: (id) =>
+    http.get(`/business-management/${id}/voucher-settings`),
+
+  updateBusinessVoucherSettings: (id, voucherTypes) =>
+    http.put(`/business-management/${id}/voucher-settings`, { voucher_types: voucherTypes }),
+
+  getBusinessLinkedCards: (id) =>
+    http.get(`/business-management/${id}/linked-cards`),
+
+  approveBusinessLinkedCard: (id, cardId) =>
+    http.post(`/business-management/${id}/linked-cards/${cardId}/approve`),
+
+  rejectBusinessLinkedCard: (id, cardId, reason) =>
+    http.post(`/business-management/${id}/linked-cards/${cardId}/reject`, { reason }),
+
   addBusinessOwner: (merchantId, data) =>
     http.post(`/business-management/${merchantId}/owners`, data),
 

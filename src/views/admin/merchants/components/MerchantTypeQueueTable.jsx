@@ -3,10 +3,11 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
-import { FormControl } from 'react-bootstrap'
+import { Dropdown, FormControl } from 'react-bootstrap'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import Icon from '@/components/wrappers/Icon'
 import ActionButton from './ActionButton'
 
 DataTable.use(DT)
@@ -40,15 +41,15 @@ const columns = [
   textCol('phone_no'),
   textCol('island'),
   textCol('suntag_shortcode'),
-  { data: 'id', orderable: false, searchable: false, width: '130px', className: 'text-nowrap action-cell', render: (id) => `<div class="merchant-type-action-slot" data-id="${id}"></div>` },
+  { data: 'id', orderable: false, searchable: false, width: '170px', className: 'text-nowrap action-cell', render: (id) => `<div class="merchant-type-action-slot" data-id="${id}"></div>` },
 ]
 
 const headers = ['Created', 'Client ID', 'Name', 'Phone', 'Island', 'Short Code', 'Action']
 
 /** Shared pending/approved/rejected DataTable list for Business Management and Charity Management — same shape, only the filter and approve/reject wording differ per caller. */
-const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onApprove, onReject, onActivate, activateAlways = false }) => {
-  const handlers = useRef({ onView, onApprove, onReject, onActivate })
-  handlers.current = { onView, onApprove, onReject, onActivate }
+const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onApprove, onReject, onActivate, activateAlways = false, businessActions }) => {
+  const handlers = useRef({ onView, onApprove, onReject, onActivate, businessActions })
+  handlers.current = { onView, onApprove, onReject, onActivate, businessActions }
 
   const rowMap = useMemo(() => {
     const map = {}
@@ -74,6 +75,25 @@ const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onAppr
         )}
         {tab === 'approved' && canEdit && (activateAlways || Number(item.client_status_id) === -1) && (
           <ActionButton label="Activate" icon="circle-check" iconClassName="text-success" onClick={() => handlers.current.onActivate(item)} />
+        )}
+        {tab === 'approved' && handlers.current.businessActions && (
+          <Dropdown>
+            <Dropdown.Toggle as="button" className="btn btn-light btn-icon btn-sm rounded-circle" aria-label="More actions">
+              <Icon icon="dots-vertical" className="fs-lg" />
+            </Dropdown.Toggle>
+            <Dropdown.Menu align="end">
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onResetPassword(item)}>password</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onServicesPermission(item)}>services permission</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onSmartpayAccess(item)}>Smartpay permission</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onLinkedCards(item)}>credit/debit card</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onCardHoldSettings(item)}>Card Hold Settings</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onTransactionFee(item)}>Suncash Transaction Fee</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onAuthorizedAuth(item)}>Authorized Auth</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onGcFee(item)}>GC Fee</Dropdown.Item>
+              <Dropdown.Item onClick={() => handlers.current.businessActions.onVoucherSetting(item)}>Voucher Setting</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         )}
       </div>
     )
