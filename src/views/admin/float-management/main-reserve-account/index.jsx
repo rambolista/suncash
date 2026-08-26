@@ -58,7 +58,7 @@ const MainReserveAccountPage = () => {
     <>
       <PageBreadcrumb title="Main Reserve Account" subtitle="Float Management" />
       <Card>
-        <Card.Header className="px-3 pt-3 pb-0 bg-body d-flex align-items-start justify-content-between flex-wrap gap-2">
+        <Card.Header className="px-3 pt-3 pb-0 bg-body">
           <div className="customer-profile-tabs-scroll">
             <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && setTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
               {TABS.map((t) => {
@@ -79,16 +79,19 @@ const MainReserveAccountPage = () => {
               })}
             </Nav>
           </div>
-          <div className="d-flex gap-2 mb-3">
-            {canEdit && <Button variant="outline-primary" size="sm" onClick={() => setShowTopup(true)}><Icon icon="plus" className="me-1" /> Top Up</Button>}
-            {canAdd && <Button variant="outline-primary" size="sm" onClick={() => setShowRequest(true)}><Icon icon="cash" className="me-1" /> Request Replenishment</Button>}
-          </div>
         </Card.Header>
         <Card.Body>
           {loading ? (
             <LoadingState />
           ) : (
             <div className="table-responsive">
+              {/* Legacy shows these two actions only on the Approved tab, and only once at least one account has been approved. */}
+              {tab === 'approved' && rows.approved.length > 0 && (
+                <div className="d-flex justify-content-end gap-2 mb-3">
+                  {canEdit && <Button variant="outline-primary" size="sm" onClick={() => setShowTopup(true)}><Icon icon="plus" className="me-1" /> Account Topup</Button>}
+                  {canAdd && <Button variant="outline-primary" size="sm" onClick={() => setShowRequest(true)}><Icon icon="cash" className="me-1" /> Request Replenishment</Button>}
+                </div>
+              )}
               <Table className="align-middle mb-0">
                 <thead className="thead-sm text-uppercase fs-xxs">
                   <tr>
