@@ -134,6 +134,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/merchants/charity-management')),
       },
       {
+        path: '/merchants/settlements',
+        Component: lazy(() => import('@/views/admin/merchants/settlements')),
+      },
+      {
         path: '/settings/notifications',
         Component: lazy(() => import('@/views/admin/settings/notifications')),
       },

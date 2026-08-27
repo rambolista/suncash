@@ -799,6 +799,31 @@ const ApiService = {
     const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
     return http.download(`/charity-management/export?${query}`)
   },
+
+  // Merchant Settlements
+  getMerchantSettlements: () =>
+    http.get('/merchant-settlements'),
+
+  getMerchantSettlement: (id) =>
+    http.get(`/merchant-settlements/${id}`),
+
+  getMerchantSettlementHistory: (merchantId) =>
+    http.get(`/merchant-settlements/merchants/${merchantId}/history`),
+
+  getSettlementBanks: () =>
+    http.get('/merchant-settlements/banks'),
+
+  getLinkedBankAccounts: () =>
+    http.get('/merchant-settlements/linked-bank-accounts'),
+
+  linkSettlementBankAccount: (data) =>
+    http.post('/merchant-settlements/linked-bank-accounts', data),
+
+  approveMerchantSettlement: (id, data) =>
+    http.post(`/merchant-settlements/${id}/approve`, data),
+
+  rejectMerchantSettlement: (id, data) =>
+    http.post(`/merchant-settlements/${id}/reject`, data),
 }
 
 export default ApiService
