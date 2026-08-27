@@ -810,6 +810,9 @@ const ApiService = {
   getMerchantSettlementHistory: (merchantId) =>
     http.get(`/merchant-settlements/merchants/${merchantId}/history`),
 
+  getMerchantTransactionHistory: (merchantId) =>
+    http.get(`/merchant-settlements/merchants/${merchantId}/transactions`),
+
   getSettlementBanks: () =>
     http.get('/merchant-settlements/banks'),
 

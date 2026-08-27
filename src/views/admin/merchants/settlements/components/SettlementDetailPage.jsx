@@ -5,8 +5,10 @@ import Icon from '@/components/wrappers/Icon'
 import LoadingState from '@/components/LoadingState'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
+import ConfirmActionModal from '../../components/ConfirmActionModal'
 import LinkBankAccountModal from './LinkBankAccountModal'
 import SettlementHistoryModal from './SettlementHistoryModal'
+import MerchantTransactionsModal from './MerchantTransactionsModal'
 
 const STATUS_BADGE = {
   P: { text: 'PENDING', className: 'bg-warning-subtle text-warning' },
@@ -40,7 +42,8 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
   const [banks, setBanks] = useState([])
   const [showLinkModal, setShowLinkModal] = useState(false)
   const [showHistoryModal, setShowHistoryModal] = useState(false)
-  const [submitting, setSubmitting] = useState('')
+  const [showTransactionsModal, setShowTransactionsModal] = useState(false)
+  const [activeConfirm, setActiveConfirm] = useState(null) // 'approve' | 'reject' | null
   const [formError, setFormError] = useState('')
 
   const [bankAccountId, setBankAccountId] = useState('')
@@ -77,47 +80,36 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
   const isPending = settlement?.status === 'P'
   const canProcess = isPending && canApprove
 
-  const handleApprove = async () => {
-    setFormError('')
-    if (!confirm('Are you sure you want to process this settlement?')) return
-    setSubmitting('approve')
-    try {
-      const result = await ApiService.approveMerchantSettlement(settlementId, {
-        payee, message,
-        bank_account_id: bankAccountId,
-        check_number: checkNumber,
-        is_process: isProcess,
-        bank_trans_id: bankTransId,
-        account_number: accountNumber,
-      })
-      showNotification({ title: 'Success', message: result?.message || 'Request has been approved.', variant: 'success' })
-      onBack()
-    } catch (err) {
-      const errors = err?.errors || {}
-      setFormError(Object.values(errors)[0]?.[0] || err?.message || 'Failed to approve settlement.')
-    } finally {
-      setSubmitting('')
+  const validateApprove = () => {
+    if (isCheque) {
+      if (!bankAccountId) return 'Please select a bank.'
+      if (!checkNumber.trim()) return 'Please enter check number.'
+      if (!payee.trim()) return 'Please enter Payee.'
+      if (!isProcess) return 'Please check Check Signed to process.'
+    } else if (isTransfer) {
+      if (!bankAccountId) return 'Please select a bank.'
+      if (settlement?.type === 'Bank Transfer' && !bankTransId.trim()) return 'Please enter Transaction ID.'
     }
+    return null
   }
 
-  const handleReject = async () => {
+  const openApproveConfirm = () => {
+    const error = validateApprove()
+    if (error) {
+      setFormError(error)
+      return
+    }
     setFormError('')
+    setActiveConfirm('approve')
+  }
+
+  const openRejectConfirm = () => {
     if (!payee.trim()) {
       setFormError('Please enter Payee.')
       return
     }
-    if (!confirm('Are you sure you want to reject this settlement?')) return
-    setSubmitting('reject')
-    try {
-      const result = await ApiService.rejectMerchantSettlement(settlementId, { payee, message })
-      showNotification({ title: 'Success', message: result?.message || 'Request has been rejected.', variant: 'success' })
-      onBack()
-    } catch (err) {
-      const errors = err?.errors || {}
-      setFormError(Object.values(errors)[0]?.[0] || err?.message || 'Failed to reject settlement.')
-    } finally {
-      setSubmitting('')
-    }
+    setFormError('')
+    setActiveConfirm('reject')
   }
 
   if (loading) {
@@ -252,15 +244,12 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
             <Button variant="light" onClick={onBack}>Cancel</Button>
             {canProcess && (
               <>
-                <Button variant="danger" disabled={submitting !== ''} onClick={handleReject}>
-                  {submitting === 'reject' ? 'Rejecting...' : 'Reject'}
-                </Button>
-                <Button variant="primary" disabled={submitting !== ''} onClick={handleApprove}>
-                  {submitting === 'approve' ? 'Processing...' : 'Process'}
-                </Button>
+                <Button variant="danger" onClick={openRejectConfirm}>Reject</Button>
+                <Button variant="primary" onClick={openApproveConfirm}>Process</Button>
               </>
             )}
             <Button variant="outline-primary" onClick={() => setShowHistoryModal(true)}>View Settlements</Button>
+            <Button variant="outline-primary" onClick={() => setShowTransactionsModal(true)}>View Transactions</Button>
           </div>
         </Card.Body>
       </Card>
@@ -276,6 +265,42 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
         onHide={() => setShowHistoryModal(false)}
         merchantId={settlement?.client_record_id}
         merchantName={settlement?.dba_name}
+      />
+      <MerchantTransactionsModal
+        show={showTransactionsModal}
+        onHide={() => setShowTransactionsModal(false)}
+        merchantId={settlement?.client_record_id}
+        merchantName={settlement?.dba_name}
+      />
+
+      <ConfirmActionModal
+        show={activeConfirm === 'approve'}
+        onHide={() => setActiveConfirm(null)}
+        title="Process settlement"
+        message={`Are you sure you want to process this settlement request for ${settlement?.dba_name || 'this merchant'}?`}
+        confirmLabel="Process"
+        confirmVariant="primary"
+        successMessage="Request has been approved."
+        onConfirm={() => ApiService.approveMerchantSettlement(settlementId, {
+          payee, message,
+          bank_account_id: bankAccountId,
+          check_number: checkNumber,
+          is_process: isProcess,
+          bank_trans_id: bankTransId,
+          account_number: accountNumber,
+        })}
+        onDone={onBack}
+      />
+      <ConfirmActionModal
+        show={activeConfirm === 'reject'}
+        onHide={() => setActiveConfirm(null)}
+        title="Reject settlement"
+        message={`Are you sure you want to reject this settlement request for ${settlement?.dba_name || 'this merchant'}?`}
+        confirmLabel="Reject"
+        confirmVariant="danger"
+        successMessage="Request has been rejected."
+        onConfirm={() => ApiService.rejectMerchantSettlement(settlementId, { payee, message })}
+        onDone={onBack}
       />
     </>
   )
