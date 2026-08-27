@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
-import { Alert, Button, Card, Col, Form, Row } from 'react-bootstrap'
+import { useEffect, useMemo, useState } from 'react'
+import { Button, Card, Col, Form, Row } from 'react-bootstrap'
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Icon from '@/components/wrappers/Icon'
 import LoadingState from '@/components/LoadingState'
@@ -14,6 +16,33 @@ const STATUS_BADGE = {
   P: { text: 'PENDING', className: 'bg-warning-subtle text-warning' },
   A: { text: 'PROCESSED', className: 'bg-success-subtle text-success' },
   R: { text: 'REJECTED', className: 'bg-danger-subtle text-danger' },
+}
+
+const emptyValues = {
+  bank_account_id: '', check_number: '', payee: '', is_process: false, bank_trans_id: '', account_number: '', message: '',
+}
+
+const buildSchema = (type) => {
+  if (type === 'Cheque') {
+    return Yup.object({
+      bank_account_id: Yup.string().required('Please select a bank.'),
+      check_number: Yup.string().trim().required('Check number is required.'),
+      payee: Yup.string().trim().required('Payee is required.'),
+      is_process: Yup.boolean().oneOf([true], 'Please confirm the check has been signed.'),
+      message: Yup.string(),
+    })
+  }
+  if (type === 'Bank Transfer' || type === 'Bank Deposit') {
+    return Yup.object({
+      bank_account_id: Yup.string().required('Please select a bank.'),
+      bank_trans_id: type === 'Bank Transfer'
+        ? Yup.string().trim().required('Transaction ID is required.')
+        : Yup.string(),
+      account_number: Yup.string(),
+      message: Yup.string(),
+    })
+  }
+  return Yup.object()
 }
 
 const money = (value) => `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -44,15 +73,19 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
   const [showHistoryModal, setShowHistoryModal] = useState(false)
   const [showTransactionsModal, setShowTransactionsModal] = useState(false)
   const [activeConfirm, setActiveConfirm] = useState(null) // 'approve' | 'reject' | null
-  const [formError, setFormError] = useState('')
 
-  const [bankAccountId, setBankAccountId] = useState('')
-  const [checkNumber, setCheckNumber] = useState('')
-  const [payee, setPayee] = useState('')
-  const [isProcess, setIsProcess] = useState(false)
-  const [bankTransId, setBankTransId] = useState('')
-  const [accountNumber, setAccountNumber] = useState('')
-  const [message, setMessage] = useState('')
+  const isCheque = settlement?.type === 'Cheque'
+  const isTransfer = settlement?.type === 'Bank Transfer' || settlement?.type === 'Bank Deposit'
+  const isPending = settlement?.status === 'P'
+  const canProcess = isPending && canApprove
+
+  const schema = useMemo(() => buildSchema(settlement?.type), [settlement?.type])
+
+  const formik = useFormik({
+    initialValues: emptyValues,
+    validationSchema: schema,
+    onSubmit: () => setActiveConfirm('approve'),
+  })
 
   const load = () => {
     setLoading(true)
@@ -61,13 +94,17 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
         setSettlement(detail)
         setLinkedAccounts(Array.isArray(accounts) ? accounts : [])
         setBanks(Array.isArray(bankList) ? bankList : [])
-        setPayee(detail?.payee || '')
-        setCheckNumber(detail?.check_number || '')
-        setIsProcess(Boolean(detail?.is_process))
-        setBankTransId(detail?.bank_trans_id || '')
-        setAccountNumber(detail?.account_number_transfered || '')
-        setMessage(detail?.message_to_business || '')
-        setBankAccountId(detail?.bank_account_id && detail.bank_account_id !== -1 ? String(detail.bank_account_id) : '')
+        formik.resetForm({
+          values: {
+            bank_account_id: detail?.bank_account_id && detail.bank_account_id !== -1 ? String(detail.bank_account_id) : '',
+            check_number: detail?.check_number || '',
+            payee: detail?.payee || '',
+            is_process: Boolean(detail?.is_process),
+            bank_trans_id: detail?.bank_trans_id || '',
+            account_number: detail?.account_number_transfered || '',
+            message: detail?.message_to_business || '',
+          },
+        })
       })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load settlement request.', variant: 'danger' }))
       .finally(() => setLoading(false))
@@ -75,40 +112,12 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
 
   useEffect(() => { load() }, [settlementId])
 
-  const isCheque = settlement?.type === 'Cheque'
-  const isTransfer = settlement?.type === 'Bank Transfer' || settlement?.type === 'Bank Deposit'
-  const isPending = settlement?.status === 'P'
-  const canProcess = isPending && canApprove
-
-  const validateApprove = () => {
-    if (isCheque) {
-      if (!bankAccountId) return 'Please select a bank.'
-      if (!checkNumber.trim()) return 'Please enter check number.'
-      if (!payee.trim()) return 'Please enter Payee.'
-      if (!isProcess) return 'Please check Check Signed to process.'
-    } else if (isTransfer) {
-      if (!bankAccountId) return 'Please select a bank.'
-      if (settlement?.type === 'Bank Transfer' && !bankTransId.trim()) return 'Please enter Transaction ID.'
-    }
-    return null
-  }
-
-  const openApproveConfirm = () => {
-    const error = validateApprove()
-    if (error) {
-      setFormError(error)
-      return
-    }
-    setFormError('')
-    setActiveConfirm('approve')
-  }
-
   const openRejectConfirm = () => {
-    if (!payee.trim()) {
-      setFormError('Please enter Payee.')
+    if (isCheque && !formik.values.payee.trim()) {
+      formik.setFieldTouched('payee', true, false)
+      formik.setFieldError('payee', 'Payee is required.')
       return
     }
-    setFormError('')
     setActiveConfirm('reject')
   }
 
@@ -122,6 +131,7 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
   }
 
   const badge = STATUS_BADGE[settlement?.status] || { text: settlement?.status || 'UNKNOWN', className: 'bg-secondary-subtle text-secondary' }
+  const { values: v, errors: e, touched: t } = formik
 
   return (
     <>
@@ -139,8 +149,6 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
             </div>
             <span className={`badge ${badge.className} badge-label`}>{badge.text}</span>
           </div>
-
-          {formError && <Alert variant="danger" className="py-2 small">{formError}</Alert>}
 
           <Row>
             <Col md={6}>
@@ -174,83 +182,134 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
 
           <hr />
 
-          <Row>
-            <Col md={6}>
-              {isCheque && (
-                <>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Bank Account *</Form.Label>
-                    <div className="d-flex gap-2">
-                      <Form.Select value={bankAccountId} onChange={(e) => setBankAccountId(e.target.value)} disabled={!canProcess}>
-                        <option value="">--Select Bank--</option>
-                        {linkedAccounts.map((account) => <option key={account.id} value={account.id}>{account.bank} - {account.branch}</option>)}
-                      </Form.Select>
-                      <Button variant="outline-secondary" size="sm" disabled={!canEdit} onClick={() => setShowLinkModal(true)}>Link Account</Button>
-                    </div>
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Check Number *</Form.Label>
-                    <Form.Control value={checkNumber} onChange={(e) => setCheckNumber(e.target.value)} disabled={!canProcess} />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Payee *</Form.Label>
-                    <Form.Control value={payee} onChange={(e) => setPayee(e.target.value)} disabled={!canProcess} />
-                  </Form.Group>
-                  <Form.Check
-                    type="checkbox"
-                    id="is_process"
-                    label="Check Signed"
-                    checked={isProcess}
-                    onChange={(e) => setIsProcess(e.target.checked)}
-                    disabled={!canProcess}
-                    className="mb-3"
-                  />
-                </>
-              )}
-
-              {isTransfer && (
-                <>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Bank Account Transferred From *</Form.Label>
-                    <div className="d-flex gap-2">
-                      <Form.Select value={bankAccountId} onChange={(e) => setBankAccountId(e.target.value)} disabled={!canProcess}>
-                        <option value="">--Select Bank--</option>
-                        {linkedAccounts.map((account) => <option key={account.id} value={account.id}>{account.bank} - {account.branch}</option>)}
-                      </Form.Select>
-                      <Button variant="outline-secondary" size="sm" disabled={!canEdit} onClick={() => setShowLinkModal(true)}>Link Account</Button>
-                    </div>
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Account Number</Form.Label>
-                    <Form.Control value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} disabled={!canProcess} />
-                  </Form.Group>
-                  {settlement?.type === 'Bank Transfer' && (
+          <Form noValidate onSubmit={formik.handleSubmit}>
+            <Row>
+              <Col md={6}>
+                {isCheque && (
+                  <>
                     <Form.Group className="mb-3">
-                      <Form.Label>Transaction ID *</Form.Label>
-                      <Form.Control value={bankTransId} onChange={(e) => setBankTransId(e.target.value)} disabled={!canProcess} />
+                      <Form.Label>Bank Account *</Form.Label>
+                      <div className="d-flex gap-2">
+                        <Form.Select
+                          name="bank_account_id"
+                          value={v.bank_account_id}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          isInvalid={t.bank_account_id && !!e.bank_account_id}
+                          disabled={!canProcess}
+                        >
+                          <option value="">--Select Bank--</option>
+                          {linkedAccounts.map((account) => <option key={account.id} value={account.id}>{account.bank} - {account.branch}</option>)}
+                        </Form.Select>
+                        <Button variant="outline-secondary" size="sm" disabled={!canEdit} onClick={() => setShowLinkModal(true)}>Link Account</Button>
+                      </div>
+                      <Form.Control.Feedback type="invalid" className={t.bank_account_id && e.bank_account_id ? 'd-block' : ''}>{e.bank_account_id}</Form.Control.Feedback>
                     </Form.Group>
-                  )}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Check Number *</Form.Label>
+                      <Form.Control
+                        name="check_number"
+                        value={v.check_number}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        isInvalid={t.check_number && !!e.check_number}
+                        disabled={!canProcess}
+                      />
+                      <Form.Control.Feedback type="invalid">{e.check_number}</Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Payee *</Form.Label>
+                      <Form.Control
+                        name="payee"
+                        value={v.payee}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        isInvalid={t.payee && !!e.payee}
+                        disabled={!canProcess}
+                      />
+                      <Form.Control.Feedback type="invalid">{e.payee}</Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Check
+                        type="checkbox"
+                        id="is_process"
+                        name="is_process"
+                        label="Check Signed"
+                        checked={v.is_process}
+                        onChange={formik.handleChange}
+                        isInvalid={t.is_process && !!e.is_process}
+                        disabled={!canProcess}
+                      />
+                      {t.is_process && e.is_process && <div className="invalid-feedback d-block">{e.is_process}</div>}
+                    </Form.Group>
+                  </>
+                )}
+
+                {isTransfer && (
+                  <>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Bank Account Transferred From *</Form.Label>
+                      <div className="d-flex gap-2">
+                        <Form.Select
+                          name="bank_account_id"
+                          value={v.bank_account_id}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          isInvalid={t.bank_account_id && !!e.bank_account_id}
+                          disabled={!canProcess}
+                        >
+                          <option value="">--Select Bank--</option>
+                          {linkedAccounts.map((account) => <option key={account.id} value={account.id}>{account.bank} - {account.branch}</option>)}
+                        </Form.Select>
+                        <Button variant="outline-secondary" size="sm" disabled={!canEdit} onClick={() => setShowLinkModal(true)}>Link Account</Button>
+                      </div>
+                      <Form.Control.Feedback type="invalid" className={t.bank_account_id && e.bank_account_id ? 'd-block' : ''}>{e.bank_account_id}</Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Account Number</Form.Label>
+                      <Form.Control
+                        name="account_number"
+                        value={v.account_number}
+                        onChange={formik.handleChange}
+                        disabled={!canProcess}
+                      />
+                    </Form.Group>
+                    {settlement?.type === 'Bank Transfer' && (
+                      <Form.Group className="mb-3">
+                        <Form.Label>Transaction ID *</Form.Label>
+                        <Form.Control
+                          name="bank_trans_id"
+                          value={v.bank_trans_id}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          isInvalid={t.bank_trans_id && !!e.bank_trans_id}
+                          disabled={!canProcess}
+                        />
+                        <Form.Control.Feedback type="invalid">{e.bank_trans_id}</Form.Control.Feedback>
+                      </Form.Group>
+                    )}
+                  </>
+                )}
+
+                <Form.Group>
+                  <Form.Label>Message to Business</Form.Label>
+                  <Form.Control as="textarea" rows={3} name="message" value={v.message} onChange={formik.handleChange} disabled={!canProcess} />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <div className="d-flex gap-2 mt-3 flex-wrap">
+              <Button variant="light" onClick={onBack}>Cancel</Button>
+              {canProcess && (
+                <>
+                  <Button variant="danger" type="button" onClick={openRejectConfirm}>Reject</Button>
+                  <Button variant="primary" type="submit">Process</Button>
                 </>
               )}
-
-              <Form.Group>
-                <Form.Label>Message to Business</Form.Label>
-                <Form.Control as="textarea" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} disabled={!canProcess} />
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <div className="d-flex gap-2 mt-3 flex-wrap">
-            <Button variant="light" onClick={onBack}>Cancel</Button>
-            {canProcess && (
-              <>
-                <Button variant="danger" onClick={openRejectConfirm}>Reject</Button>
-                <Button variant="primary" onClick={openApproveConfirm}>Process</Button>
-              </>
-            )}
-            <Button variant="outline-primary" onClick={() => setShowHistoryModal(true)}>View Settlements</Button>
-            <Button variant="outline-primary" onClick={() => setShowTransactionsModal(true)}>View Transactions</Button>
-          </div>
+              <Button variant="outline-primary" type="button" onClick={() => setShowHistoryModal(true)}>View Settlements</Button>
+              <Button variant="outline-primary" type="button" onClick={() => setShowTransactionsModal(true)}>View Transactions</Button>
+            </div>
+          </Form>
         </Card.Body>
       </Card>
 
@@ -281,14 +340,7 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
         confirmLabel="Process"
         confirmVariant="primary"
         successMessage="Request has been approved."
-        onConfirm={() => ApiService.approveMerchantSettlement(settlementId, {
-          payee, message,
-          bank_account_id: bankAccountId,
-          check_number: checkNumber,
-          is_process: isProcess,
-          bank_trans_id: bankTransId,
-          account_number: accountNumber,
-        })}
+        onConfirm={() => ApiService.approveMerchantSettlement(settlementId, v)}
         onDone={onBack}
       />
       <ConfirmActionModal
@@ -299,7 +351,7 @@ const SettlementDetailPage = ({ settlementId, canApprove, canEdit, onBack }) => 
         confirmLabel="Reject"
         confirmVariant="danger"
         successMessage="Request has been rejected."
-        onConfirm={() => ApiService.rejectMerchantSettlement(settlementId, { payee, message })}
+        onConfirm={() => ApiService.rejectMerchantSettlement(settlementId, { payee: v.payee, message: v.message })}
         onDone={onBack}
       />
     </>
