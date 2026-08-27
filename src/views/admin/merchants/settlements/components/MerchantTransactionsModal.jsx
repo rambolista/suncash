@@ -1,13 +1,40 @@
-import { useEffect, useState } from 'react'
-import { Modal, Spinner, Table } from 'react-bootstrap'
+import DT from 'datatables.net-bs5'
+import DataTable from 'datatables.net-react'
+import 'datatables.net-responsive'
+import { useEffect, useMemo, useState } from 'react'
+import { FormControl, Modal, Spinner } from 'react-bootstrap'
 import ApiService from '@/services/ApiService'
+import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
+import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
+import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+
+DataTable.use(DT)
+
+const escapeHtml = (value) =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
 
 const formatDateTime = (value) => {
   if (!value) return '—'
   const date = new Date(String(value).replace(' ', 'T'))
-  if (Number.isNaN(date.getTime())) return value
+  if (Number.isNaN(date.getTime())) return escapeHtml(value)
   return date.toLocaleString('en-US', { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
+
+const money = (value) => `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+const columns = [
+  { data: 'timestamp', render: (value, type) => (type === 'display' ? formatDateTime(value) : value || '') },
+  { data: 'transaction_type', render: (value) => escapeHtml(value || '—') },
+  { data: 'description', render: (value) => escapeHtml(value || '—') },
+  { data: 'amount', render: (value, type) => (type === 'display' ? money(value) : value) },
+]
+
+const headers = ['Transaction Date', 'Type', 'Description', 'Amount']
 
 /** Legacy's "View Transactions" button — a merchant's general ledger history (not settlement-specific). */
 const MerchantTransactionsModal = ({ show, onHide, merchantId, merchantName }) => {
@@ -22,6 +49,17 @@ const MerchantTransactionsModal = ({ show, onHide, merchantId, merchantName }) =
       .finally(() => setLoading(false))
   }, [show, merchantId])
 
+  const options = useMemo(() => ({
+    responsive: true,
+    orderCellsTop: true,
+    columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
+    initComplete: function () {
+      bindColumnSearchInputs(this.api())
+      bindSortLabels(this.api())
+    },
+    language: { paginate: paginationIcons },
+  }), [])
+
   return (
     <Modal show={show} onHide={onHide} centered size="lg">
       <Modal.Header closeButton>
@@ -31,31 +69,20 @@ const MerchantTransactionsModal = ({ show, onHide, merchantId, merchantName }) =
         {loading ? (
           <div className="text-center py-4"><Spinner size="sm" /></div>
         ) : (
-          <div className="table-responsive" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-            <Table size="sm" className="align-middle mb-0">
-              <thead className="thead-sm text-uppercase fs-xxs">
-                <tr>
-                  <th>Transaction Date</th>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, index) => (
-                  <tr key={index}>
-                    <td className="text-nowrap">{formatDateTime(row.timestamp)}</td>
-                    <td>{row.transaction_type || '—'}</td>
-                    <td>{row.description || '—'}</td>
-                    <td>BSD {Number(row.amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                  </tr>
+          <DataTable data={rows} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
+            <thead className="thead-sm text-uppercase fs-xxs">
+              <tr>
+                {headers.map((header) => <th key={header}>{header}</th>)}
+              </tr>
+              <tr className="column-search-input-bar">
+                {headers.map((header, index) => (
+                  <th key={header}>
+                    <FormControl size="sm" type="text" placeholder={header} className="bg-light-subtle border-light" data-col-index={index} />
+                  </th>
                 ))}
-                {!rows.length && (
-                  <tr><td colSpan={4} className="text-center text-muted py-4">No transactions found for this merchant.</td></tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
+              </tr>
+            </thead>
+          </DataTable>
         )}
       </Modal.Body>
     </Modal>
