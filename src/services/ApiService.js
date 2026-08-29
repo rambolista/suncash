@@ -880,6 +880,15 @@ const ApiService = {
   updateTerminalManagement: (id, data) => http.put(`/terminals-management/${id}`, data),
 
   changeTerminalManagementStatus: (id, status) => http.post(`/terminals-management/${id}/status`, { status }),
+
+  // Giftcards — Products
+  getGiftcardProducts: () => http.get('/giftcard-products'),
+
+  getGiftcardProductTypes: (id) => http.get(`/giftcard-products/${id}/product-types`),
+
+  activateGiftcardProduct: (id) => http.post(`/giftcard-products/${id}/activate`),
+
+  deactivateGiftcardProduct: (id) => http.post(`/giftcard-products/${id}/deactivate`),
 }
 
 export default ApiService
