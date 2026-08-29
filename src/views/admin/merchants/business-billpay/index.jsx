@@ -7,16 +7,16 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
-import SettlementsTable from './components/SettlementsTable'
-import SettlementDetailPage from './components/SettlementDetailPage'
+import BillpayTable from './components/BillpayTable'
+import BillpayDetailPage from './components/BillpayDetailPage'
 
 const TABS = [
   { key: 'pending', label: 'Pending', icon: 'clock' },
-  { key: 'approved', label: 'Processed', icon: 'circle-check' },
+  { key: 'processed', label: 'Processed', icon: 'circle-check' },
   { key: 'rejected', label: 'Rejected', icon: 'circle-x' },
 ]
 
-const STATUS_BY_TAB = { pending: 'P', approved: 'A', rejected: 'R' }
+const STATUS_BY_TAB = { pending: 'A', processed: 'P', rejected: 'R' }
 
 const triggerDownload = (blob, filename) => {
   const url = window.URL.createObjectURL(blob)
@@ -29,24 +29,23 @@ const triggerDownload = (blob, filename) => {
   window.URL.revokeObjectURL(url)
 }
 
-const MerchantSettlementsPage = () => {
+const BusinessBillpayPage = () => {
   const currentUser = useCurrentUser()
   const { showNotification } = useNotificationContext()
-  const modulePermission = useMemo(() => getModulePermission(currentUser, '/merchants/settlements'), [currentUser])
+  const modulePermission = useMemo(() => getModulePermission(currentUser, '/merchants/business-billpay'), [currentUser])
 
   const [tab, setTab] = useState('pending')
-  const [rows, setRows] = useState({ pending: [], approved: [], rejected: [] })
+  const [rows, setRows] = useState({ pending: [], processed: [], rejected: [] })
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState(null)
   const [exporting, setExporting] = useState('')
 
   const canApprove = Boolean(modulePermission.can_approve)
-  const canEdit = Boolean(modulePermission.can_edit)
 
   const handleExport = async (format) => {
     setExporting(format)
     try {
-      const { blob, filename } = await ApiService.exportMerchantSettlements(STATUS_BY_TAB[tab], format)
+      const { blob, filename } = await ApiService.exportBusinessBillpay(STATUS_BY_TAB[tab], format)
       triggerDownload(blob, filename)
     } catch (err) {
       showNotification({ title: 'Failed', message: err?.message || `Failed to export ${format.toUpperCase()}.`, variant: 'danger' })
@@ -57,9 +56,9 @@ const MerchantSettlementsPage = () => {
 
   const load = () => {
     setLoading(true)
-    ApiService.getMerchantSettlements()
-      .then((data) => setRows({ pending: data?.pending || [], approved: data?.approved || [], rejected: data?.rejected || [] }))
-      .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load settlements.', variant: 'danger' }))
+    ApiService.getBusinessBillpay()
+      .then((data) => setRows({ pending: data?.pending || [], processed: data?.processed || [], rejected: data?.rejected || [] }))
+      .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load billpay requests.', variant: 'danger' }))
       .finally(() => setLoading(false))
   }
 
@@ -69,10 +68,9 @@ const MerchantSettlementsPage = () => {
 
   if (selectedId) {
     return (
-      <SettlementDetailPage
-        settlementId={selectedId}
+      <BillpayDetailPage
+        transactionId={selectedId}
         canApprove={canApprove}
-        canEdit={canEdit}
         onBack={() => { setSelectedId(null); load() }}
       />
     )
@@ -80,7 +78,7 @@ const MerchantSettlementsPage = () => {
 
   return (
     <>
-      <PageBreadcrumb title="Merchant Settlements" subtitle="Merchants" />
+      <PageBreadcrumb title="Business Billpay" subtitle="Merchants" />
       <Card>
         <Card.Header className="px-3 pt-3 pb-0 bg-body">
           <div className="customer-profile-tabs-scroll">
@@ -116,7 +114,7 @@ const MerchantSettlementsPage = () => {
           {loading ? (
             <LoadingState />
           ) : (
-            <SettlementsTable
+            <BillpayTable
               key={tab}
               data={activeRows}
               onView={(row) => setSelectedId(row.id)}
@@ -128,4 +126,4 @@ const MerchantSettlementsPage = () => {
   )
 }
 
-export default MerchantSettlementsPage
+export default BusinessBillpayPage

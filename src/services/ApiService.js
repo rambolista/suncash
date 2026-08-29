@@ -827,6 +827,59 @@ const ApiService = {
 
   rejectMerchantSettlement: (id, data) =>
     http.post(`/merchant-settlements/${id}/reject`, data),
+
+  exportMerchantSettlements: (status, format) => {
+    const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
+    return http.download(`/merchant-settlements/export?${query}`)
+  },
+
+  // Business Billpay
+  getBusinessBillpay: () =>
+    http.get('/business-billpay'),
+
+  getBusinessBillpayDetail: (id) =>
+    http.get(`/business-billpay/${id}`),
+
+  approveBusinessBillpay: (id) =>
+    http.post(`/business-billpay/${id}/approve`),
+
+  rejectBusinessBillpay: (id) =>
+    http.post(`/business-billpay/${id}/reject`),
+
+  exportBusinessBillpay: (status, format) => {
+    const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
+    return http.download(`/business-billpay/export?${query}`)
+  },
+
+  // Merchant Statement
+  getMerchantStatementList: (search) => {
+    const query = new URLSearchParams(search ? { search } : {}).toString()
+    return http.get(`/merchant-statement${query ? `?${query}` : ''}`)
+  },
+
+  getMerchantStatement: (id, dateFrom, dateTo) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo }).toString()
+    return http.get(`/merchant-statement/${id}?${query}`)
+  },
+
+  exportMerchantStatement: (id, dateFrom, dateTo, format) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo, format }).toString()
+    return http.download(`/merchant-statement/${id}/export?${query}`)
+  },
+
+  adjustMerchantStatementBalance: (id, data) =>
+    http.post(`/merchant-statement/${id}/adjustment`, data),
+
+  // Terminals Management
+  getTerminalsManagement: () => http.get('/terminals-management'),
+
+  getTerminalManagementMerchants: () => http.get('/terminals-management/merchants'),
+
+  addTerminalManagement: (data) => http.post('/terminals-management', data),
+
+  updateTerminalManagement: (id, data) => http.put(`/terminals-management/${id}`, data),
+
+  changeTerminalManagementStatus: (id, status) => http.post(`/terminals-management/${id}/status`, { status }),
 }
 
 export default ApiService

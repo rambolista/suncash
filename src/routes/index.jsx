@@ -138,6 +138,18 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/merchants/settlements')),
       },
       {
+        path: '/merchants/business-billpay',
+        Component: lazy(() => import('@/views/admin/merchants/business-billpay')),
+      },
+      {
+        path: '/merchants/statement',
+        Component: lazy(() => import('@/views/admin/merchants/statement')),
+      },
+      {
+        path: '/terminals/management',
+        Component: lazy(() => import('@/views/admin/terminals/management')),
+      },
+      {
         path: '/settings/notifications',
         Component: lazy(() => import('@/views/admin/settings/notifications')),
       },
