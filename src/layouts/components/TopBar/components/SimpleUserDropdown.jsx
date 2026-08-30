@@ -20,7 +20,7 @@ const UserDropdown = () => {
   const location = useLocation()
   const [showProfile, setShowProfile] = useState(false)
   const [showChangePassword, setShowChangePassword] = useState(false)
-  const isCustomerRoute = location.pathname.startsWith('/customer')
+  const isCustomerRoute = location.pathname === '/customer' || location.pathname.startsWith('/customer/')
   const handleLogout = isCustomerRoute ? logoutCustomer : logout
 
   const avatarVersion = currentUser?.updated_at

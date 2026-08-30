@@ -82,7 +82,7 @@ export const useLayoutContext = () => {
 export const LayoutProvider = ({ children }) => {
   const { showNotification } = useNotificationContext()
   const location = useLocation()
-  const isCustomerRoute = location.pathname.startsWith('/customer')
+  const isCustomerRoute = location.pathname === '/customer' || location.pathname.startsWith('/customer/')
   const [adminSettings, setAdminSettings] = useState(ADMIN_DEFAULT_STATE)
   const [customerSettings, setCustomerSettings] = useState(CUSTOMER_DEFAULT_STATE)
   const [initializing, setInitializing] = useState(true)

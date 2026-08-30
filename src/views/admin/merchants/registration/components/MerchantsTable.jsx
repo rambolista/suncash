@@ -32,13 +32,35 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleDateString()
 }
 
-const ActionButton = ({ label, icon, iconClassName, onClick }) => (
-  <OverlayTrigger placement="top" delay={{ show: 250, hide: 0 }} overlay={<Tooltip>{label}</Tooltip>}>
-    <Button variant="light" size="sm" className="btn-icon rounded-circle" aria-label={label} onClick={onClick}>
-      <Icon icon={icon} className={`fs-lg${iconClassName ? ` ${iconClassName}` : ''}`} />
-    </Button>
-  </OverlayTrigger>
-)
+// Tooltip visibility is explicitly controlled (rather than left to hover/focus) so a
+// click closes it immediately instead of it getting orphaned mid-display if the row
+// it's anchored to is removed right after (e.g. a swap to a detail view) — see
+// src/views/admin/merchants/components/ActionButton.jsx for the full explanation.
+const ActionButton = ({ label, icon, iconClassName, onClick }) => {
+  const [show, setShow] = useState(false)
+
+  const handleClick = (event) => {
+    setShow(false)
+    event.currentTarget.blur()
+    onClick?.(event)
+  }
+
+  return (
+    <OverlayTrigger
+      placement="top"
+      trigger={['hover']}
+      delay={{ show: 250, hide: 0 }}
+      overlay={<Tooltip>{label}</Tooltip>}
+      show={show}
+      onToggle={setShow}
+      transition={false}
+    >
+      <Button variant="light" size="sm" className="btn-icon rounded-circle" aria-label={label} onClick={handleClick}>
+        <Icon icon={icon} className={`fs-lg${iconClassName ? ` ${iconClassName}` : ''}`} />
+      </Button>
+    </OverlayTrigger>
+  )
+}
 
 const MerchantAvatar = ({ size = 32 }) => (
   <div className="rounded-circle bg-light d-flex align-items-center justify-content-center text-muted flex-shrink-0" style={{ width: size, height: size }}>

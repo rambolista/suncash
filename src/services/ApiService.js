@@ -889,6 +889,20 @@ const ApiService = {
   activateGiftcardProduct: (id) => http.post(`/giftcard-products/${id}/activate`),
 
   deactivateGiftcardProduct: (id) => http.post(`/giftcard-products/${id}/deactivate`),
+
+  // Customers — KYC Upgrade
+  getKycUpgrades: () => http.get('/kyc-upgrade'),
+
+  getKycUpgrade: (id) => http.get(`/kyc-upgrade/${id}`),
+
+  approveKycUpgrade: (id) => http.post(`/kyc-upgrade/${id}/approve`),
+
+  rejectKycUpgrade: (id, reason) => http.post(`/kyc-upgrade/${id}/reject`, { reason }),
+
+  exportKycUpgrades: (status, format) => {
+    const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
+    return http.download(`/kyc-upgrade/export?${query}`)
+  },
 }
 
 export default ApiService

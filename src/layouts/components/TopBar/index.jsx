@@ -17,7 +17,7 @@ const TopBar = () => {
   const { scrollY } = useScrollEvent()
   const { settings } = useProjectSettingsContext()
   const location = useLocation()
-  const isCustomerRoute = location.pathname.startsWith('/customer')
+  const isCustomerRoute = location.pathname === '/customer' || location.pathname.startsWith('/customer/')
   return (
     <header
       className={clsx('app-topbar', {

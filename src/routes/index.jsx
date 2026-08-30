@@ -154,6 +154,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/giftcards/products')),
       },
       {
+        path: '/customers/kyc-upgrade',
+        Component: lazy(() => import('@/views/admin/customers/kyc-upgrade')),
+      },
+      {
         path: '/settings/notifications',
         Component: lazy(() => import('@/views/admin/settings/notifications')),
       },

@@ -66,7 +66,7 @@ const App = () => {
   const hasToken = Boolean(getToken())
   const storedUser = getStoredCurrentUser()
   const authPage = pathname.startsWith('/auth/') ? pathname.split('/').pop() : null
-  const isCustomerPath = pathname.startsWith('/customer')
+  const isCustomerPath = pathname === '/customer' || pathname.startsWith('/customer/')
   const hasCustomerTwoFactorChallenge = Boolean(getTwoFactorChallenge())
   const userStatus = currentUser?.status ?? storedUser?.status
   const activeUser = currentUser ?? storedUser

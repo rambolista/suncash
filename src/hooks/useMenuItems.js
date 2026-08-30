@@ -180,7 +180,7 @@ const findFirstMenuUrl = (nodes = []) => {
  */
 const useMenuItems = () => {
   const location = useLocation()
-  const isCustomerRoute = location.pathname.startsWith('/customer')
+  const isCustomerRoute = location.pathname === '/customer' || location.pathname.startsWith('/customer/')
   const [menuItems, setMenuItems] = useState([])
   const [accessibleMenuUrls, setAccessibleMenuUrls] = useState([])
   const [loading, setLoading] = useState(true)
