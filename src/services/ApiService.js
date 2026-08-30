@@ -903,6 +903,11 @@ const ApiService = {
     const query = new URLSearchParams({ ...(status ? { status } : {}), format }).toString()
     return http.download(`/kyc-upgrade/export?${query}`)
   },
+
+  // Customers — Documents
+  getCustomerDocuments: () => http.get('/customer-documents'),
+
+  getCustomerDocument: (id) => http.get(`/customer-documents/${id}`),
 }
 
 export default ApiService
