@@ -22,12 +22,14 @@ const MerchantManagementPage = () => {
   const [searchParams] = useSearchParams()
   const initialStatusFilter = searchParams.get('status') || 'all'
   const initialRegistrationFilter = searchParams.get('registration') || 'all'
-  const hasIncomingFilter = initialStatusFilter !== 'all' || initialRegistrationFilter !== 'all'
+  const initialEntityTypeFilter = searchParams.get('entity_type') || 'all'
 
   const [merchants, setMerchants] = useState([])
   const [loading, setLoading] = useState(false)
   const [view, setView] = useState('list') // 'list' | 'create' | 'edit' | 'manage'
-  const [viewMode, setViewMode] = useState(hasIncomingFilter ? 'grid' : 'list') // table layout: 'list' | 'grid'
+  // Always opens in the list layout — a Dashboard drill-down filter is applied via
+  // the list's own column-header dropdowns, not by switching to the grid layout.
+  const [viewMode, setViewMode] = useState('list') // table layout: 'list' | 'grid'
   const [selectedMerchantId, setSelectedMerchantId] = useState(null)
   const [manageReadOnly, setManageReadOnly] = useState(false)
   const [deactivateMerchant, setDeactivateMerchant] = useState(null)
@@ -151,6 +153,7 @@ const MerchantManagementPage = () => {
               onResetPassword={setResetPasswordMerchant}
               initialStatusFilter={initialStatusFilter}
               initialRegistrationFilter={initialRegistrationFilter}
+              initialEntityTypeFilter={initialEntityTypeFilter}
             />
           )}
         </Card.Body>

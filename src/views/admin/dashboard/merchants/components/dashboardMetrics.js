@@ -85,10 +85,10 @@ export const registrationStatusMetrics = [
 ]
 
 export const entityTypeMetrics = [
-  { key: '1', label: 'Merchant', route: '/merchants/registration', chartColor: 'primary' },
-  { key: '2', label: 'Supplier', route: '/merchants/registration', chartColor: 'secondary' },
-  { key: '3', label: 'Biller', route: '/merchants/registration', chartColor: 'info' },
-  { key: '4', label: 'Charitable Institutions', route: '/merchants/registration', chartColor: 'success' },
-  { key: '5', label: 'Business', route: '/merchants/registration', chartColor: 'warning' },
-  { key: '6', label: 'Charity', route: '/merchants/registration', chartColor: 'dark' },
+  { key: '1', label: 'Merchant', route: '/merchants/registration', filter: { entity_type: '1' }, chartColor: 'primary' },
+  { key: '2', label: 'Supplier', route: '/merchants/registration', filter: { entity_type: '2' }, chartColor: 'secondary' },
+  { key: '3', label: 'Biller', route: '/merchants/registration', filter: { entity_type: '3' }, chartColor: 'info' },
+  { key: '4', label: 'Charitable Institutions', route: '/merchants/registration', filter: { entity_type: '4' }, chartColor: 'success' },
+  { key: '5', label: 'Business', route: '/merchants/registration', filter: { entity_type: '5' }, chartColor: 'warning' },
+  { key: '6', label: 'Charity', route: '/merchants/registration', filter: { entity_type: '6' }, chartColor: 'dark' },
 ]

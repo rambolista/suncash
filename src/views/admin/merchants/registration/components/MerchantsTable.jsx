@@ -8,7 +8,7 @@ import Icon from '@/components/wrappers/Icon'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
-import { entityTypeLabel } from '../data/merchantReferenceData'
+import { ENTITY_TYPES, entityTypeLabel } from '../data/merchantReferenceData'
 
 DataTable.use(DT)
 
@@ -93,16 +93,25 @@ const columns = [
   { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-nowrap action-cell', render: (id) => `<div class="action-slot" data-id="${id}"></div>` },
 ]
 
-const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, onToggleStatus, onResetPassword, initialStatusFilter = 'all', initialRegistrationFilter = 'all' }) => {
+const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onView, onAction, onToggleStatus, onResetPassword, initialStatusFilter = 'all', initialRegistrationFilter = 'all', initialEntityTypeFilter = 'all' }) => {
   const [searchText, setSearchText] = useState('')
   const [statusFilter, setStatusFilter] = useState(initialStatusFilter)
   const [registrationFilter, setRegistrationFilter] = useState(initialRegistrationFilter)
+  const [entityTypeFilter, setEntityTypeFilter] = useState(initialEntityTypeFilter)
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
 
   const handlers = useRef({ onEdit, onView, onAction, onToggleStatus, onResetPassword })
   handlers.current = { onEdit, onView, onAction, onToggleStatus, onResetPassword }
   const canEdit = Boolean(permissions.can_edit)
+
+  // Column-header <select> filters live inside DataTables' managed <thead>, where
+  // React's synthetic event delegation doesn't reliably reach — a real 'change'
+  // dispatched there doesn't call a React onChange prop at all (same reason the
+  // free-text search inputs are wired via bindColumnSearchInputs' manual
+  // addEventListener rather than a controlled onChange). Bound natively instead.
+  const filterSetters = useRef({ entityType: setEntityTypeFilter, status: setStatusFilter, registration: setRegistrationFilter })
+  filterSetters.current = { entityType: setEntityTypeFilter, status: setStatusFilter, registration: setRegistrationFilter }
 
   const tableData = useMemo(
     () => data.map((merchant) => ({
@@ -112,24 +121,43 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
     [data]
   )
 
-  const gridFilteredData = useMemo(() => {
+  // Legacy's client_management.php only ever RENDERS client_status_id 0
+  // (active) or 2 (admin-deactivated) rows when no explicit status search
+  // was submitted (its $status_array default) — 1 (unused) and -1
+  // (self-registered, never touched by an admin) are fetched but hidden.
+  // Mirrored here as the default scope; an incoming explicit status/
+  // registration/entity-type filter (e.g. a Dashboard drill-down, or the
+  // column-header dropdowns below) opens it back up to every merchant so
+  // that filter can do its own, broader matching.
+  const hasActiveFilter = statusFilter !== 'all' || registrationFilter !== 'all' || entityTypeFilter !== 'all'
+
+  const scopedData = useMemo(() => {
+    if (hasActiveFilter) return tableData
+    return tableData.filter((merchant) => [0, 2].includes(Number(merchant.client_status_id)))
+  }, [tableData, hasActiveFilter])
+
+  // Used as the `data` source for BOTH the list (DataTable) and grid views,
+  // so the column-header dropdowns below filter identically regardless of
+  // which layout is active.
+  const filteredData = useMemo(() => {
     const query = searchText.trim().toLowerCase()
-    return tableData.filter((merchant) => {
+    return scopedData.filter((merchant) => {
       const accountStatus = String(merchant.account_status || 'active').toLowerCase()
       const registrationStatus = merchant.registration_status === 'A' ? 'approved' : 'pending'
       const matchesSearch = !query || [merchant.client_id, merchant.legal_name, merchant.dba_name, merchant.merchant_name, merchant.phone_no]
         .some((value) => String(value ?? '').toLowerCase().includes(query))
       const matchesStatus = statusFilter === 'all' || accountStatus === statusFilter
       const matchesRegistration = registrationFilter === 'all' || registrationStatus === registrationFilter
-      return matchesSearch && matchesStatus && matchesRegistration
+      const matchesEntityType = entityTypeFilter === 'all' || String(merchant.entity_type ?? '') === String(entityTypeFilter)
+      return matchesSearch && matchesStatus && matchesRegistration && matchesEntityType
     })
-  }, [tableData, searchText, statusFilter, registrationFilter])
+  }, [scopedData, searchText, statusFilter, registrationFilter, entityTypeFilter])
 
-  const totalPages = Math.max(1, Math.ceil(gridFilteredData.length / pageSize))
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / pageSize))
 
   useEffect(() => {
     setPage(1)
-  }, [searchText, statusFilter, registrationFilter, pageSize, viewMode])
+  }, [searchText, statusFilter, registrationFilter, entityTypeFilter, pageSize, viewMode])
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages)
@@ -137,14 +165,14 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
 
   const paginatedGridData = useMemo(() => {
     const start = (page - 1) * pageSize
-    return gridFilteredData.slice(start, start + pageSize)
-  }, [gridFilteredData, page, pageSize])
+    return filteredData.slice(start, start + pageSize)
+  }, [filteredData, page, pageSize])
 
   const rowMap = useMemo(() => {
     const map = {}
-    tableData.forEach((item) => { map[item.id] = item })
+    filteredData.forEach((item) => { map[item.id] = item })
     return map
-  }, [tableData])
+  }, [filteredData])
 
   const options = useMemo(() => ({
     responsive: true,
@@ -153,6 +181,12 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
     initComplete: function () {
       bindColumnSearchInputs(this.api())
       bindSortLabels(this.api())
+      this.api().table().container().querySelectorAll('thead tr.column-search-input-bar th select[data-filter]').forEach((select) => {
+        select.addEventListener('click', (event) => event.stopPropagation())
+        select.addEventListener('change', function () {
+          filterSetters.current[this.getAttribute('data-filter')]?.(this.value)
+        })
+      })
     },
     language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
@@ -198,7 +232,7 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
   }), [canEdit, rowMap])
 
   const renderGridPagination = () => {
-    if (!gridFilteredData.length) return null
+    if (!filteredData.length) return null
 
     const maxVisiblePages = 5
     let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2))
@@ -264,6 +298,13 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
                       <Icon icon="clipboard-check" className="app-search-icon text-muted" />
                     </div>
                     <div className="app-search">
+                      <FormSelect className="form-control my-1 my-md-0" value={entityTypeFilter} onChange={(e) => setEntityTypeFilter(e.target.value)}>
+                        <option value="all">Entity Type</option>
+                        {ENTITY_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+                      </FormSelect>
+                      <Icon icon="building-store" className="app-search-icon text-muted" />
+                    </div>
+                    <div className="app-search">
                       <FormSelect className="form-control my-1 my-md-0" value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))}>
                         {gridPageSizes.map((size) => <option key={size} value={size}>{size} / page</option>)}
                       </FormSelect>
@@ -278,7 +319,16 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
       )}
 
       {viewMode === 'list' ? (
-        <DataTable data={tableData} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
+        // Keyed on the 3 dropdown filters so changing any of them fully
+        // remounts the table: datatables.net-react snapshots the <thead> at
+        // its own init time, and a React-controlled <select>'s chosen option
+        // only exists as a JS `.value` property (no `selected` attribute in
+        // the actual markup), which that snapshot doesn't carry over — so a
+        // value update after mount silently fails to show visually even
+        // though the (already correct) filtered `data` still drives the
+        // real row set. Remounting sidesteps that by having each dropdown
+        // render its correct value from a clean initial render every time.
+        <DataTable key={`${statusFilter}|${registrationFilter}|${entityTypeFilter}`} data={filteredData} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
           <thead className="thead-sm text-uppercase fs-xxs">
             <tr>
               <th>Merchant ID</th>
@@ -293,10 +343,33 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
             <tr className="column-search-input-bar">
               <th><FormControl size="sm" type="text" placeholder="Merchant ID" className="bg-light-subtle border-light" data-col-index="0" /></th>
               <th><FormControl size="sm" type="text" placeholder="Merchant" className="bg-light-subtle border-light" data-col-index="1" /></th>
-              <th><FormControl size="sm" type="text" placeholder="Entity Type" className="bg-light-subtle border-light" data-col-index="2" /></th>
+              <th>
+                {/* Uncontrolled (defaultValue, not value) and bound via the manual
+                    addEventListener in initComplete above, not onChange: this table
+                    remounts fresh on every filter change (see the DataTable `key`
+                    above), so the correct option is baked into each initial render,
+                    and DataTables' own header handling of this thead doesn't reliably
+                    deliver a real 'change' event to a React onChange prop. */}
+                <FormSelect size="sm" className="bg-light-subtle border-light" defaultValue={entityTypeFilter} data-filter="entityType">
+                  <option value="all">All Entity Types</option>
+                  {ENTITY_TYPES.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
+                </FormSelect>
+              </th>
               <th><FormControl size="sm" type="text" placeholder="Phone" className="bg-light-subtle border-light" data-col-index="3" /></th>
-              <th><FormControl size="sm" type="text" placeholder="Status" className="bg-light-subtle border-light" data-col-index="4" /></th>
-              <th><FormControl size="sm" type="text" placeholder="Registration" className="bg-light-subtle border-light" data-col-index="5" /></th>
+              <th>
+                <FormSelect size="sm" className="bg-light-subtle border-light" defaultValue={statusFilter} data-filter="status">
+                  <option value="all">All Statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </FormSelect>
+              </th>
+              <th>
+                <FormSelect size="sm" className="bg-light-subtle border-light" defaultValue={registrationFilter} data-filter="registration">
+                  <option value="all">All Registrations</option>
+                  <option value="approved">Approved</option>
+                  <option value="pending">Pending</option>
+                </FormSelect>
+              </th>
               <th><FormControl size="sm" type="text" placeholder="Registered" className="bg-light-subtle border-light" data-col-index="6" /></th>
               <th />
             </tr>
