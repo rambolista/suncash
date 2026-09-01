@@ -1,5 +1,6 @@
 import { useLayoutContext } from '@/context/useLayoutContext'
 import { useAuth } from '@/hooks/useAuth'
+import useLogPageVisit from '@/hooks/useLogPageVisit'
 import HorizontalLayout from '@/layouts/HorizontalLayout'
 import VerticalLayout from '@/layouts/VerticalLayout'
 import { Suspense } from 'react'
@@ -17,6 +18,7 @@ const PageLoadingFallback = () => (
 const MainLayout = () => {
   const { orientation } = useLayoutContext()
   const { isAuthenticated } = useAuth()
+  useLogPageVisit()
   if (!isAuthenticated) {
     return null
   }

@@ -934,6 +934,14 @@ const ApiService = {
   approveCustomerSettlement: (id, data) => http.post(`/customer-settlements/${id}/approve`, data),
 
   rejectCustomerSettlement: (id, data) => http.post(`/customer-settlements/${id}/reject`, data),
+
+  // Administration — User Activity
+  getUserActivity: (filters = {}) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
+    return http.get(`/user-activity${query ? `?${query}` : ''}`)
+  },
+
+  logPageVisit: (path) => http.post('/user-activity/visit', { path }),
 }
 
 export default ApiService

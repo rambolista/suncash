@@ -170,6 +170,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/customers/settlements')),
       },
       {
+        path: '/administration/user-activity',
+        Component: lazy(() => import('@/views/admin/administration/user-activity')),
+      },
+      {
         path: '/settings/notifications',
         Component: lazy(() => import('@/views/admin/settings/notifications')),
       },
