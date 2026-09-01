@@ -908,6 +908,32 @@ const ApiService = {
   getCustomerDocuments: () => http.get('/customer-documents'),
 
   getCustomerDocument: (id) => http.get(`/customer-documents/${id}`),
+
+  // Customers — Card Verification
+  getCardVerifications: () => http.get('/card-verification'),
+
+  getCardVerification: (id) => http.get(`/card-verification/${id}`),
+
+  approveCardVerification: (id) => http.post(`/card-verification/${id}/approve`),
+
+  rejectCardVerification: (id, reason) => http.post(`/card-verification/${id}/reject`, { reason }),
+
+  blacklistCardVerification: (id, reason) => http.post(`/card-verification/${id}/blacklist`, { reason }),
+
+  // Customers — Settlements
+  getCustomerSettlements: () => http.get('/customer-settlements'),
+
+  getCustomerSettlement: (id) => http.get(`/customer-settlements/${id}`),
+
+  getCustomerSettlementHistory: (id) => http.get(`/customer-settlements/${id}/history`),
+
+  getCustomerSettlementTransactions: (id) => http.get(`/customer-settlements/${id}/transactions`),
+
+  getCustomerSettlementLinkedBankAccounts: () => http.get('/customer-settlements/linked-bank-accounts'),
+
+  approveCustomerSettlement: (id, data) => http.post(`/customer-settlements/${id}/approve`, data),
+
+  rejectCustomerSettlement: (id, data) => http.post(`/customer-settlements/${id}/reject`, data),
 }
 
 export default ApiService

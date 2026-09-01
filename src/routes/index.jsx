@@ -162,6 +162,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/customers/documents')),
       },
       {
+        path: '/customers/card-verification',
+        Component: lazy(() => import('@/views/admin/customers/card-verification')),
+      },
+      {
+        path: '/customers/settlements',
+        Component: lazy(() => import('@/views/admin/customers/settlements')),
+      },
+      {
         path: '/settings/notifications',
         Component: lazy(() => import('@/views/admin/settings/notifications')),
       },
