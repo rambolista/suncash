@@ -302,6 +302,9 @@ const ApiService = {
   getMerchantDashboardStats: (period) =>
     http.get(`/dashboard/merchants${period && period !== 'all' ? `?period=${encodeURIComponent(period)}` : ''}`),
 
+  getCustomerDashboardStats: (period) =>
+    http.get(`/dashboard/customers${period && period !== 'all' ? `?period=${encodeURIComponent(period)}` : ''}`),
+
   getMerchants: () =>
     http.get('/access-management/merchants'),
 

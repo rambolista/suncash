@@ -115,7 +115,7 @@ export const routes = [
       },
       {
         path: '/dashboard/merchants',
-        Component: lazy(() => import('@/views/admin/dashboard/merchants')),
+        Component: lazy(() => import('@/views/admin/dashboard')),
       },
       {
         path: '/pages/empty',

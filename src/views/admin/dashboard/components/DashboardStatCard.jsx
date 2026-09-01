@@ -3,7 +3,7 @@ import Icon from '@/components/wrappers/Icon'
 import clsx from 'clsx'
 import { Card, CardBody } from 'react-bootstrap'
 
-const MerchantDashboardStatCard = ({ metric, value, canOpen, onOpen }) => (
+const DashboardStatCard = ({ metric, value, canOpen, onOpen }) => (
   <Card
     className={clsx('h-100 border border-body-secondary shadow-sm rounded-3 overflow-hidden', canOpen ? 'cursor-pointer' : 'opacity-75')}
     onClick={canOpen ? onOpen : undefined}
@@ -29,4 +29,4 @@ const MerchantDashboardStatCard = ({ metric, value, canOpen, onOpen }) => (
   </Card>
 )
 
-export default MerchantDashboardStatCard
+export default DashboardStatCard

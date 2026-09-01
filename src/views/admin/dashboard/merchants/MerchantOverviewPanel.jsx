@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, ButtonGroup, Card, CardBody, Col, Row } from 'react-bootstrap'
 import { useNavigate } from 'react-router'
 import LoadingState from '@/components/LoadingState'
-import PageBreadcrumb from '@/components/PageBreadcrumb'
 import ApiService from '@/services/ApiService'
-import useCurrentUser from '@/hooks/useCurrentUser'
 import { canAccessModule } from '@/utils/modulePermissions'
+import DashboardStatCard from '../components/DashboardStatCard'
+import StatusProgressChart from '../components/StatusProgressChart'
 import { accountStatusMetrics, dashboardMetrics, entityTypeMetrics, registrationStatusMetrics } from './components/dashboardMetrics'
-import MerchantDashboardStatCard from './components/MerchantDashboardStatCard'
-import StatusProgressChart from './components/StatusProgressChart'
 
 const PERIOD_OPTIONS = [
   { value: 'all', label: 'All Time' },
@@ -17,9 +15,8 @@ const PERIOD_OPTIONS = [
   { value: 'year', label: 'Yearly' },
 ]
 
-const MerchantDashboardPage = () => {
+const MerchantOverviewPanel = ({ currentUser }) => {
   const navigate = useNavigate()
-  const currentUser = useCurrentUser()
   const [stats, setStats] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -64,8 +61,6 @@ const MerchantDashboardPage = () => {
 
   return (
     <>
-      <PageBreadcrumb title="Dashboard" subtitle="Merchant Overview" />
-
       {error ? <Alert variant="danger">{error}</Alert> : null}
 
       <Card className="border-0 shadow-sm mb-3">
@@ -103,13 +98,13 @@ const MerchantDashboardPage = () => {
 
       {loading ? <LoadingState message="Loading merchant dashboard..." /> : (
         <>
-          <Row className="g-3">
+          <Row className="g-3 row-cols-1 row-cols-md-5">
             {dashboardMetrics.map((metric) => {
               const canOpen = canAccessModule(currentUser, metric.route)
 
               return (
-                <Col xxl={2} xl={4} md={6} sm={6} key={metric.key}>
-                  <MerchantDashboardStatCard
+                <Col key={metric.key}>
+                  <DashboardStatCard
                     metric={metric}
                     value={stats?.totals?.[metric.key] || 0}
                     canOpen={canOpen}
@@ -159,4 +154,4 @@ const MerchantDashboardPage = () => {
   )
 }
 
-export default MerchantDashboardPage
+export default MerchantOverviewPanel
