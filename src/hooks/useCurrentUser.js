@@ -6,11 +6,13 @@ import { CURRENT_USER_CHANGED_EVENT, clearStoredCurrentUser, getStoredCurrentUse
 const currentUserCache = {
   promise: null,
   user: null,
+  hasRefreshedThisPageLoad: false,
 }
 
 export const resetCurrentUserCache = () => {
   currentUserCache.promise = null
   currentUserCache.user = null
+  currentUserCache.hasRefreshedThisPageLoad = false
 }
 
 const isCustomerUser = (user) => {
@@ -28,11 +30,8 @@ const normalizeUser = (user) => {
   }
 }
 
-const loadCurrentUser = async () => {
-  if (currentUserCache.user) {
-    return currentUserCache.user
-  }
-
+/** Always hits the server (deduping concurrent callers via the shared in-flight promise) — never short-circuits on an already-cached user. */
+const fetchCurrentUserFromServer = () => {
   if (!currentUserCache.promise) {
     currentUserCache.promise = ApiService.getUser()
       .then((response) => {
@@ -48,6 +47,14 @@ const loadCurrentUser = async () => {
   }
 
   return currentUserCache.promise
+}
+
+const loadCurrentUser = async () => {
+  if (currentUserCache.user) {
+    return currentUserCache.user
+  }
+
+  return fetchCurrentUserFromServer()
 }
 
 const useCurrentUser = () => {
@@ -75,16 +82,40 @@ const useCurrentUser = () => {
     }
 
     const stored = normalizeUser(getStoredCurrentUser())
-    if (stored && (stored.menu_permissions || isCustomerUser(stored))) {
+    const hasUsableStoredCopy = stored && (stored.menu_permissions || isCustomerUser(stored))
+    if (hasUsableStoredCopy) {
       currentUserCache.user = stored
+    }
+
+    // A stored copy only proves permissions were correct as of whenever this
+    // browser tab first logged in, not that they still are — e.g. a menu or
+    // action granted via a later migration wouldn't show up otherwise until
+    // an explicit logout. The stored value already painted instantly via
+    // useState's initializer above; once per real page load (not per SPA
+    // navigation — every route mounts a fresh component that calls this
+    // hook, and refetching on every one of those would be excessive) this
+    // quietly refetches in the background to pick up any changes.
+    //
+    // Deliberately no unmount guard here: this effect never calls a local
+    // state setter directly (the OTHER effect's CURRENT_USER_CHANGED_EVENT
+    // listener does that, and cleans itself up on unmount), it only updates
+    // the shared cache/sessionStorage — which stays correct even if the
+    // component that happened to kick off the fetch has since unmounted
+    // (a real, observed case: the initial route-redirect chain right after
+    // a full page load mounts and unmounts several components in quick
+    // succession, before the very first fetch has time to resolve). Only
+    // flipping the "already refreshed" flag on actual success, rather than
+    // before the fetch even starts, means an interrupted attempt doesn't
+    // permanently block every later component on the same page load from
+    // retrying.
+    if (hasUsableStoredCopy && currentUserCache.hasRefreshedThisPageLoad) {
       return
     }
 
-    let active = true
-
-    loadCurrentUser()
+    fetchCurrentUserFromServer()
       .then((user) => {
-        if (!active || !user) {
+        currentUserCache.hasRefreshedThisPageLoad = true
+        if (!user) {
           return
         }
 
@@ -93,17 +124,14 @@ const useCurrentUser = () => {
       })
       .catch((error) => {
         if (error?.status === 401) {
+          currentUserCache.hasRefreshedThisPageLoad = true
           removeToken()
           clearStoredCurrentUser()
           currentUserCache.user = null
-        } else {
+        } else if (!hasUsableStoredCopy) {
           console.error('Failed to load current user.', error)
         }
       })
-
-    return () => {
-      active = false
-    }
   }, [])
 
   return currentUser

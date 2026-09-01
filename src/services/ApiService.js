@@ -935,6 +935,38 @@ const ApiService = {
 
   rejectCustomerSettlement: (id, data) => http.post(`/customer-settlements/${id}/reject`, data),
 
+  // Customers — Bank Loads
+  getCustomerBankLoads: () => http.get('/customer-bank-loads'),
+
+  getCustomerBankLoad: (id) => http.get(`/customer-bank-loads/${id}`),
+
+  getCustomerBankLoadHistory: (id) => http.get(`/customer-bank-loads/${id}/history`),
+
+  getCustomerBankLoadTransactions: (id) => http.get(`/customer-bank-loads/${id}/transactions`),
+
+  approveCustomerBankLoad: (id, data) => http.post(`/customer-bank-loads/${id}/approve`, data),
+
+  rejectCustomerBankLoad: (id, data) => http.post(`/customer-bank-loads/${id}/reject`, data),
+
+  // Customers — Archive
+  getCustomerArchiveList: () => http.get('/customer-archive'),
+
+  getCustomerArchive: (id) => http.get(`/customer-archive/${id}`),
+
+  getCustomerArchiveTransactions: (id, from, to) => http.get(`/customer-archive/${id}/transactions?from=${from}&to=${to}`),
+
+  archiveCustomer: (id) => http.post(`/customer-archive/${id}/archive`),
+
+  exportCustomerArchiveTransactions: (id, format, from, to) => {
+    const query = new URLSearchParams({ format, ...(from && to ? { from, to } : {}) }).toString()
+    return http.download(`/customer-archive/${id}/export?${query}`)
+  },
+
+  // Customers — Login Logs
+  getCustomerSuccessLogs: (from, to) => http.get(`/customer-login-logs/success?from=${from}&to=${to}`),
+
+  getCustomerFailedLogs: (from, to) => http.get(`/customer-login-logs/failed?from=${from}&to=${to}`),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()

@@ -170,6 +170,22 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/customers/settlements')),
       },
       {
+        path: '/customers/bank-loads',
+        Component: lazy(() => import('@/views/admin/customers/bank-loads')),
+      },
+      {
+        path: '/customers/archive',
+        Component: lazy(() => import('@/views/admin/customers/archive')),
+      },
+      {
+        path: '/customers/logs',
+        Component: lazy(() => import('@/views/admin/customers/logs')),
+      },
+      {
+        path: '/customers/failed-logs',
+        Component: lazy(() => import('@/views/admin/customers/failed-logs')),
+      },
+      {
         path: '/administration/user-activity',
         Component: lazy(() => import('@/views/admin/administration/user-activity')),
       },
