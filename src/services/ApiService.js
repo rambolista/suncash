@@ -1116,6 +1116,22 @@ const ApiService = {
   getKioskReplenishClearAcceptor: (terminalId) => http.get(`/kiosk-replenish-reports/${terminalId}/clear-acceptor`),
   exportKioskReplenishClearAcceptor: (terminalId, format) => http.download(`/kiosk-replenish-reports/${terminalId}/clear-acceptor/export?format=${format}`),
 
+  // Kiosk — Transaction Report
+  getKioskTransactionReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-transaction-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskTransactionReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-transaction-reports/export?${query}`)
+  },
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()

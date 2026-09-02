@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Button, Card, CardBody, Col, Form, Row } from 'react-bootstrap'
-import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
 import ApiService from '@/services/ApiService'
@@ -131,8 +130,6 @@ const KioskReplenishReportsPage = () => {
 
   return (
     <>
-      <PageBreadcrumb title="Replenish Reports" subtitle="Kiosk" />
-
       <Card className="mb-3">
         <CardBody>
           <Row className="g-3 align-items-end">
