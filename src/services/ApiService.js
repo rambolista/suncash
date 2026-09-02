@@ -1058,6 +1058,64 @@ const ApiService = {
   deleteKioskUser: (id) => http.delete(`/kiosk-users/${id}`),
   resetKioskUserPassword: (id) => http.post(`/kiosk-users/${id}/reset-password`),
 
+  // Kiosk — Zout Reports
+  getKioskZoutReports: (branchId, location, date) => {
+    const query = new URLSearchParams({
+      ...(branchId ? { branch_id: branchId } : {}),
+      ...(location ? { location } : {}),
+      ...(date ? { date } : {}),
+    }).toString()
+    return http.get(`/kiosk-zout-reports${query ? `?${query}` : ''}`)
+  },
+  getKioskZoutReportDetails: (settlementNo) => http.get(`/kiosk-zout-reports/${settlementNo}`),
+  exportKioskZoutReports: (branchId, location, date, format) => {
+    const query = new URLSearchParams({
+      ...(branchId ? { branch_id: branchId } : {}),
+      ...(location ? { location } : {}),
+      ...(date ? { date } : {}),
+      format,
+    }).toString()
+    return http.download(`/kiosk-zout-reports/export?${query}`)
+  },
+
+  // Kiosk — Cash Meters (Transaction)
+  getKioskCashMeters: () => http.get('/kiosk-cash-meters'),
+  getKioskCashMeterTerminals: (branchId) => {
+    const query = new URLSearchParams(branchId ? { branch_id: branchId } : {}).toString()
+    return http.get(`/kiosk-cash-meters/terminals${query ? `?${query}` : ''}`)
+  },
+  getKioskCashMeterReadings: (terminalId, type) => {
+    const query = new URLSearchParams({ terminal_id: terminalId, type }).toString()
+    return http.get(`/kiosk-cash-meters/meters?${query}`)
+  },
+
+  // Kiosk — Replenish Reports
+  getKioskReplenishReports: (terminalId, branchId) => {
+    const query = new URLSearchParams({
+      ...(terminalId ? { terminal_id: terminalId } : {}),
+      ...(branchId ? { branch_id: branchId } : {}),
+    }).toString()
+    return http.get(`/kiosk-replenish-reports${query ? `?${query}` : ''}`)
+  },
+  getKioskReplenishReportTerminals: (branchId) => {
+    const query = new URLSearchParams({ branch_id: branchId }).toString()
+    return http.get(`/kiosk-replenish-reports/terminals?${query}`)
+  },
+  exportKioskReplenishReports: (terminalId, branchId, format) => {
+    const query = new URLSearchParams({
+      ...(terminalId ? { terminal_id: terminalId } : {}),
+      ...(branchId ? { branch_id: branchId } : {}),
+      format,
+    }).toString()
+    return http.download(`/kiosk-replenish-reports/export?${query}`)
+  },
+  getKioskReplenishMeter: (terminalId) => http.get(`/kiosk-replenish-reports/${terminalId}/meter`),
+  exportKioskReplenishMeter: (terminalId, format) => http.download(`/kiosk-replenish-reports/${terminalId}/meter/export?format=${format}`),
+  getKioskReplenishAddCash: (terminalId) => http.get(`/kiosk-replenish-reports/${terminalId}/add-cash`),
+  exportKioskReplenishAddCash: (terminalId, format) => http.download(`/kiosk-replenish-reports/${terminalId}/add-cash/export?format=${format}`),
+  getKioskReplenishClearAcceptor: (terminalId) => http.get(`/kiosk-replenish-reports/${terminalId}/clear-acceptor`),
+  exportKioskReplenishClearAcceptor: (terminalId, format) => http.download(`/kiosk-replenish-reports/${terminalId}/clear-acceptor/export?format=${format}`),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
