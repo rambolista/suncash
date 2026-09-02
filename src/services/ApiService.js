@@ -975,6 +975,16 @@ const ApiService = {
 
   voidTransaction: (data) => http.post('/void-transaction/void', data),
 
+  // Transactions — Resend Receipt
+  searchTransactionReceipt: (data) => http.post('/resend-receipt/search', data),
+
+  generateTransactionReceipt: (transactionId, transactionType) => {
+    const query = new URLSearchParams({ transaction_id: transactionId, transaction_type: transactionType }).toString()
+    return http.download(`/resend-receipt/generate?${query}`)
+  },
+
+  sendTransactionReceipt: (data) => http.post('/resend-receipt/send', data),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()

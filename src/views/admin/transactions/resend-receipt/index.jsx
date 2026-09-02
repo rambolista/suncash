@@ -6,36 +6,40 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import ConfirmActionModal from '@/views/admin/merchants/components/ConfirmActionModal'
-import { formatAmount, formatDateTime } from '../components/format'
+import { formatAmount, formatDateTime, triggerDownload } from '../components/format'
 
 const TRANSACTION_TYPES = [
   { value: 'RELOAD', label: 'Load' },
   { value: 'SALE', label: 'Purchase' },
+  { value: 'ACTIVATION', label: 'Activation' },
   { value: 'MONEY_TRANSFER', label: 'Money Transfer' },
   { value: 'PHONE2PHONE', label: 'Phone to Phone' },
   { value: 'PHONE2STORE', label: 'Phone to Store' },
   { value: 'CASHOUT_CODE', label: 'Cashout by Code' },
   { value: 'CASHOUT_MOBILE', label: 'Cashout by Mobile' },
-  { value: 'LOAD_CASHOUTCODE', label: 'Load via Cashout Code' },
+  { value: 'BILLPAY', label: 'Billpay' },
   { value: 'BUSINESS_BILLPAY', label: 'Business Billpay' },
   { value: 'BUSINESS_BILLPAY_STORE', label: 'Business Billpay (Store)' },
   { value: 'CUSTOMERSPAYMENT', label: "Customer's Payment" },
   { value: 'DONATION', label: 'Donation' },
   { value: 'CHECKCASHING', label: 'Check Cashing' },
-  { value: 'SUNCASH_VOUCHER', label: 'SunCash Voucher' },
-  { value: 'UNIBUCKS_VOUCHER', label: 'UniBucks Voucher' },
+  { value: 'TICKETS', label: 'Events Ticket' },
+  { value: 'TICKETS_MOVIE', label: 'Movie Ticket' },
 ]
 
-const VoidTransactionPage = () => {
+const rowKey = (row) => `${row.transaction_type}-${row.transaction_id}`
+
+const ResendReceiptPage = () => {
   const currentUser = useCurrentUser()
-  const canReverse = useMemo(() => Boolean(getModulePermission(currentUser, '/transactions/void-transaction').can_reverse), [currentUser])
+  const canGenerate = useMemo(() => Boolean(getModulePermission(currentUser, '/transactions/resend-receipt').can_execute), [currentUser])
 
   const [transactionType, setTransactionType] = useState('RELOAD')
   const [transactionId, setTransactionId] = useState('')
   const [results, setResults] = useState(null)
+  const [mobiles, setMobiles] = useState({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [voidTarget, setVoidTarget] = useState(null)
+  const [receiptTarget, setReceiptTarget] = useState(null)
   const [hasSearched, setHasSearched] = useState(false)
 
   const search = (event) => {
@@ -48,23 +52,40 @@ const VoidTransactionPage = () => {
 
     setLoading(true)
     setError('')
-    ApiService.searchVoidTransaction({ transaction_id: trimmedId, transaction_type: transactionType })
+    ApiService.searchTransactionReceipt({ transaction_id: trimmedId, transaction_type: transactionType })
       .then((data) => {
-        setResults(Array.isArray(data?.data) ? data.data : [])
+        const rows = Array.isArray(data?.data) ? data.data : []
+        setResults(rows)
+        setMobiles(Object.fromEntries(rows.map((row) => [rowKey(row), row.mobile || ''])))
         setHasSearched(true)
       })
       .catch((err) => setError(err?.message || 'Failed to search for the transaction.'))
       .finally(() => setLoading(false))
   }
 
+  const sendReceipt = () => {
+    const mobile = mobiles[rowKey(receiptTarget)] || ''
+    return ApiService.sendTransactionReceipt({
+      transaction_id: receiptTarget.transaction_id,
+      transaction_type: receiptTarget.transaction_type,
+      mobile,
+    })
+  }
+
+  const downloadReceipt = (row) => {
+    ApiService.generateTransactionReceipt(row.transaction_id, row.transaction_type)
+      .then(({ blob, filename }) => triggerDownload(blob, filename))
+      .catch((err) => setError(err?.message || 'Failed to generate the receipt.'))
+  }
+
   return (
     <>
-      <PageBreadcrumb title="Void Transaction" subtitle="Transactions" />
+      <PageBreadcrumb title="Resend Transaction Receipt" subtitle="Transactions" />
       <Card className="mb-3">
         <CardBody>
           <h5 className="mb-1">Search Transaction</h5>
           <p className="text-muted small mb-3">
-            Select a transaction type and look up its exact Transaction ID to void it.
+            Select a transaction type and look up its exact Transaction ID to resend its receipt.
           </p>
 
           {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
@@ -120,26 +141,34 @@ const VoidTransactionPage = () => {
                       <td colSpan={7} className="text-center text-muted py-4">No matching transaction found.</td>
                     </tr>
                   ) : results.map((row) => (
-                    <tr key={`${row.transaction_type}-${row.transaction_id}`}>
+                    <tr key={rowKey(row)}>
                       <td>{row.transaction_id}</td>
                       <td>{row.customer_name || '—'}</td>
                       <td>{formatDateTime(row.timestamp)}</td>
                       <td>{row.transaction_type_label}</td>
-                      <td>{row.mobile || '—'}</td>
+                      <td style={{ minWidth: 160 }}>
+                        <Form.Control
+                          size="sm"
+                          type="text"
+                          value={mobiles[rowKey(row)] ?? ''}
+                          onChange={(e) => setMobiles((prev) => ({ ...prev, [rowKey(row)]: e.target.value }))}
+                          placeholder="Mobile number"
+                        />
+                      </td>
                       <td>{formatAmount(row.amount)}</td>
                       <td>
-                        {row.status === 'voided' ? (
-                          <Badge bg="secondary">{row.status_label || 'Voided'}</Badge>
-                        ) : canReverse ? (
-                          <div className="d-flex align-items-center gap-2">
-                            <Button size="sm" variant="danger" onClick={() => setVoidTarget(row)}>Void Me</Button>
-                            {row.status_label && row.status_label !== 'Active' && (
-                              <Badge bg="info" className="fw-normal">{row.status_label}</Badge>
-                            )}
-                          </div>
-                        ) : (
-                          <Badge bg="success">{row.status_label || 'Active'}</Badge>
-                        )}
+                        <div className="d-flex align-items-center gap-2">
+                          {canGenerate && (
+                            <>
+                              <Button size="sm" variant="primary" onClick={() => setReceiptTarget(row)}>Send Receipt</Button>
+                              <Button size="sm" variant="outline-secondary" onClick={() => downloadReceipt(row)}>PDF</Button>
+                            </>
+                          )}
+                          {row.status === 'voided' && <Badge bg="secondary">{row.status_label || 'Voided'}</Badge>}
+                          {row.status !== 'voided' && row.status_label && row.status_label !== 'Active' && (
+                            <Badge bg="info" className="fw-normal">{row.status_label}</Badge>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -151,18 +180,17 @@ const VoidTransactionPage = () => {
       ) : null}
 
       <ConfirmActionModal
-        show={Boolean(voidTarget)}
-        onHide={() => setVoidTarget(null)}
-        title="Void Transaction"
-        message={voidTarget ? `Are you sure you want to void transaction ${voidTarget.transaction_id} (${formatAmount(voidTarget.amount)})? This cannot be undone.` : ''}
-        confirmLabel="Void Transaction"
-        confirmVariant="danger"
-        successMessage="Transaction has been voided successfully."
-        onConfirm={() => ApiService.voidTransaction({ transaction_id: voidTarget.transaction_id, transaction_type: voidTarget.transaction_type })}
-        onDone={() => search()}
+        show={Boolean(receiptTarget)}
+        onHide={() => setReceiptTarget(null)}
+        title="Send Receipt"
+        message={receiptTarget ? `Send the receipt for transaction ${receiptTarget.transaction_id} to ${mobiles[rowKey(receiptTarget)] || '(no mobile number)'}?` : ''}
+        confirmLabel="Send Receipt"
+        confirmVariant="primary"
+        successMessage="Receipt has been sent via text."
+        onConfirm={sendReceipt}
       />
     </>
   )
 }
 
-export default VoidTransactionPage
+export default ResendReceiptPage

@@ -154,6 +154,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/transactions/void-transaction')),
       },
       {
+        path: '/transactions/resend-receipt',
+        Component: lazy(() => import('@/views/admin/transactions/resend-receipt')),
+      },
+      {
         path: '/giftcards/products',
         Component: lazy(() => import('@/views/admin/giftcards/products')),
       },
