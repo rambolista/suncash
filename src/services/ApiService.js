@@ -985,6 +985,13 @@ const ApiService = {
 
   sendTransactionReceipt: (data) => http.post('/resend-receipt/send', data),
 
+  // Kiosk — Monitoring Dashboard
+  getKioskMonitoring: () => http.get('/kiosk-monitoring'),
+
+  clearKioskMachine: (id) => http.post(`/kiosk-monitoring/${id}/clear`),
+
+  acknowledgeKioskMachine: (id) => http.post(`/kiosk-monitoring/${id}/acknowledge`),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()

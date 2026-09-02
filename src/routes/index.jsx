@@ -158,6 +158,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/transactions/resend-receipt')),
       },
       {
+        path: '/kiosk/monitoring-dashboard',
+        Component: lazy(() => import('@/views/admin/kiosk/monitoring-dashboard')),
+      },
+      {
         path: '/giftcards/products',
         Component: lazy(() => import('@/views/admin/giftcards/products')),
       },
