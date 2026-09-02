@@ -150,6 +150,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/terminals/management')),
       },
       {
+        path: '/transactions/void-transaction',
+        Component: lazy(() => import('@/views/admin/transactions/void-transaction')),
+      },
+      {
         path: '/giftcards/products',
         Component: lazy(() => import('@/views/admin/giftcards/products')),
       },

@@ -970,6 +970,11 @@ const ApiService = {
 
   getCustomerFailedLogs: (from, to) => http.get(`/customer-login-logs/failed?from=${from}&to=${to}`),
 
+  // Transactions — Void Transaction
+  searchVoidTransaction: (data) => http.post('/void-transaction/search', data),
+
+  voidTransaction: (data) => http.post('/void-transaction/void', data),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
