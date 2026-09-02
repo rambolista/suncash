@@ -8,7 +8,9 @@ const __dirname = dirname(__filename)
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, __dirname, '')
-  const apiProxyTarget = env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000'
+  const apiProxyTarget = env.VITE_API_PROXY_TARGET || 'http://suncash_api.test'
+  const apiProxyConnectTarget = env.VITE_API_PROXY_CONNECT_TARGET || apiProxyTarget
+  const apiProxyHost = new URL(apiProxyTarget).host
 
   return {
     plugins: [react()],
@@ -26,9 +28,12 @@ export default defineConfig(({ mode }) => {
 
       proxy: {
         '/api': {
-          target: apiProxyTarget,
+          target: apiProxyConnectTarget,
           changeOrigin: true,
           secure: false,
+          headers: {
+            Host: apiProxyHost,
+          },
         },
       },
     },
