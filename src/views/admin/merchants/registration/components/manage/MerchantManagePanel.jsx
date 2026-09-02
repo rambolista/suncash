@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, Card, Col, Nav, Row } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Icon from '@/components/wrappers/Icon'
 import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
-import { getModulePermission } from '@/utils/modulePermissions'
+import useModuleTabs from '@/hooks/useModuleTabs'
 
 import PrincipalInfoPanel from './PrincipalInfoPanel'
 import PrefundPanel from './PrefundPanel'
@@ -34,9 +34,7 @@ const PANEL_COMPONENTS = {
 
 const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
   const currentUser = useCurrentUser()
-  const modulePermission = useMemo(() => getModulePermission(currentUser, '/merchants/registration'), [currentUser])
-  const visibleTabs = useMemo(() => modulePermission.tabs.filter((tab) => tab.can_view), [modulePermission.tabs])
-  const tabLayout = modulePermission.raw?.tab_layout === 'vertical' ? 'vertical' : 'horizontal'
+  const { tabs: visibleTabs, tabLayout } = useModuleTabs(currentUser, '/merchants/registration')
 
   const [merchant, setMerchant] = useState(null)
   const [activeTab, setActiveTab] = useState(null)
@@ -58,12 +56,8 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
   const PanelComponent = currentTab ? PANEL_COMPONENTS[currentTab.key] : null
   const editable = !forceReadOnly && Boolean(currentTab?.can_edit)
 
-  const tabNavigation = (
-    <Nav
-      variant="tabs"
-      activeKey={activeTab}
-      className={`nav-bordered nav-bordered-primary customer-profile-tabs${tabLayout === 'vertical' ? ' nav-tabs-vertical flex-column' : ' flex-nowrap'}`}
-    >
+  const tabNavigation = tabLayout === 'vertical' ? (
+    <Nav variant="tabs" activeKey={activeTab} className="nav-bordered nav-bordered-primary customer-profile-tabs nav-tabs-vertical flex-column">
       {visibleTabs.map((tab) => (
         <Nav.Item key={tab.tab_id || tab.key}>
           <Nav.Link eventKey={tab.key} onClick={() => setActiveTab(tab.key)} className="d-flex align-items-center gap-2">
@@ -74,6 +68,17 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
               {tab.icon && <Icon icon={tab.icon} className="text-primary" style={{ fontSize: '1rem' }} />}
             </span>
             <span className="fw-semibold text-nowrap">{tab.label}</span>
+          </Nav.Link>
+        </Nav.Item>
+      ))}
+    </Nav>
+  ) : (
+    <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => key && setActiveTab(key)} className="nav-bordered nav-bordered-primary module-tabs-horizontal mb-3 flex-nowrap">
+      {visibleTabs.map((tab) => (
+        <Nav.Item key={tab.tab_id || tab.key}>
+          <Nav.Link eventKey={tab.key} className="d-flex align-items-center gap-2">
+            <Icon icon={tab.icon} className="fs-lg" />
+            <span className="fw-semibold">{tab.label}</span>
           </Nav.Link>
         </Nav.Item>
       ))}
@@ -108,7 +113,7 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
 
       {!visibleTabs.length ? (
         <Alert variant="warning">Your role does not have access to any tabs for Merchant Management.</Alert>
-      ) : (
+      ) : tabLayout === 'vertical' ? (
         <Card>
           <Card.Header>
             <div>
@@ -116,26 +121,30 @@ const MerchantManagePanel = ({ merchantId, forceReadOnly = false, onBack }) => {
               <p className="text-muted mb-0 small">{merchant?.client_id}</p>
             </div>
           </Card.Header>
-          {tabLayout === 'vertical' ? (
-            <Card.Body className="p-0">
-              <Row className="g-0">
-                <Col xs={12} className="customer-profile-tab-sidebar bg-body-tertiary p-3">
-                  {tabNavigation}
-                </Col>
-                <Col xs={12} className="customer-profile-tab-content p-4">
-                  {tabContent}
-                </Col>
-              </Row>
-            </Card.Body>
-          ) : (
-            <>
-              <Card.Header className="border-top-0 pt-0">
-                <div className="customer-profile-tabs-scroll">{tabNavigation}</div>
-              </Card.Header>
-              <Card.Body>{tabContent}</Card.Body>
-            </>
-          )}
+          <Card.Body className="p-0">
+            <Row className="g-0">
+              <Col xs={12} className="customer-profile-tab-sidebar bg-body-tertiary p-3">
+                {tabNavigation}
+              </Col>
+              <Col xs={12} className="customer-profile-tab-content p-4">
+                {tabContent}
+              </Col>
+            </Row>
+          </Card.Body>
         </Card>
+      ) : (
+        <>
+          {tabNavigation}
+          <Card>
+            <Card.Body>
+              <div className="mb-3">
+                <h5 className="mb-0">{merchant?.dba_name || merchant?.legal_name || merchant?.client_id}</h5>
+                <p className="text-muted mb-0 small">{merchant?.client_id}</p>
+              </div>
+              {tabContent}
+            </Card.Body>
+          </Card>
+        </>
       )}
     </>
   )

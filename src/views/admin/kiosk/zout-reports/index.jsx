@@ -18,7 +18,7 @@ const downloadBlob = (blob, filename) => {
   window.URL.revokeObjectURL(url)
 }
 
-const KioskZoutReportsPage = () => {
+const KioskZoutReportsPage = ({ canExport = true }) => {
   const { showNotification } = useNotificationContext()
 
   const [rows, setRows] = useState([])
@@ -106,18 +106,22 @@ const KioskZoutReportsPage = () => {
                 View All Records
               </Button>
             </Col>
-            <Col />
-            <Col md="auto">
-              <Button variant="outline-secondary" disabled={exporting !== '' || rows.length === 0} onClick={() => handleExport('pdf')}>
-                <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
-              </Button>
-            </Col>
-            <Col md="auto">
-              <Button variant="outline-success" disabled={exporting !== '' || rows.length === 0} onClick={() => handleExport('csv')}>
-                <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
-              </Button>
-            </Col>
           </Row>
+
+          {canExport && (
+            <Row className="g-3 mt-1">
+              <Col md="auto">
+                <Button variant="outline-secondary" disabled={exporting !== '' || rows.length === 0} onClick={() => handleExport('pdf')}>
+                  <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+                </Button>
+              </Col>
+              <Col md="auto">
+                <Button variant="outline-success" disabled={exporting !== '' || rows.length === 0} onClick={() => handleExport('csv')}>
+                  <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
+                </Button>
+              </Col>
+            </Row>
+          )}
         </CardBody>
       </Card>
 

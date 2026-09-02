@@ -457,13 +457,6 @@ const ApiService = {
   updateMenu: (id, data) =>
     http.put(`/access-management/menus/${id}`, data),
 
-  /**
-   * Delete a menu item (children cascade).
-   * @param {number} id
-   */
-  deleteMenu: (id) =>
-    http.delete(`/access-management/menus/${id}`),
-
   createCustomerMenu: (data) =>
     http.post('/access-management/customer-menus', data),
 

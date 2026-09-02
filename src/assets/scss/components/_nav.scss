@@ -200,3 +200,12 @@
         }
     }
 }
+
+// module-tabs-horizontal — the horizontal tab strip on `menu_tabs`-driven
+// pages (Kiosk Reports, Merchant Management, ...). Bootstrap's default 1px
+// active border reads as barely-there next to this app's other headings.
+.nav-tabs.module-tabs-horizontal {
+    .nav-item .nav-link.active {
+        border-bottom-width: 3px;
+    }
+}

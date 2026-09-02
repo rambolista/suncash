@@ -39,7 +39,7 @@ const VIEWS = {
   },
 }
 
-const KioskReplenishReportsPage = () => {
+const KioskReplenishReportsPage = ({ canExport = true }) => {
   const { showNotification } = useNotificationContext()
 
   const [rows, setRows] = useState([])
@@ -152,17 +152,21 @@ const KioskReplenishReportsPage = () => {
                 <Icon icon="filter" className="me-1" /> Apply Filters
               </Button>
             </Col>
-            <Col />
-            <Col md="auto">
-              <Button variant="outline-secondary" disabled={exportingList !== '' || rows.length === 0} onClick={() => handleExportList('pdf')}>
-                <Icon icon="file-type-pdf" className="me-1" /> {exportingList === 'pdf' ? 'Exporting...' : 'Export to PDF'}
-              </Button>
-            </Col>
-            <Col md="auto">
-              <Button variant="outline-success" disabled={exportingList !== '' || rows.length === 0} onClick={() => handleExportList('csv')}>
-                <Icon icon="file-type-xls" className="me-1" /> {exportingList === 'csv' ? 'Exporting...' : 'Export to Excel'}
-              </Button>
-            </Col>
+            {canExport && (
+              <>
+                <Col />
+                <Col md="auto">
+                  <Button variant="outline-secondary" disabled={exportingList !== '' || rows.length === 0} onClick={() => handleExportList('pdf')}>
+                    <Icon icon="file-type-pdf" className="me-1" /> {exportingList === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+                  </Button>
+                </Col>
+                <Col md="auto">
+                  <Button variant="outline-success" disabled={exportingList !== '' || rows.length === 0} onClick={() => handleExportList('csv')}>
+                    <Icon icon="file-type-xls" className="me-1" /> {exportingList === 'csv' ? 'Exporting...' : 'Export to Excel'}
+                  </Button>
+                </Col>
+              </>
+            )}
           </Row>
         </CardBody>
       </Card>
@@ -191,6 +195,7 @@ const KioskReplenishReportsPage = () => {
           rows={detail?.rows || []}
           totals={detail?.totals}
           exporting={detailExporting}
+          canExport={canExport}
           onExport={handleDetailExport}
         />
       )}

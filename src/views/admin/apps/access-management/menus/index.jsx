@@ -5,7 +5,6 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import MenusTable from './components/MenusTable'
-import DeleteMenuModal from './components/DeleteMenuModal'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import { useNavigate } from 'react-router'
 import LoadingState from '@/components/LoadingState'
@@ -17,7 +16,6 @@ const MenuManagement = () => {
   const modulePermission = useMemo(() => getModulePermission(currentUser, '/apps/access-management'), [currentUser])
 
   const [menus, setMenus] = useState([])
-  const [deleteTarget, setDeleteTarget] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const notify = (variant, message) =>
@@ -37,21 +35,6 @@ const MenuManagement = () => {
 
   useEffect(() => { loadData() }, [])
 
-  const handleDeleteMenu = async () => {
-    if (!deleteTarget) return
-    try {
-      await ApiService.deleteMenu(deleteTarget.id)
-      setMenus((prev) => prev.filter((m) => m.id !== deleteTarget.id && m.parent_id !== deleteTarget.id))
-      notifyMenuItemsChanged()
-      notifyNotificationsChanged()
-      notify('success', `"${deleteTarget.label}" deleted.`)
-    } catch (error) {
-      notify('danger', error?.message || 'Failed to delete menu.')
-    } finally {
-      setDeleteTarget(null)
-    }
-  }
-
   // Enrich each menu with its parent label for the DataTable
   const tableData = useMemo(
     () => menus.map((m) => ({
@@ -63,7 +46,6 @@ const MenuManagement = () => {
 
   const canAddMenu = Boolean(modulePermission.can_add)
   const canEditMenu = Boolean(modulePermission.can_edit)
-  const canDeleteMenu = Boolean(modulePermission.can_delete)
 
   const openCreate = () => {
     if (!canAddMenu) return
@@ -95,20 +77,12 @@ const MenuManagement = () => {
           {loading ? <LoadingState /> : (
             <MenusTable
               data={tableData}
-              permissions={{ can_edit: canEditMenu, can_delete: canDeleteMenu }}
+              permissions={{ can_edit: canEditMenu }}
               onEdit={openEdit}
-              onDelete={(menu) => setDeleteTarget(menu)}
             />
           )}
         </Card.Body>
       </Card>
-
-      <DeleteMenuModal
-        show={!!deleteTarget}
-        onHide={() => setDeleteTarget(null)}
-        onConfirm={handleDeleteMenu}
-        menu={deleteTarget}
-      />
     </>
   )
 }

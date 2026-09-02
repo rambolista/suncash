@@ -97,15 +97,13 @@ const columns = [
  * MenusTable
  *
  * Props:
- *   data     – flat menus array (each item should include `parent_label`)
- *   onEdit   – (menu) => void
- *   onDelete – (menu) => void
+ *   data   – flat menus array (each item should include `parent_label`)
+ *   onEdit – (menu) => void
  */
-const MenusTable = ({ data, onEdit, onDelete, permissions = {} }) => {
-  const handlers = useRef({ onEdit, onDelete })
-  handlers.current = { onEdit, onDelete }
+const MenusTable = ({ data, onEdit, permissions = {} }) => {
+  const handlers = useRef({ onEdit })
+  handlers.current = { onEdit }
   const canEdit = Boolean(permissions.can_edit)
-  const canDelete = Boolean(permissions.can_delete)
 
   // Build a quick id→row lookup so createdRow can pass the full object
   const rowMap = useMemo(() => {
@@ -151,15 +149,10 @@ const MenusTable = ({ data, onEdit, onDelete, permissions = {} }) => {
               <Icon icon="edit" className="fs-lg" />
             </Button>
           )}
-          {canDelete && (
-            <Button variant="danger" size="sm" className="btn-icon rounded-circle" title="Delete" aria-label="Delete" onClick={() => handlers.current.onDelete?.(item)}>
-              <Icon icon="trash" className="fs-lg" />
-            </Button>
-          )}
         </div>
       )
     },
-  }), [canEdit, canDelete, rowMap])
+  }), [canEdit, rowMap])
 
   return (
     <DataTable

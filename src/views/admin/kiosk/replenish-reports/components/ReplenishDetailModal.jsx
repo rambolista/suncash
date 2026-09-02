@@ -7,7 +7,7 @@ const money = (value) => `$${Number(value || 0).toLocaleString(undefined, { mini
 const VALUE_COLUMNS = new Set(['value'])
 
 /** Shared detail panel for the three Replenish Reports "View" actions (Meter / Add Cash / Clear Acceptor). */
-const ReplenishDetailModal = ({ show, onHide, title, loading, date, columns, rows, totals, exporting, onExport }) => (
+const ReplenishDetailModal = ({ show, onHide, title, loading, date, columns, rows, totals, exporting, onExport, canExport = true }) => (
   <Modal show={show} onHide={onHide} centered size="lg">
     <Modal.Header closeButton>
       <Modal.Title>{title}</Modal.Title>
@@ -57,12 +57,16 @@ const ReplenishDetailModal = ({ show, onHide, title, loading, date, columns, row
       )}
     </Modal.Body>
     <Modal.Footer>
-      <Button variant="outline-secondary" disabled={exporting !== '' || rows.length === 0} onClick={() => onExport('pdf')}>
-        <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
-      </Button>
-      <Button variant="outline-success" disabled={exporting !== '' || rows.length === 0} onClick={() => onExport('csv')}>
-        <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
-      </Button>
+      {canExport && (
+        <>
+          <Button variant="outline-secondary" disabled={exporting !== '' || rows.length === 0} onClick={() => onExport('pdf')}>
+            <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+          </Button>
+          <Button variant="outline-success" disabled={exporting !== '' || rows.length === 0} onClick={() => onExport('csv')}>
+            <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
+          </Button>
+        </>
+      )}
       <Button variant="secondary" onClick={onHide}>Back</Button>
     </Modal.Footer>
   </Modal>
