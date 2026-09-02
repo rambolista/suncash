@@ -16,4 +16,15 @@ export const bindColumnSearchInputs = (api) => {
       }
     })
   })
+
+  container.querySelectorAll('thead tr.column-search-input-bar th select[data-col-index]').forEach((select) => {
+    const columnIndex = Number(select.getAttribute('data-col-index'))
+
+    select.addEventListener('click', stopPropagation)
+    select.addEventListener('change', function onChange() {
+      if (api.column(columnIndex).search() !== this.value) {
+        api.column(columnIndex).search(this.value).draw()
+      }
+    })
+  })
 }

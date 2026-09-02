@@ -162,6 +162,34 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/kiosk/monitoring-dashboard')),
       },
       {
+        path: '/kiosk/management',
+        Component: lazy(() => import('@/views/admin/kiosk/management')),
+      },
+      {
+        path: '/kiosk/management/:branchId/terminals',
+        Component: lazy(() => import('@/views/admin/kiosk/management/terminals')),
+      },
+      {
+        path: '/kiosk/management/:branchId/partners',
+        Component: lazy(() => import('@/views/admin/kiosk/management/partners')),
+      },
+      {
+        path: '/kiosk/management/bank-accounts',
+        Component: lazy(() => import('@/views/admin/kiosk/management/bank-accounts')),
+      },
+      {
+        path: '/kiosk/statement',
+        Component: lazy(() => import('@/views/admin/kiosk/statement')),
+      },
+      {
+        path: '/kiosk/statement/:terminalId/ledger',
+        Component: lazy(() => import('@/views/admin/kiosk/statement/ledger')),
+      },
+      {
+        path: '/kiosk/users',
+        Component: lazy(() => import('@/views/admin/kiosk/users')),
+      },
+      {
         path: '/giftcards/products',
         Component: lazy(() => import('@/views/admin/giftcards/products')),
       },

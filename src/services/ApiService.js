@@ -992,6 +992,72 @@ const ApiService = {
 
   acknowledgeKioskMachine: (id) => http.post(`/kiosk-monitoring/${id}/acknowledge`),
 
+  // Kiosk — Kiosk Management: Branches
+  getKioskBranches: () => http.get('/kiosk-management/branches'),
+  getKioskBranchMerchants: () => http.get('/kiosk-management/branches/merchants'),
+  addKioskBranch: (data) => http.post('/kiosk-management/branches', data),
+  deleteKioskBranch: (id) => http.delete(`/kiosk-management/branches/${id}`),
+
+  // Kiosk — Kiosk Management: Terminals
+  getKioskTerminals: (branchId) => http.get(`/kiosk-management/branches/${branchId}/terminals`),
+  addKioskTerminal: (data) => http.post('/kiosk-management/terminals', data),
+  updateKioskTerminal: (id, data) => http.put(`/kiosk-management/terminals/${id}`, data),
+  updateKioskTerminalCommission: (id, data) => http.put(`/kiosk-management/terminals/${id}/commission`, data),
+  deleteKioskTerminal: (id) => http.delete(`/kiosk-management/terminals/${id}`),
+
+  // Kiosk — Kiosk Management: Add Partner / Settlement / Commission
+  getKioskPartners: (branchId) => http.get(`/kiosk-management/branches/${branchId}/partners`),
+  addKioskPartner: (branchId, data) => http.post(`/kiosk-management/branches/${branchId}/partners`, data),
+  updateKioskPartner: (id, data) => http.put(`/kiosk-management/partners/${id}`, data),
+  deleteKioskPartner: (id) => http.delete(`/kiosk-management/partners/${id}`),
+
+  // Kiosk — Kiosk Management: Manage Bank Account
+  getKioskBankAccounts: () => http.get('/kiosk-management/bank-accounts'),
+  getKioskBankAccount: (id) => http.get(`/kiosk-management/bank-accounts/${id}`),
+  getKioskBankAccountBranches: (bankId) => http.get(`/kiosk-management/bank-accounts/banks/${bankId}/branches`),
+  addKioskBankAccount: (data) => http.post('/kiosk-management/bank-accounts', data),
+  updateKioskBankAccount: (id, data) => http.put(`/kiosk-management/bank-accounts/${id}`, data),
+  deleteKioskBankAccount: (id) => http.delete(`/kiosk-management/bank-accounts/${id}`),
+
+  // Kiosk — Statement
+  getKioskStatement: (branchId, terminalId) => {
+    const query = new URLSearchParams({
+      ...(branchId ? { branch_id: branchId } : {}),
+      ...(terminalId ? { terminal_id: terminalId } : {}),
+    }).toString()
+    return http.get(`/kiosk-statement${query ? `?${query}` : ''}`)
+  },
+  getKioskStatementTerminals: (branchId) => {
+    const query = new URLSearchParams(branchId ? { branch_id: branchId } : {}).toString()
+    return http.get(`/kiosk-statement/terminals${query ? `?${query}` : ''}`)
+  },
+  exportKioskStatement: (branchId, terminalId, format) => {
+    const query = new URLSearchParams({
+      ...(branchId ? { branch_id: branchId } : {}),
+      ...(terminalId ? { terminal_id: terminalId } : {}),
+      format,
+    }).toString()
+    return http.download(`/kiosk-statement/export?${query}`)
+  },
+  getKioskStatementLedger: (terminalId, dateFrom, dateTo) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo }).toString()
+    return http.get(`/kiosk-statement/${terminalId}/ledger?${query}`)
+  },
+  exportKioskStatementLedger: (terminalId, dateFrom, dateTo, format) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo, format }).toString()
+    return http.download(`/kiosk-statement/${terminalId}/ledger/export?${query}`)
+  },
+
+  // Kiosk — Users
+  getKioskUsers: (branchId) => {
+    const query = new URLSearchParams(branchId ? { branch_id: branchId } : {}).toString()
+    return http.get(`/kiosk-users${query ? `?${query}` : ''}`)
+  },
+  addKioskUser: (data) => http.post('/kiosk-users', data),
+  updateKioskUser: (type, id, data) => http.put(`/kiosk-users/${type}/${id}`, data),
+  deleteKioskUser: (id) => http.delete(`/kiosk-users/${id}`),
+  resetKioskUserPassword: (id) => http.post(`/kiosk-users/${id}/reset-password`),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
