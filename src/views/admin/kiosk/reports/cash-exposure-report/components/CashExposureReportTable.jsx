@@ -17,33 +17,31 @@ const columns = [
   textCol('kiosk'),
   textCol('island'),
   textCol('location'),
-  moneyCol('running_balance'),
-  moneyCol('total_cash_in'),
-  moneyCol('total_cash_out'),
-  moneyCol('total_fee'),
-  moneyCol('total_vat'),
-  moneyCol('credit_adjustments'),
-  moneyCol('debit_adjustments'),
-  moneyCol('total_cash_loaded'),
-  moneyCol('total_deposits'),
-  moneyCol('cash_movement'),
-  moneyCol('net_balance'),
+  moneyCol('cash_acceptor'),
+  moneyCol('cash_dispenser'),
+  moneyCol('cash_reserve'),
+  moneyCol('cash_reject'),
+  moneyCol('cash_exposure'),
 ]
 
-const headers = [
-  'Kiosk', 'Island', 'Location', 'Balance B/F', 'Total Cash In', 'Total Cash Out',
-  'Total Fees', 'Total Vat', 'Total Credit Adjustment', 'Total Debit Adjustment',
-  'Total Cash Loaded', 'Total Cash Deposit', 'Total Cash Movement', 'Net Balance',
-]
+const headers = ['Kiosk', 'Island', 'Location', 'Total Cash in Acceptor', 'Total Cash Dispenser', 'Total Cash Reserve', 'Total Cash Reject Bin', 'Cash Exposure']
 
 // Kiosk / Island / Location are filtered via a dropdown of the values actually present, not free text.
 const DROPDOWN_COLUMNS = { 0: 'kiosk', 1: 'island', 2: 'location' }
 
-const ReconciliationReportTable = ({ data }) => {
+/** Legacy highlights a row pale-yellow when the acceptor is at/above its high-alert threshold or the dispenser is at/below its low-alert threshold. */
+const createdRow = (row, rowData) => {
+  if (rowData.flagged) {
+    row.style.backgroundColor = 'rgba(255, 221, 87, 0.18)'
+  }
+}
+
+const CashExposureReportTable = ({ data }) => {
   const options = useMemo(() => ({
     responsive: true,
     pageLength: 25,
     orderCellsTop: true,
+    order: [[7, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
       bindColumnSearchInputs(this.api())
@@ -54,6 +52,7 @@ const ReconciliationReportTable = ({ data }) => {
       controlsRow?.classList.add('mb-3')
     },
     language: { paginate: paginationIcons },
+    createdRow,
   }), [])
 
   return (
@@ -68,4 +67,4 @@ const ReconciliationReportTable = ({ data }) => {
   )
 }
 
-export default ReconciliationReportTable
+export default CashExposureReportTable

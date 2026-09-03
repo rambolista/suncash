@@ -2,10 +2,10 @@ import DT from 'datatables.net-bs5'
 import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo } from 'react'
-import { FormControl } from 'react-bootstrap'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import DataTableColumnSearchRow from '@/views/admin/apps/access-management/utils/DataTableColumnSearchRow'
 import { escapeHtml, money } from './format'
 
 DataTable.use(DT)
@@ -33,6 +33,9 @@ const headers = [
   'Customer / Account No', 'Cash Received', 'Fee', 'VAT', 'Total Fees', 'Product Amount',
 ]
 
+// Kiosk / Location / Island / Product are filtered via a dropdown of the values actually present, not free text.
+const DROPDOWN_COLUMNS = { 1: 'terminal_code', 2: 'location', 3: 'island', 4: 'product' }
+
 const TransactionReportTable = ({ data }) => {
   const options = useMemo(() => ({
     responsive: true,
@@ -57,13 +60,7 @@ const TransactionReportTable = ({ data }) => {
         <tr>
           {headers.map((header) => <th key={header}>{header}</th>)}
         </tr>
-        <tr className="column-search-input-bar">
-          {headers.map((header, index) => (
-            <th key={header}>
-              <FormControl size="sm" type="text" placeholder={header} className="bg-light-subtle border-light" data-col-index={index} />
-            </th>
-          ))}
-        </tr>
+        <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
   )

@@ -3,10 +3,10 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
-import { FormControl } from 'react-bootstrap'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import DataTableColumnSearchRow from '@/views/admin/apps/access-management/utils/DataTableColumnSearchRow'
 import ActionButton from '@/views/admin/merchants/components/ActionButton'
 import { escapeHtml } from './format'
 
@@ -30,6 +30,9 @@ const columns = [
 ]
 
 const headers = ['Replenishment Date', 'Kiosk Terminal', 'Island', 'Location', 'Action']
+
+// Kiosk Terminal / Island / Location are filtered via a dropdown of the values actually present, not free text.
+const DROPDOWN_COLUMNS = { 1: 'kiosk_terminal', 2: 'island', 3: 'location' }
 
 const ReplenishTable = ({ data, onViewMeter, onViewAddCash, onViewClearAcceptor }) => {
   const handlers = useRef({ onViewMeter, onViewAddCash, onViewClearAcceptor })
@@ -82,13 +85,7 @@ const ReplenishTable = ({ data, onViewMeter, onViewAddCash, onViewClearAcceptor 
         <tr>
           {headers.map((header) => <th key={header}>{header}</th>)}
         </tr>
-        <tr className="column-search-input-bar">
-          {headers.map((header, index) => (
-            <th key={header}>
-              {header !== 'Action' && <FormControl size="sm" type="text" placeholder={header} className="bg-light-subtle border-light" data-col-index={index} />}
-            </th>
-          ))}
-        </tr>
+        <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
   )

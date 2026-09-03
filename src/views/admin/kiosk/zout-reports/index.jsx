@@ -23,6 +23,7 @@ const KioskZoutReportsPage = ({ canExport = true }) => {
 
   const [rows, setRows] = useState([])
   const [branches, setBranches] = useState([])
+  const [locations, setLocations] = useState([])
   const [branchId, setBranchId] = useState('')
   const [location, setLocation] = useState('')
   const [date, setDate] = useState('')
@@ -37,6 +38,7 @@ const KioskZoutReportsPage = ({ canExport = true }) => {
       .then((data) => {
         setRows(Array.isArray(data?.data) ? data.data : [])
         setBranches(Array.isArray(data?.branches) ? data.branches : [])
+        setLocations(Array.isArray(data?.locations) ? data.locations : [])
       })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load zout reports.', variant: 'danger' }))
       .finally(() => setLoading(false))
@@ -89,7 +91,7 @@ const KioskZoutReportsPage = ({ canExport = true }) => {
               <Form.Label>Location</Form.Label>
               <Form.Select value={location} onChange={(e) => setLocation(e.target.value)}>
                 <option value="">-- Select Location --</option>
-                <option value="bahamas">Bahamas</option>
+                {locations.map((loc) => <option key={loc} value={loc}>{loc}</option>)}
               </Form.Select>
             </Col>
             <Col md={3}>
