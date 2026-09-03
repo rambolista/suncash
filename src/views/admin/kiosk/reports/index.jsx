@@ -7,11 +7,17 @@ import useModuleTabs from '@/hooks/useModuleTabs'
 import ZoutReportsPage from '../zout-reports'
 import ReplenishReportsPage from '../replenish-reports'
 import TransactionReportTab from './transaction-report'
+import CommissionReportTab from './commission-report'
+import AgentCommissionReportTab from './agent-commission-report'
+import ReconciliationReportTab from './reconciliation-report'
 
 const TAB_COMPONENTS = {
   zout: ZoutReportsPage,
   replenish: ReplenishReportsPage,
   transaction: TransactionReportTab,
+  commission: CommissionReportTab,
+  agent_commission: AgentCommissionReportTab,
+  reconciliation: ReconciliationReportTab,
 }
 
 const KioskReportsPage = () => {

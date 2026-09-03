@@ -1125,6 +1125,54 @@ const ApiService = {
     return http.download(`/kiosk-transaction-reports/export?${query}`)
   },
 
+  // Kiosk — Commission Report
+  getKioskCommissionReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-commission-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskCommissionReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-commission-reports/export?${query}`)
+  },
+
+  // Kiosk — Agent Commission Report
+  getKioskAgentCommissionReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-agent-commission-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskAgentCommissionReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-agent-commission-reports/export?${query}`)
+  },
+
+  // Kiosk — Reconciliation Report
+  getKioskReconciliationReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-reconciliation-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskReconciliationReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-reconciliation-reports/export?${query}`)
+  },
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
