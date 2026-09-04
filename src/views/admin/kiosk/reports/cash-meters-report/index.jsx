@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Button, Card, CardBody, Col, Form, Row, Table } from 'react-bootstrap'
-import PageBreadcrumb from '@/components/PageBreadcrumb'
 import Icon from '@/components/wrappers/Icon'
 import LoadingState from '@/components/LoadingState'
 import ApiService from '@/services/ApiService'
@@ -8,7 +7,19 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 
 const money = (value) => `$${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
-const KioskCashMetersPage = () => {
+const downloadBlob = (blob, filename) => {
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+// Legacy has no date range for this lookup — pick a Branch/Terminal/Type and see the LATEST recorded meter reading.
+const KioskCashMetersReportTab = ({ canExport = true }) => {
   const { showNotification } = useNotificationContext()
 
   const [branches, setBranches] = useState([])
@@ -20,6 +31,7 @@ const KioskCashMetersPage = () => {
   const [loadingFilters, setLoadingFilters] = useState(true)
   const [loadingResults, setLoadingResults] = useState(false)
   const [result, setResult] = useState(null)
+  const [exporting, setExporting] = useState('')
 
   useEffect(() => {
     setLoadingFilters(true)
@@ -64,44 +76,72 @@ const KioskCashMetersPage = () => {
       .finally(() => setLoadingResults(false))
   }
 
+  const handleExport = async (format) => {
+    setExporting(format)
+    try {
+      const { blob, filename } = await ApiService.exportKioskCashMeters(terminalId, type, format)
+      downloadBlob(blob, filename)
+    } catch (err) {
+      showNotification({ title: 'Failed', message: err?.message || `Failed to export ${format.toUpperCase()}.`, variant: 'danger' })
+    } finally {
+      setExporting('')
+    }
+  }
+
   const isDispenser = result?.type === 'out'
   const columnLabel = isDispenser ? 'Out (Dispensed)' : 'In (Accepted)'
+  const canDownload = canExport && result?.has_data
 
   return (
     <>
-      <PageBreadcrumb title="Cash Meters (Transaction)" subtitle="Kiosk" />
-
       <Card className="mb-3">
         <CardBody>
           {loadingFilters ? <LoadingState message="Loading filters..." /> : (
-            <Row className="g-3 align-items-end">
-              <Col md={3}>
-                <Form.Label>Kiosk Branch</Form.Label>
-                <Form.Select value={branchId} onChange={(e) => handleBranchChange(e.target.value)}>
-                  <option value="">-- Select a Branch --</option>
-                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
-                </Form.Select>
-              </Col>
-              <Col md={3}>
-                <Form.Label>Kiosk Terminal</Form.Label>
-                <Form.Select value={terminalId} onChange={(e) => setTerminalId(e.target.value)}>
-                  <option value="">--Select a Terminal--</option>
-                  {terminals.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </Form.Select>
-              </Col>
-              <Col md={3}>
-                <Form.Label>Transaction Type</Form.Label>
-                <Form.Select value={type} onChange={(e) => setType(e.target.value)}>
-                  <option value="">--Select Meter Type--</option>
-                  {Object.entries(transactionTypes).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                </Form.Select>
-              </Col>
-              <Col md="auto">
-                <Button variant="primary" onClick={handleApply} disabled={loadingResults}>
-                  <Icon icon="filter" className="me-1" /> Apply Filters
-                </Button>
-              </Col>
-            </Row>
+            <>
+              <Row className="g-3 align-items-end">
+                <Col md={3}>
+                  <Form.Label>Kiosk Branch</Form.Label>
+                  <Form.Select value={branchId} onChange={(e) => handleBranchChange(e.target.value)}>
+                    <option value="">-- Select a Branch --</option>
+                    {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </Form.Select>
+                </Col>
+                <Col md={3}>
+                  <Form.Label>Kiosk Terminal</Form.Label>
+                  <Form.Select value={terminalId} onChange={(e) => setTerminalId(e.target.value)}>
+                    <option value="">--Select a Terminal--</option>
+                    {terminals.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  </Form.Select>
+                </Col>
+                <Col md={3}>
+                  <Form.Label>Transaction Type</Form.Label>
+                  <Form.Select value={type} onChange={(e) => setType(e.target.value)}>
+                    <option value="">--Select Meter Type--</option>
+                    {Object.entries(transactionTypes).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                  </Form.Select>
+                </Col>
+                <Col md="auto">
+                  <Button variant="primary" onClick={handleApply} disabled={loadingResults}>
+                    <Icon icon="filter" className="me-1" /> Apply Filters
+                  </Button>
+                </Col>
+              </Row>
+
+              {canDownload && (
+                <Row className="g-3 mt-1">
+                  <Col md="auto">
+                    <Button variant="outline-secondary" disabled={exporting !== ''} onClick={() => handleExport('pdf')}>
+                      <Icon icon="file-type-pdf" className="me-1" /> {exporting === 'pdf' ? 'Exporting...' : 'Export to PDF'}
+                    </Button>
+                  </Col>
+                  <Col md="auto">
+                    <Button variant="outline-success" disabled={exporting !== ''} onClick={() => handleExport('csv')}>
+                      <Icon icon="file-type-xls" className="me-1" /> {exporting === 'csv' ? 'Exporting...' : 'Export to Excel'}
+                    </Button>
+                  </Col>
+                </Row>
+              )}
+            </>
           )}
         </CardBody>
       </Card>
@@ -157,4 +197,4 @@ const KioskCashMetersPage = () => {
   )
 }
 
-export default KioskCashMetersPage
+export default KioskCashMetersReportTab

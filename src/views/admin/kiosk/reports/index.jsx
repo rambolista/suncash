@@ -5,6 +5,7 @@ import Icon from '@/components/wrappers/Icon'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import useModuleTabs from '@/hooks/useModuleTabs'
 import ZoutReportsPage from '../zout-reports'
+import CashMetersReportTab from './cash-meters-report'
 import ReplenishReportsPage from '../replenish-reports'
 import TransactionReportTab from './transaction-report'
 import CommissionReportTab from './commission-report'
@@ -14,6 +15,7 @@ import CashExposureReportTab from './cash-exposure-report'
 
 const TAB_COMPONENTS = {
   zout: ZoutReportsPage,
+  cash_meters: CashMetersReportTab,
   replenish: ReplenishReportsPage,
   transaction: TransactionReportTab,
   commission: CommissionReportTab,

@@ -190,8 +190,8 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/kiosk/users')),
       },
       {
-        path: '/kiosk/cash-meters',
-        Component: lazy(() => import('@/views/admin/kiosk/cash-meters')),
+        path: '/kiosk/commission-profiles',
+        Component: lazy(() => import('@/views/admin/kiosk/commission-profiles')),
       },
       {
         path: '/kiosk/reports',

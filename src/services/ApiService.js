@@ -1051,6 +1051,15 @@ const ApiService = {
   deleteKioskUser: (id) => http.delete(`/kiosk-users/${id}`),
   resetKioskUserPassword: (id) => http.post(`/kiosk-users/${id}/reset-password`),
 
+  // Kiosk — Commission Profiles
+  getKioskCommissionProfiles: () => http.get('/kiosk-commission-profiles'),
+  getKioskCommissionProfile: (profileName) => http.get(`/kiosk-commission-profiles/${encodeURIComponent(profileName)}`),
+  addKioskCommissionProfile: (profileName) => http.post('/kiosk-commission-profiles', { profile_name: profileName }),
+  copyKioskCommissionProfile: (sourceProfileName, newProfileName) =>
+    http.post('/kiosk-commission-profiles/copy', { source_profile_name: sourceProfileName, new_profile_name: newProfileName }),
+  updateKioskCommissionProfileRow: (id, data) => http.put(`/kiosk-commission-profiles/rows/${id}`, data),
+  deleteKioskCommissionProfile: (profileName) => http.delete(`/kiosk-commission-profiles/${encodeURIComponent(profileName)}`),
+
   // Kiosk — Zout Reports
   getKioskZoutReports: (branchId, location, date) => {
     const query = new URLSearchParams({
@@ -1080,6 +1089,10 @@ const ApiService = {
   getKioskCashMeterReadings: (terminalId, type) => {
     const query = new URLSearchParams({ terminal_id: terminalId, type }).toString()
     return http.get(`/kiosk-cash-meters/meters?${query}`)
+  },
+  exportKioskCashMeters: (terminalId, type, format) => {
+    const query = new URLSearchParams({ terminal_id: terminalId, type, format }).toString()
+    return http.download(`/kiosk-cash-meters/export?${query}`)
   },
 
   // Kiosk — Replenish Reports
