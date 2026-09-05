@@ -198,6 +198,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/kiosk/product-profiles')),
       },
       {
+        path: '/kiosk/commission-approval',
+        Component: lazy(() => import('@/views/admin/kiosk/commission-approval')),
+      },
+      {
         path: '/kiosk/reports',
         Component: lazy(() => import('@/views/admin/kiosk/reports')),
       },

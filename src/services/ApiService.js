@@ -1071,6 +1071,26 @@ const ApiService = {
   getKioskFeatureSettings: () => http.get('/kiosk-product-profiles/feature-settings'),
   updateKioskFeatureSetting: (id, isActive) => http.put(`/kiosk-product-profiles/feature-settings/${id}`, { is_active: isActive }),
 
+  // Kiosk — Commission Approval
+  getKioskCommissionApprovals: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-commission-approval${query ? `?${query}` : ''}`)
+  },
+  getKioskCommissionApprovalDetail: (transactionId) => http.get(`/kiosk-commission-approval/${encodeURIComponent(transactionId)}`),
+  getKioskCommissionApprovalHistory: (terminalId) => http.get(`/kiosk-commission-approval/terminals/${terminalId}/history`),
+  approveKioskCommission: (transactionId, data) => http.post(`/kiosk-commission-approval/${encodeURIComponent(transactionId)}/approve`, data),
+  rejectKioskCommission: (transactionId, data) => http.post(`/kiosk-commission-approval/${encodeURIComponent(transactionId)}/reject`, data),
+  exportKioskCommissionApprovals: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-commission-approval/export?${query}`)
+  },
+
   // Kiosk — Zout Reports
   getKioskZoutReports: (branchId, location, date) => {
     const query = new URLSearchParams({
@@ -1211,6 +1231,22 @@ const ApiService = {
       )
     ).toString()
     return http.download(`/kiosk-cash-exposure-reports/export?${query}`)
+  },
+
+  // Kiosk — Partner Settlement Report
+  getKioskPartnerSettlementReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-partner-settlement-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskPartnerSettlementReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-partner-settlement-reports/export?${query}`)
   },
 
   // Administration — User Activity

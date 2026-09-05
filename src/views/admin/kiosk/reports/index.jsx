@@ -12,6 +12,7 @@ import CommissionReportTab from './commission-report'
 import AgentCommissionReportTab from './agent-commission-report'
 import ReconciliationReportTab from './reconciliation-report'
 import CashExposureReportTab from './cash-exposure-report'
+import PartnerSettlementReportTab from './partner-settlement-report'
 
 const TAB_COMPONENTS = {
   zout: ZoutReportsPage,
@@ -22,6 +23,7 @@ const TAB_COMPONENTS = {
   agent_commission: AgentCommissionReportTab,
   reconciliation: ReconciliationReportTab,
   cash_exposure: CashExposureReportTab,
+  partner_settlement: PartnerSettlementReportTab,
 }
 
 const KioskReportsPage = () => {
