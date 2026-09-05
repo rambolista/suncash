@@ -1060,6 +1060,17 @@ const ApiService = {
   updateKioskCommissionProfileRow: (id, data) => http.put(`/kiosk-commission-profiles/rows/${id}`, data),
   deleteKioskCommissionProfile: (profileName) => http.delete(`/kiosk-commission-profiles/${encodeURIComponent(profileName)}`),
 
+  // Kiosk — Product Profiles
+  getKioskProductProfiles: () => http.get('/kiosk-product-profiles'),
+  getKioskProductProfileTerminalModules: (terminalId) => http.get(`/kiosk-product-profiles/${terminalId}/modules`),
+  addKioskProductProfileServices: (terminalId, moduleIds) => http.post(`/kiosk-product-profiles/${terminalId}/services`, { module_ids: moduleIds }),
+  replaceKioskProductProfileServices: (terminalId, moduleIds) => http.put(`/kiosk-product-profiles/${terminalId}/services`, { module_ids: moduleIds }),
+  disableKioskProductProfileTerminal: (terminalId) => http.post(`/kiosk-product-profiles/${terminalId}/disable`),
+  enableKioskProductProfileTerminal: (terminalId) => http.post(`/kiosk-product-profiles/${terminalId}/enable`),
+  updateKioskModuleStatus: (id, status) => http.put(`/kiosk-product-profiles/modules/${id}`, { status }),
+  getKioskFeatureSettings: () => http.get('/kiosk-product-profiles/feature-settings'),
+  updateKioskFeatureSetting: (id, isActive) => http.put(`/kiosk-product-profiles/feature-settings/${id}`, { is_active: isActive }),
+
   // Kiosk — Zout Reports
   getKioskZoutReports: (branchId, location, date) => {
     const query = new URLSearchParams({

@@ -1,49 +1,95 @@
-import { Table } from 'react-bootstrap'
+import DT from 'datatables.net-bs5'
+import DataTable from 'datatables.net-react'
+import 'datatables.net-responsive'
+import { useMemo, useRef } from 'react'
+import { createRoot } from 'react-dom/client'
+import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
+import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
+import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import DataTableColumnSearchRow from '@/views/admin/apps/access-management/utils/DataTableColumnSearchRow'
 import ActionButton from '@/views/admin/merchants/components/ActionButton'
-import { money, percent } from './format'
+import { escapeHtml, money, percent } from './format'
 
-const CommissionProfileTable = ({ rows, canEdit, onEdit }) => (
-  <Table responsive hover size="sm" className="align-middle mb-0">
-    <thead className="thead-sm text-uppercase fs-xxs table-light">
-      <tr>
-        <th>Transaction Type</th>
-        <th className="text-end">Provider %</th>
-        <th className="text-end">Cap Amount</th>
-        <th className="text-end">Minimum Amount</th>
-        <th className="text-end">Frequency Limit (Days)</th>
-        <th className="text-end">Agent %</th>
-        <th className="text-end">Suncash %</th>
-        <th className="text-end">Owner %</th>
-        {canEdit && <th className="text-center" style={{ width: 80 }}>Action</th>}
-      </tr>
-    </thead>
-    <tbody>
-      {rows.length === 0 && (
+DataTable.use(DT)
+
+const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
+const percentCol = (key) => ({ data: key, render: (value) => escapeHtml(percent(value)) })
+const moneyCol = (key) => ({ data: key, render: (value) => escapeHtml(money(value)) })
+
+const columns = [
+  textCol('product_name'),
+  percentCol('provider_percentage'),
+  moneyCol('cap_amount'),
+  moneyCol('minimum_amount'),
+  { data: 'frequency_in_limit_days' },
+  percentCol('agent_percentage'),
+  percentCol('suncash_percentage'),
+  percentCol('owner_percentage'),
+  {
+    data: 'id',
+    orderable: false,
+    searchable: false,
+    width: '80px',
+    className: 'text-center action-cell',
+    render: (id) => `<div class="commission-profile-action-slot" data-id="${id}"></div>`,
+  },
+]
+
+const headers = [
+  'Transaction Type', 'Provider %', 'Cap Amount', 'Minimum Amount',
+  'Frequency Limit (Days)', 'Agent %', 'Suncash %', 'Owner %', 'Action',
+]
+
+const CommissionProfileTable = ({ rows, canEdit, onEdit }) => {
+  const handlers = useRef({ onEdit })
+  handlers.current = { onEdit }
+
+  const rowMap = useMemo(() => {
+    const map = {}
+    rows.forEach((item) => { map[item.id] = item })
+    return map
+  }, [rows])
+
+  const createdRow = useMemo(() => (row, rowData) => {
+    if (!canEdit) return
+    const item = rowMap[rowData.id] ?? rowData
+    const slot = row.querySelector('.commission-profile-action-slot')
+    if (!slot) return
+    const root = slot.__actionRoot || createRoot(slot)
+    slot.__actionRoot = root
+
+    root.render(<ActionButton label="Edit" icon="edit" onClick={() => handlers.current.onEdit(item)} />)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rowMap, canEdit])
+
+  const options = useMemo(() => ({
+    responsive: true,
+    pageLength: 25,
+    orderCellsTop: true,
+    order: [[0, 'asc']],
+    columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
+    initComplete: function () {
+      bindColumnSearchInputs(this.api())
+      bindSortLabels(this.api())
+      const container = this.api().table().container()
+      container.style.marginTop = '0'
+      const controlsRow = container.querySelector(':scope > .row')
+      controlsRow?.classList.add('mb-3')
+    },
+    language: { paginate: paginationIcons },
+    createdRow,
+  }), [createdRow])
+
+  return (
+    <DataTable data={rows} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
+      <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
-          <td colSpan={canEdit ? 9 : 8} className="text-center text-muted py-4">
-            No commission rows found for this profile.
-          </td>
+          {headers.map((header) => <th key={header}>{header}</th>)}
         </tr>
-      )}
-      {rows.map((row) => (
-        <tr key={row.id}>
-          <td>{row.product_name}</td>
-          <td className="text-end">{percent(row.provider_percentage)}</td>
-          <td className="text-end">{money(row.cap_amount)}</td>
-          <td className="text-end">{money(row.minimum_amount)}</td>
-          <td className="text-end">{row.frequency_in_limit_days}</td>
-          <td className="text-end">{percent(row.agent_percentage)}</td>
-          <td className="text-end">{percent(row.suncash_percentage)}</td>
-          <td className="text-end">{percent(row.owner_percentage)}</td>
-          {canEdit && (
-            <td className="text-center">
-              <ActionButton label="Edit" icon="edit" onClick={() => onEdit(row)} />
-            </td>
-          )}
-        </tr>
-      ))}
-    </tbody>
-  </Table>
-)
+        <DataTableColumnSearchRow headers={headers} columns={columns} data={rows} />
+      </thead>
+    </DataTable>
+  )
+}
 
 export default CommissionProfileTable
