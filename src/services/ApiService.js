@@ -344,6 +344,12 @@ const ApiService = {
   addMerchantUser: (id, data) =>
     http.post(`/access-management/merchants/${id}/users`, data),
 
+  updateMerchantUser: (id, userId, data) =>
+    http.put(`/access-management/merchants/${id}/users/${userId}`, data),
+
+  resetMerchantUserPassword: (id, userId) =>
+    http.post(`/access-management/merchants/${id}/users/${userId}/reset-password`),
+
   toggleMerchantStatus: (id) =>
     http.post(`/access-management/merchants/${id}/toggle-status`),
 
