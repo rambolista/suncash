@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Badge, Button, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
+import ActionButton from '@/views/admin/merchants/components/ActionButton'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
@@ -11,6 +12,7 @@ const TerminalPanel = ({ merchant, editable }) => {
   const [terminals, setTerminals] = useState([])
   const [deviceTypes, setDeviceTypes] = useState({})
   const [connectionTypes, setConnectionTypes] = useState({})
+  const [branches, setBranches] = useState([])
   const [loading, setLoading] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [showForm, setShowForm] = useState(false)
@@ -26,6 +28,7 @@ const TerminalPanel = ({ merchant, editable }) => {
         setTerminals(Array.isArray(data?.terminals) ? data.terminals : [])
         setDeviceTypes(data?.device_types || {})
         setConnectionTypes(data?.connection_types || {})
+        setBranches(Array.isArray(data?.branches) ? data.branches : [])
       })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load terminals.', variant: 'danger' }))
       .finally(() => setLoading(false))
@@ -55,7 +58,9 @@ const TerminalPanel = ({ merchant, editable }) => {
       model: terminal.model || '',
       lane_counter: terminal.lane_counter || '',
       counter_no: terminal.counter_no || '',
-      branch_id: terminal.branch_id || '',
+      // "-1" is the "No Branch" sentinel (see MerchantTerminalService::normalizeBranchId) —
+      // shown as the blank/default option rather than a selectable branch.
+      branch_id: terminal.branch_id && terminal.branch_id !== '-1' ? terminal.branch_id : '',
     })
     setErrors({})
     setShowForm(true)
@@ -154,6 +159,15 @@ const TerminalPanel = ({ merchant, editable }) => {
               <Form.Control value={values.counter_no} onChange={(e) => setValues((prev) => ({ ...prev, counter_no: e.target.value }))} />
             </Form.Group>
           </Col>
+          <Col md={6}>
+            <Form.Group>
+              <Form.Label>Branch</Form.Label>
+              <Form.Select value={values.branch_id} onChange={(e) => setValues((prev) => ({ ...prev, branch_id: e.target.value }))}>
+                <option value="">No Branch</option>
+                {branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.branch_code} — {branch.description}</option>)}
+              </Form.Select>
+            </Form.Group>
+          </Col>
         </Row>
         <div className="d-flex justify-content-end gap-2 mt-3">
           <Button variant="secondary" size="sm" onClick={() => setShowForm(false)} disabled={submitting}>Cancel</Button>
@@ -170,7 +184,7 @@ const TerminalPanel = ({ merchant, editable }) => {
       <div className="table-responsive">
         <Table size="sm" className="align-middle mb-2">
           <thead className="thead-sm text-uppercase fs-xxs">
-            <tr><th>Device ID</th><th>Type</th><th>Brand/Model</th><th>Status</th>{editable && <th />}</tr>
+            <tr><th>Device ID</th><th>Type</th><th>Brand/Model</th><th>Branch</th><th>Connection Type</th><th>Registration Date</th><th>Status</th>{editable && <th />}</tr>
           </thead>
           <tbody>
             {terminals.map((terminal) => (
@@ -178,6 +192,9 @@ const TerminalPanel = ({ merchant, editable }) => {
                 <td>{terminal.device_id}</td>
                 <td>{terminal.device_type}</td>
                 <td>{terminal.brand_name} {terminal.model}</td>
+                <td>{terminal.branch_name || '—'}</td>
+                <td>{terminal.connection_type || '—'}</td>
+                <td>{terminal.creation_date || '—'}</td>
                 <td>
                   <Badge bg={terminal.status === 'active' ? 'success-subtle' : 'secondary-subtle'} className={terminal.status === 'active' ? 'text-success' : 'text-secondary'}>
                     {terminal.status}
@@ -185,18 +202,18 @@ const TerminalPanel = ({ merchant, editable }) => {
                 </td>
                 {editable && (
                   <td className="text-end text-nowrap">
-                    <Button variant="light" size="sm" className="me-1" onClick={() => openEdit(terminal)}><Icon icon="edit" /></Button>
+                    <ActionButton label="Edit" icon="edit" onClick={() => openEdit(terminal)} />
                     {terminal.status === 'active' ? (
-                      <Button variant="light" size="sm" className="me-1" onClick={() => handleStatusChange(terminal, 1)}><Icon icon="ban" className="text-danger" /></Button>
+                      <ActionButton label="Disable" icon="ban" iconClassName="text-danger" onClick={() => handleStatusChange(terminal, 1)} />
                     ) : (
-                      <Button variant="light" size="sm" className="me-1" onClick={() => handleStatusChange(terminal, 0)}><Icon icon="circle-check" className="text-success" /></Button>
+                      <ActionButton label="Enable" icon="circle-check" iconClassName="text-success" onClick={() => handleStatusChange(terminal, 0)} />
                     )}
-                    <Button variant="light" size="sm" onClick={() => handleStatusChange(terminal, 2)}><Icon icon="trash" className="text-danger" /></Button>
+                    <ActionButton label="Delete" icon="trash" iconClassName="text-danger" onClick={() => handleStatusChange(terminal, 2)} />
                   </td>
                 )}
               </tr>
             ))}
-            {!terminals.length && <tr><td colSpan={5} className="text-center text-muted py-3">No terminals yet.</td></tr>}
+            {!terminals.length && <tr><td colSpan={8} className="text-center text-muted py-3">No terminals yet.</td></tr>}
           </tbody>
         </Table>
       </div>
