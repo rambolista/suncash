@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
+import ActionButton from '@/views/admin/merchants/components/ActionButton'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
@@ -190,10 +191,12 @@ const BranchPanel = ({ merchant, editable }) => {
                 </td>
                 {editable && (
                   <td className="text-end text-nowrap">
-                    <Button variant="light" size="sm" className="me-1" onClick={() => openEdit(branch)}><Icon icon="edit" /></Button>
-                    <Button variant="light" size="sm" onClick={() => handleToggleStatus(branch)}>
-                      {branch.status === 'active' ? <Icon icon="ban" className="text-danger" /> : <Icon icon="circle-check" className="text-success" />}
-                    </Button>
+                    <ActionButton label="Edit" icon="edit" onClick={() => openEdit(branch)} />
+                    {branch.status === 'active' ? (
+                      <ActionButton label="Deactivate" icon="ban" iconClassName="text-danger" onClick={() => handleToggleStatus(branch)} />
+                    ) : (
+                      <ActionButton label="Activate" icon="circle-check" iconClassName="text-success" onClick={() => handleToggleStatus(branch)} />
+                    )}
                   </td>
                 )}
               </tr>

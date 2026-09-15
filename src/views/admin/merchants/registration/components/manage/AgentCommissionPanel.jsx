@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
-import Icon from '@/components/wrappers/Icon'
+import ActionButton from '@/views/admin/merchants/components/ActionButton'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
@@ -142,9 +142,7 @@ const AgentCommissionPanel = ({ merchant, editable }) => {
                   <Button variant="light" size="sm" className="me-1" onClick={() => handleToggleEmailStatus(email)}>
                     {email.status === 'enabled' ? 'Disable' : 'Enable'}
                   </Button>
-                  <Button variant="light" size="sm" onClick={() => handleDeleteEmail(email)}>
-                    <Icon icon="trash" className="text-danger" />
-                  </Button>
+                  <ActionButton label="Remove" icon="trash" iconClassName="text-danger" onClick={() => handleDeleteEmail(email)} />
                 </td>
               )}
             </tr>
@@ -155,7 +153,7 @@ const AgentCommissionPanel = ({ merchant, editable }) => {
       {editable && (
         <div className="d-flex gap-2">
           <Form.Control size="sm" type="email" placeholder="new-email@example.com" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
-          <Button variant="light" size="sm" onClick={handleAddEmail}><Icon icon="plus" /></Button>
+          <ActionButton label="Add e-mail" icon="plus" onClick={handleAddEmail} />
         </div>
       )}
     </div>
