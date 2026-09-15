@@ -80,6 +80,17 @@ const MerchantManagementPage = () => {
       message: `Merchant "${result?.client_id}" ${isEdit ? 'updated' : 'registered'}.`,
       variant: 'success',
     })
+
+    // Editing is a "jump to any tab, save, keep working" screen, not a
+    // one-shot wizard — staying put (and just refreshing the list in the
+    // background for whenever the user does navigate back) keeps the admin
+    // on whichever tab they were editing instead of bouncing them out to
+    // the list on every save. Creating a brand-new merchant IS a one-shot
+    // flow, so that still returns to the list once it's done.
+    if (isEdit) {
+      loadData()
+      return
+    }
     backToList()
   }
 
