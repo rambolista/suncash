@@ -113,7 +113,7 @@ const MenusTable = ({ data, onEdit, permissions = {} }) => {
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
@@ -155,6 +155,7 @@ const MenusTable = ({ data, onEdit, permissions = {} }) => {
   }), [canEdit, rowMap])
 
   return (
+    <div className="table-responsive">
     <DataTable
       data={data}
       columns={columns}
@@ -212,6 +213,7 @@ const MenusTable = ({ data, onEdit, permissions = {} }) => {
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

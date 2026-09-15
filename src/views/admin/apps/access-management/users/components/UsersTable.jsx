@@ -156,7 +156,7 @@ const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelet
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
@@ -321,6 +321,7 @@ const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelet
       )}
 
       {viewMode === 'list' ? (
+        <div className="table-responsive">
         <DataTable
           data={data}
           columns={columns}
@@ -354,6 +355,7 @@ const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelet
             </tr>
           </thead>
         </DataTable>
+        </div>
       ) : (
         <>
           <Row>

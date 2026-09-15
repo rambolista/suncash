@@ -189,7 +189,7 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
   // the callbacks need must come from refs (read fresh on every call)
   // rather than values closed over here.
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     language: { paginate: paginationIcons },
     drawCallback: function () {
       dtApiRef.current = this.api()
@@ -257,6 +257,7 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
         {loading ? (
           <LoadingState />
         ) : (
+          <div className="table-responsive">
           <DataTable data={settings} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
             <thead className="thead-sm text-uppercase fs-xxs">
               <tr>
@@ -267,6 +268,7 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
               </tr>
             </thead>
           </DataTable>
+          </div>
         )}
       </Card.Body>
     </Card>

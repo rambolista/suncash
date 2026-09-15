@@ -199,7 +199,7 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
   }, [filteredData])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
@@ -352,6 +352,7 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
         // though the (already correct) filtered `data` still drives the
         // real row set. Remounting sidesteps that by having each dropdown
         // render its correct value from a clean initial render every time.
+        <div className="table-responsive">
         <DataTable key={`${statusFilter}|${registrationFilter}|${entityTypeFilter}`} data={filteredData} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
           <thead className="thead-sm text-uppercase fs-xxs">
             <tr>
@@ -399,6 +400,7 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
             </tr>
           </thead>
         </DataTable>
+        </div>
       ) : (
         <>
           <Row>

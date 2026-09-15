@@ -63,7 +63,7 @@ const CommissionProfileTable = ({ rows, canEdit, onEdit }) => {
   }, [rowMap, canEdit])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     order: [[0, 'asc']],
@@ -81,6 +81,7 @@ const CommissionProfileTable = ({ rows, canEdit, onEdit }) => {
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={rows} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -89,6 +90,7 @@ const CommissionProfileTable = ({ rows, canEdit, onEdit }) => {
         <DataTableColumnSearchRow headers={headers} columns={columns} data={rows} />
       </thead>
     </DataTable>
+    </div>
   )
 }
 

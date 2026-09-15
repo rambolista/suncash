@@ -57,7 +57,7 @@ const MerchantSearchTable = ({ data, onView }) => {
   }, [rowMap])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
@@ -69,6 +69,7 @@ const MerchantSearchTable = ({ data, onView }) => {
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -83,6 +84,7 @@ const MerchantSearchTable = ({ data, onView }) => {
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

@@ -39,7 +39,7 @@ const DROPDOWN_COLUMNS = { 1: 'terminal_code', 2: 'location', 3: 'island', 4: 'p
 
 const CommissionReportTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     // Legacy defaults to sorting by Owner Commission (last column) descending.
@@ -57,6 +57,7 @@ const CommissionReportTable = ({ data }) => {
   }), [])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -65,6 +66,7 @@ const CommissionReportTable = ({ data }) => {
         <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
+    </div>
   )
 }
 

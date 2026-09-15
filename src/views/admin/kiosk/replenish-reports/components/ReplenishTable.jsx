@@ -62,7 +62,7 @@ const ReplenishTable = ({ data, onViewMeter, onViewAddCash, onViewClearAcceptor 
   }, [rowMap])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     order: [[1, 'asc']],
@@ -80,6 +80,7 @@ const ReplenishTable = ({ data, onViewMeter, onViewAddCash, onViewClearAcceptor 
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -88,6 +89,7 @@ const ReplenishTable = ({ data, onViewMeter, onViewAddCash, onViewClearAcceptor 
         <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
+    </div>
   )
 }
 

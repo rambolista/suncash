@@ -39,7 +39,7 @@ const headers = ['Date/Time', 'Transaction ID', 'Description', 'Debit', 'Credit'
 
 const ArchiveTransactionsTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
@@ -50,6 +50,7 @@ const ArchiveTransactionsTable = ({ data }) => {
   }), [])
 
   return (
+    <div className="table-responsive">
     <DataTable key={data.length} data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -64,6 +65,7 @@ const ArchiveTransactionsTable = ({ data }) => {
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

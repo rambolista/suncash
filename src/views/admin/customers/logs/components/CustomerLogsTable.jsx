@@ -45,7 +45,7 @@ const headers = ['Date Login', 'Customer ID', 'Customer Name', 'Mobile', 'Model'
 
 const CustomerLogsTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
@@ -57,6 +57,7 @@ const CustomerLogsTable = ({ data }) => {
   }), [])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -71,6 +72,7 @@ const CustomerLogsTable = ({ data }) => {
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

@@ -63,7 +63,7 @@ const BankAccountsTable = ({ data, canEdit, canDelete, onEdit, onDelete }) => {
   }, [rowMap, canEdit, canDelete])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     order: [[0, 'desc']],
@@ -81,6 +81,7 @@ const BankAccountsTable = ({ data, canEdit, canDelete, onEdit, onDelete }) => {
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -95,6 +96,7 @@ const BankAccountsTable = ({ data, canEdit, canDelete, onEdit, onDelete }) => {
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

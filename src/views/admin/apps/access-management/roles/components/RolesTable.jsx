@@ -164,7 +164,7 @@ const RolesTable = ({ data, users = [], viewMode = 'list', permissions = {}, onA
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
@@ -304,6 +304,7 @@ const RolesTable = ({ data, users = [], viewMode = 'list', permissions = {}, onA
       )}
 
       {viewMode === 'list' ? (
+        <div className="table-responsive">
         <DataTable
           data={data}
           columns={columns}
@@ -337,6 +338,7 @@ const RolesTable = ({ data, users = [], viewMode = 'list', permissions = {}, onA
             </tr>
           </thead>
         </DataTable>
+        </div>
       ) : (
         <>
           <Row>

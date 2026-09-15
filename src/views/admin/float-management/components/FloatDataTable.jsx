@@ -11,7 +11,7 @@ DataTable.use(DT)
 /** Shared DataTable shell for every Float Management list — column search/sort bindings and pagination icons, matching MerchantsTable/GeoPromoTable. */
 const FloatDataTable = ({ data, columns, createdRow, children }) => {
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
@@ -24,9 +24,11 @@ const FloatDataTable = ({ data, columns, createdRow, children }) => {
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       {children}
     </DataTable>
+    </div>
   )
 }
 

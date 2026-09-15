@@ -85,7 +85,7 @@ const CommissionApprovalTable = ({ data, canApprove, canReject, onApprove, onRej
   }, [rowMap, canApprove, canReject])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
@@ -102,6 +102,7 @@ const CommissionApprovalTable = ({ data, canApprove, canReject, onApprove, onRej
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -110,6 +111,7 @@ const CommissionApprovalTable = ({ data, canApprove, canReject, onApprove, onRej
         <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
+    </div>
   )
 }
 

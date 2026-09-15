@@ -31,7 +31,7 @@ const DROPDOWN_COLUMNS = { 0: 'terminal_code', 1: 'island', 2: 'location', 3: 'p
 
 const AgentCommissionReportTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     // Legacy defaults to sorting by Agent Commission (last column) descending.
@@ -49,6 +49,7 @@ const AgentCommissionReportTable = ({ data }) => {
   }), [])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -57,6 +58,7 @@ const AgentCommissionReportTable = ({ data }) => {
         <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
+    </div>
   )
 }
 

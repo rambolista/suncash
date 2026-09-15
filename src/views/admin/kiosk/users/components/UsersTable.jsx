@@ -71,7 +71,7 @@ const UsersTable = ({ data, canEdit, canDelete, canExecute, onEdit, onDelete, on
   }, [rowMap, canEdit, canDelete, canExecute])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     order: [[0, 'asc']],
@@ -89,6 +89,7 @@ const UsersTable = ({ data, canEdit, canDelete, canExecute, onEdit, onDelete, on
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={rows} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -112,6 +113,7 @@ const UsersTable = ({ data, canEdit, canDelete, canExecute, onEdit, onDelete, on
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

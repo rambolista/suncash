@@ -100,7 +100,7 @@ const CustomersTable = ({ data, viewMode = 'list', permissions = {}, onView, onE
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
@@ -229,6 +229,7 @@ const CustomersTable = ({ data, viewMode = 'list', permissions = {}, onView, onE
       )}
 
       {viewMode === 'list' ? (
+        <div className="table-responsive">
         <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
           <thead className="thead-sm text-uppercase fs-xxs">
             <tr>
@@ -251,6 +252,7 @@ const CustomersTable = ({ data, viewMode = 'list', permissions = {}, onView, onE
             </tr>
           </thead>
         </DataTable>
+        </div>
       ) : (
         <>
           <Row>

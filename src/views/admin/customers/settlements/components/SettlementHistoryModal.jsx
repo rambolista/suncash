@@ -63,7 +63,7 @@ const SettlementHistoryModal = ({ show, onHide, settlementId, customerName }) =>
   }, [show, settlementId])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
@@ -82,6 +82,7 @@ const SettlementHistoryModal = ({ show, onHide, settlementId, customerName }) =>
         {loading ? (
           <div className="text-center py-4"><Spinner size="sm" /></div>
         ) : (
+          <div className="table-responsive">
           <DataTable data={rows} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
             <thead className="thead-sm text-uppercase fs-xxs">
               <tr>
@@ -96,6 +97,7 @@ const SettlementHistoryModal = ({ show, onHide, settlementId, customerName }) =>
               </tr>
             </thead>
           </DataTable>
+          </div>
         )}
       </Modal.Body>
     </Modal>

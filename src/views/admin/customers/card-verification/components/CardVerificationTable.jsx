@@ -104,7 +104,7 @@ const CardVerificationTable = ({ data, tab, onView }) => {
   }, [rowMap, tab])
 
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     orderCellsTop: true,
     order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
@@ -117,6 +117,7 @@ const CardVerificationTable = ({ data, tab, onView }) => {
   }), [createdRow])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -131,6 +132,7 @@ const CardVerificationTable = ({ data, tab, onView }) => {
         </tr>
       </thead>
     </DataTable>
+    </div>
   )
 }
 

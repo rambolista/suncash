@@ -46,7 +46,7 @@ const DROPDOWN_COLUMNS = { 0: 'partner', 1: 'kiosk', 2: 'location', 3: 'island' 
 
 const PartnerSettlementReportTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: true,
+    responsive: false,
     pageLength: 25,
     orderCellsTop: true,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
@@ -62,6 +62,7 @@ const PartnerSettlementReportTable = ({ data }) => {
   }), [])
 
   return (
+    <div className="table-responsive">
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
@@ -70,6 +71,7 @@ const PartnerSettlementReportTable = ({ data }) => {
         <DataTableColumnSearchRow headers={headers} columns={columns} data={data} dropdownColumns={DROPDOWN_COLUMNS} />
       </thead>
     </DataTable>
+    </div>
   )
 }
 
