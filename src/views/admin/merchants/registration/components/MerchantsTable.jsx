@@ -70,9 +70,33 @@ const MerchantAvatar = ({ size = 32 }) => (
 
 const gridPageSizes = [4, 8, 12, 16, 20]
 
+// A "natural sort" key: every run of digits is zero-padded to a fixed width so
+// plain lexicographic comparison of the key orders numbers the way a human
+// would expect (e.g. "9" before "10", and "092277" as 92277) even though
+// client_id/merchant names mix numeric and non-numeric values and can't just
+// be cast to a Number column type.
+const naturalSortKey = (value) => String(value ?? '').toLowerCase().replace(/\d+/g, (digits) => digits.padStart(12, '0'))
+
 const columns = [
-  { data: 'client_id', width: '150px', className: 'text-nowrap fw-medium' },
-  { data: 'merchant_search', render: (val, type, row) => (type === 'display' ? `<div class="merchant-cell-slot" data-id="${row.id}"></div>` : val) },
+  {
+    data: 'client_id',
+    width: '150px',
+    className: 'text-nowrap fw-medium',
+    render: (value, type) => ((type === 'sort' || type === 'type') ? naturalSortKey(value) : value),
+  },
+  {
+    data: 'merchant_search',
+    render: (val, type, row) => {
+      if (type === 'display') return `<div class="merchant-cell-slot" data-id="${row.id}"></div>`
+      // Sorting/type-detection must use the same value actually shown in the cell
+      // (the business name), not `merchant_search` — that field also carries the
+      // client_id/legal_name/dba_name/merchant_name blob used for free-text
+      // filtering, and since client_id comes first in it, sorting this column
+      // was effectively sorting by Merchant ID instead of by the displayed name.
+      if (type === 'sort' || type === 'type') return naturalSortKey(row.dba_name || row.legal_name || row.merchant_name || row.client_id)
+      return val
+    },
+  },
   { data: 'entity_type_label', render: (value) => escapeHtml(value || '—') },
   { data: 'phone_no', render: (value) => escapeHtml(value || '—') },
   {
