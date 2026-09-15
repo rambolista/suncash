@@ -202,6 +202,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/kiosk/commission-approval')),
       },
       {
+        path: '/kiosk/deposits-and-adjustments',
+        Component: lazy(() => import('@/views/admin/kiosk/deposits-and-adjustments')),
+      },
+      {
+        path: '/kiosk/cash-management',
+        Component: lazy(() => import('@/views/admin/kiosk/cash-management')),
+      },
+      {
         path: '/kiosk/reports',
         Component: lazy(() => import('@/views/admin/kiosk/reports')),
       },

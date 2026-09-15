@@ -1097,6 +1097,55 @@ const ApiService = {
     return http.download(`/kiosk-commission-approval/export?${query}`)
   },
 
+  // Kiosk — Deposits and Adjustments
+  getKioskDepositsAdjustments: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-deposits-adjustments${query ? `?${query}` : ''}`)
+  },
+  getKioskDepositAdjustmentTerminal: (id, filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-deposits-adjustments/terminals/${id}${query ? `?${query}` : ''}`)
+  },
+  getKioskDepositAdjustmentTransactions: (id, filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-deposits-adjustments/terminals/${id}/transactions${query ? `?${query}` : ''}`)
+  },
+  adjustKioskDeposit: (id, data) => http.post(`/kiosk-deposits-adjustments/terminals/${id}/adjust`, data),
+  exportKioskDepositsAdjustments: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-deposits-adjustments/export?${query}`)
+  },
+  // Kiosk — Cash Management
+  getKioskCashManagement: () => http.get('/kiosk-cash-management'),
+  getKioskCashManagementBanks: (branchId) => http.get(`/kiosk-cash-management/banks?branch_id=${branchId}`),
+  getKioskCashManagementDetails: (id) => http.get(`/kiosk-cash-management/${id}`),
+  uploadKioskCashManagementReceipt: (file) => {
+    const payload = new FormData()
+    payload.append('receipt', file)
+    return http.post('/kiosk-cash-management/receipts', payload, true)
+  },
+  confirmKioskCashManagement: (id, data) => http.post(`/kiosk-cash-management/${id}/confirm`, data),
+  deleteKioskCashManagement: (id, data) => http.post(`/kiosk-cash-management/${id}/delete`, data),
+
+  exportKioskDepositAdjustmentTerminal: (id, filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-deposits-adjustments/terminals/${id}/export?${query}`)
+  },
+
   // Kiosk — Zout Reports
   getKioskZoutReports: (branchId, location, date) => {
     const query = new URLSearchParams({
