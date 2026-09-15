@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Badge, Button, Col, Form, Row, Spinner, Table } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
+import ActionButton from '@/views/admin/merchants/components/ActionButton'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
@@ -120,7 +121,7 @@ const PosUsersPanel = ({ merchant, editable }) => {
           <Col md={6}>
             <Form.Group>
               <Form.Label>Password {!editingId && <span className="text-danger">*</span>}</Form.Label>
-              <Form.Control type="text" value={values.password} placeholder={editingId ? 'Leave blank to keep current' : ''} onChange={(e) => setValues((prev) => ({ ...prev, password: e.target.value }))} isInvalid={!!errors.password} />
+              <Form.Control type="password" value={values.password} placeholder={editingId ? 'Leave blank to keep current' : ''} onChange={(e) => setValues((prev) => ({ ...prev, password: e.target.value }))} isInvalid={!!errors.password} autoComplete="new-password" />
               <Form.Control.Feedback type="invalid">{errors.password?.[0]}</Form.Control.Feedback>
             </Form.Group>
           </Col>
@@ -173,13 +174,14 @@ const PosUsersPanel = ({ merchant, editable }) => {
       <div className="table-responsive">
         <Table size="sm" className="align-middle mb-2">
           <thead className="thead-sm text-uppercase fs-xxs">
-            <tr><th>Name</th><th>Username</th><th>Type</th><th>Status</th>{editable && <th />}</tr>
+            <tr><th>Name</th><th>Username</th><th>Branch</th><th>Type</th><th>Status</th>{editable && <th />}</tr>
           </thead>
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
                 <td>{user.first_name} {user.last_name}</td>
                 <td>{user.username}</td>
+                <td>{user.branch_name || '—'}</td>
                 <td>{user.branch_user_type}</td>
                 <td>
                   <Badge bg={user.status === 'active' ? 'success-subtle' : 'secondary-subtle'} className={user.status === 'active' ? 'text-success' : 'text-secondary'}>
@@ -188,13 +190,13 @@ const PosUsersPanel = ({ merchant, editable }) => {
                 </td>
                 {editable && (
                   <td className="text-end text-nowrap">
-                    <Button variant="light" size="sm" className="me-1" onClick={() => openEdit(user)}><Icon icon="edit" /></Button>
-                    <Button variant="light" size="sm" onClick={() => handleDelete(user)}><Icon icon="trash" className="text-danger" /></Button>
+                    <ActionButton label="Edit" icon="edit" onClick={() => openEdit(user)} />
+                    <ActionButton label="Delete" icon="trash" iconClassName="text-danger" onClick={() => handleDelete(user)} />
                   </td>
                 )}
               </tr>
             ))}
-            {!users.length && <tr><td colSpan={5} className="text-center text-muted py-3">No POS users yet.</td></tr>}
+            {!users.length && <tr><td colSpan={6} className="text-center text-muted py-3">No POS users yet.</td></tr>}
           </tbody>
         </Table>
       </div>
