@@ -1304,6 +1304,22 @@ const ApiService = {
     return http.download(`/kiosk-partner-settlement-reports/export?${query}`)
   },
 
+  // Kiosk — Voucher Access Report
+  getKioskVoucherAccessReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-voucher-access-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskVoucherAccessReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-voucher-access-reports/export?${query}`)
+  },
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
