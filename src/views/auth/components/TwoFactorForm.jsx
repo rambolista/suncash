@@ -1,8 +1,10 @@
 import OTPInput from '@/components/OTPInput'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import { useAuth } from '@/hooks/useAuth'
+import { resolveFirstAccessibleMenuUrl } from '@/hooks/useMenuItems'
 import ApiService from '@/services/ApiService'
 import { getToken } from '@/services/HttpService'
+import { getStoredCurrentUser } from '@/utils/currentUser'
 import { getTwoFactorChallenge } from '@/utils/twoFactorChallenge'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Form, Spinner } from 'react-bootstrap'
@@ -105,12 +107,18 @@ const TwoFactorForm = () => {
       setSetup(null)
       setCode(emptyCode())
       showNotification({ title: 'Security updated', message: response.message, variant: 'success' })
-      navigate('/', { replace: true })
+      navigate(await resolveFirstAccessibleMenuUrl(getStoredCurrentUser()), { replace: true })
     } catch (error) {
       showNotification({ title: 'Invalid code', message: errorMessage(error, error?.errors?.code ? 'code' : 'challenge'), variant: 'danger' })
     } finally {
       setSubmitting(false)
     }
+  }
+
+  // "Back to Application" should land wherever this admin's own menu access
+  // actually starts, not a page they might not even have permission for.
+  const goToApplication = async () => {
+    navigate(await resolveFirstAccessibleMenuUrl(getStoredCurrentUser()))
   }
 
   const handleDisable = async (event) => {
@@ -121,7 +129,7 @@ const TwoFactorForm = () => {
       setStatus({ enabled: false, method: null, enabled_at: null })
       setCurrentPassword('')
       showNotification({ title: 'Security updated', message: response.message, variant: 'success' })
-      navigate('/', { replace: true })
+      navigate(await resolveFirstAccessibleMenuUrl(getStoredCurrentUser()), { replace: true })
     } catch (error) {
       showNotification({ title: 'Unable to disable 2FA', message: errorMessage(error, 'current_password'), variant: 'danger' })
     } finally {
@@ -186,7 +194,7 @@ const TwoFactorForm = () => {
             {submitting ? 'Confirming...' : 'Enable Two-Factor Authentication'}
           </Button>
           <Button variant="link" type="button" onClick={() => setSetup(null)}>Cancel</Button>
-          <Button variant="outline-secondary" type="button" onClick={() => navigate('/')}>
+          <Button variant="outline-secondary" type="button" onClick={goToApplication}>
             Back to Application
           </Button>
         </div>
@@ -208,7 +216,7 @@ const TwoFactorForm = () => {
           <Button variant="danger" type="submit" disabled={submitting}>
             {submitting ? 'Disabling...' : 'Disable Two-Factor Authentication'}
           </Button>
-          <Button variant="outline-secondary" type="button" onClick={() => navigate('/')}>
+          <Button variant="outline-secondary" type="button" onClick={goToApplication}>
             Back to Application
           </Button>
         </div>
@@ -233,7 +241,7 @@ const TwoFactorForm = () => {
         <Button type="submit" disabled={submitting}>
           {submitting ? 'Starting setup...' : 'Set Up Two-Factor Authentication'}
         </Button>
-        <Button variant="outline-secondary" type="button" onClick={() => navigate('/')}>
+        <Button variant="outline-secondary" type="button" onClick={goToApplication}>
           Back to Application
         </Button>
       </div>

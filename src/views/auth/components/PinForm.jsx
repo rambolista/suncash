@@ -1,5 +1,6 @@
 import { useNotificationContext } from '@/context/useNotificationContext'
 import useCurrentUser from '@/hooks/useCurrentUser'
+import { resolveFirstAccessibleMenuUrl } from '@/hooks/useMenuItems'
 import ApiService from '@/services/ApiService'
 import { setStoredCurrentUser } from '@/utils/currentUser'
 import { isScreenLocked, unlockScreen } from '@/utils/lockScreen'
@@ -17,6 +18,14 @@ const PinForm = () => {
   const locked = isScreenLocked()
   const [submitting, setSubmitting] = useState(false)
   const [values, setValues] = useState({ current_password: '', pin: '', pin_confirmation: '' })
+
+  // "Back to Application" should land wherever this admin's own menu access
+  // actually starts, not a page they might not even have permission for.
+  // Only offered for Change/Create PIN — never on the lock-screen unlock
+  // form, where skipping the PIN would just be a way around the lock.
+  const goToApplication = async () => {
+    navigate(await resolveFirstAccessibleMenuUrl(currentUser))
+  }
 
   const updateValue = (event) => {
     const { name, value } = event.target
@@ -37,7 +46,7 @@ const PinForm = () => {
       const response = await ApiService.updatePin(values.current_password, values.pin, values.pin_confirmation)
       setStoredCurrentUser({ ...currentUser, has_pin: response.has_pin })
       showNotification({ title: 'PIN updated', message: response.message, variant: 'success' })
-      navigate('/', { replace: true })
+      navigate(await resolveFirstAccessibleMenuUrl(currentUser), { replace: true })
     } catch (error) {
       const field = error?.errors?.current_password ? 'current_password' : 'pin'
       showNotification({ title: 'PIN request failed', message: getError(error, field), variant: 'danger' })
@@ -94,10 +103,15 @@ const PinForm = () => {
           />
         </Form.Group>
       )}
-      <div className="d-grid">
+      <div className="d-grid gap-2">
         <Button type="submit" disabled={submitting}>
           {submitting ? 'Saving...' : locked ? 'Unlock' : currentUser?.has_pin ? 'Change PIN' : 'Create PIN'}
         </Button>
+        {!locked && (
+          <Button variant="outline-secondary" type="button" onClick={goToApplication}>
+            Back to Application
+          </Button>
+        )}
       </div>
     </Form>
   )

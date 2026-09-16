@@ -172,6 +172,22 @@ const findFirstMenuUrl = (nodes = []) => {
 }
 
 /**
+ * Where a signed-in admin should land when there's no more specific
+ * destination in mind (post-login, post-2FA, "Back to Application" from an
+ * auth-adjacent page like Two-Factor or Change PIN) — the first URL in their
+ * own accessible menu tree, not a hardcoded page they might not have
+ * permission for. Falls back to the 403 page if they can't reach anything.
+ */
+const resolveFirstAccessibleMenuUrl = async (user) => {
+  const accessibleMenuIds = getAccessibleMenuIds(user)
+  const flatMenus = await ApiService.getMenus().catch(() => [])
+  const tree = buildTree(Array.isArray(flatMenus) ? flatMenus : [])
+  const visibleTree = filterTreeByAccess(tree, accessibleMenuIds)
+
+  return findFirstMenuUrl(visibleTree) || '/error/403'
+}
+
+/**
  * Fetches menu items from the API and returns them as a nested tree.
  * Falls back to an empty array while loading or on error.
  *
@@ -264,5 +280,5 @@ const useMenuItems = () => {
   return { menuItems, accessibleMenuUrls, loading, error, setMenuItems }
 }
 
-export { buildTree, filterTreeByAccess, findFirstMenuUrl, getAccessibleMenuIds, getAccessibleMenuUrls, normalizeMenuPath }
+export { buildTree, filterTreeByAccess, findFirstMenuUrl, getAccessibleMenuIds, getAccessibleMenuUrls, normalizeMenuPath, resolveFirstAccessibleMenuUrl }
 export default useMenuItems

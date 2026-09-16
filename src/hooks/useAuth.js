@@ -1,6 +1,6 @@
 import ApiService from '@/services/ApiService'
 import { getToken, removeToken, setToken } from '@/services/HttpService'
-import { buildTree, filterTreeByAccess, findFirstMenuUrl, getAccessibleMenuIds } from '@/hooks/useMenuItems'
+import { resolveFirstAccessibleMenuUrl } from '@/hooks/useMenuItems'
 import { clearStoredCurrentUser, setStoredCurrentUser } from '@/utils/currentUser'
 import { clearScreenLock } from '@/utils/lockScreen'
 import { clearTwoFactorChallenge, getTwoFactorChallenge, setTwoFactorChallenge } from '@/utils/twoFactorChallenge'
@@ -12,17 +12,6 @@ export const useAuth = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-
-  const resolveInitialRedirectPath = async (user) => {
-    const accessibleMenuIds = getAccessibleMenuIds(user)
-    const menus = await ApiService.getMenus().catch(() => [])
-    const flatMenus = Array.isArray(menus) ? menus : []
-    const tree = buildTree(flatMenus)
-    const visibleTree = filterTreeByAccess(tree, accessibleMenuIds)
-    const firstMenuUrl = findFirstMenuUrl(visibleTree)
-
-    return firstMenuUrl || '/error/403'
-  }
 
   const establishSession = async (data) => {
     clearScreenLock()
@@ -37,7 +26,7 @@ export const useAuth = () => {
       return
     }
 
-    const redirectPath = await resolveInitialRedirectPath(nextUser)
+    const redirectPath = await resolveFirstAccessibleMenuUrl(nextUser)
     clearTwoFactorChallenge()
     navigate(redirectPath, { replace: true })
   }
