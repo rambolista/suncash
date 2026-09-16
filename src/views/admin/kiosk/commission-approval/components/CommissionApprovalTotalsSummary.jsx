@@ -1,5 +1,5 @@
 import { Col, Row } from 'react-bootstrap'
-import { money } from './format'
+import { money } from '@/utils/reportHelpers'
 
 const METRICS = [
   { key: 'total_volume', label: 'Total Transaction Volume' },

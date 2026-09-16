@@ -4,7 +4,7 @@ import 'datatables.net-responsive'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Button, Card, CardBody, Col, FormControl, FormSelect, OverlayTrigger, Row, Tooltip } from 'react-bootstrap'
-import { paginationIcons } from '../../utils/paginationIcons'
+import { baseDataTableOptions } from '../../utils/dataTableOptions'
 import { bindColumnSearchInputs } from '../../utils/dataTableColumnSearch'
 import Icon from '@/components/wrappers/Icon'
 import { generateInitials } from '@/utils/helpers'
@@ -164,12 +164,10 @@ const RolesTable = ({ data, users = [], viewMode = 'list', permissions = {}, onA
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
       const item = rowMap[rowData.id] ?? rowData
       const nameSlot = row.querySelector('.role-name-slot')

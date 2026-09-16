@@ -4,7 +4,7 @@ import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Button, FormControl } from 'react-bootstrap'
-import { paginationIcons } from '../../utils/paginationIcons'
+import { baseDataTableOptions } from '../../utils/dataTableOptions'
 import { bindColumnSearchInputs } from '../../utils/dataTableColumnSearch'
 import Icon from '@/components/wrappers/Icon'
 import { MENU_ACTIONS } from '@/utils/menuPermissions'
@@ -113,12 +113,10 @@ const MenusTable = ({ data, onEdit, permissions = {} }) => {
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
       const item = rowMap[rowData.id] ?? rowData
       const iconSlot = row.querySelector('.icon-slot')

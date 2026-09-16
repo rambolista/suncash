@@ -6,9 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { FormControl, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
 import { Button } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
 DataTable.use(DT)
 
@@ -85,14 +83,11 @@ const GeoPromoTable = ({ data, canEdit, canDelete, onView, onEdit, onDelete }) =
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
+      initTableSearchAndSort(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
       const item = rowMap[rowData.id] ?? rowData
       const slot = row.querySelector('.geo-promo-action-slot')

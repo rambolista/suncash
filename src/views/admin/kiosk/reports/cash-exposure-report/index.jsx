@@ -6,17 +6,7 @@ import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import CashExposureReportTable from './components/CashExposureReportTable'
 import CashExposureTotalsSummary from './components/CashExposureTotalsSummary'
-
-const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
-}
+import { downloadBlob } from '@/utils/reportHelpers'
 
 // Legacy reads live balance columns off kiosk_terminal — a snapshot, not a
 // date-ranged report (its own view's date inputs are commented out).

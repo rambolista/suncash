@@ -6,21 +6,10 @@ import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
-import { money } from '../components/format'
+import { money, downloadBlob } from '@/utils/reportHelpers'
 import LedgerTable from './components/LedgerTable'
 
 const today = () => new Date().toISOString().slice(0, 10)
-
-const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
-}
 
 const KioskStatementLedgerPage = () => {
   const { terminalId } = useParams()
@@ -78,7 +67,7 @@ const KioskStatementLedgerPage = () => {
             {data && (
               <div className="text-end">
                 <div className="text-muted small">Opening Balance</div>
-                <div className="fs-4 fw-semibold">{money(data.opening_balance)}</div>
+                <div className="fs-4 fw-semibold">{money(data.opening_balance, 'BSD ')}</div>
               </div>
             )}
           </div>

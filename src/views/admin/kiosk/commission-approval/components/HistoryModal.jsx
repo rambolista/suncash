@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import LoadingState from '@/components/LoadingState'
-import { money } from './format'
+import { money } from '@/utils/reportHelpers'
 
 const STATUS_VARIANT = { pending: 'warning', processed: 'success', rejected: 'danger' }
 const STATUS_LABEL = { pending: 'Pending', processed: 'Approved', rejected: 'Rejected' }

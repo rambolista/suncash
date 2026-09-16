@@ -10,7 +10,7 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 import CashManagementTable from './components/CashManagementTable'
 import ConfirmActionModal from './components/ConfirmActionModal'
 import ViewDetailsModal from './components/ViewDetailsModal'
-import { money } from './components/format'
+import { money } from '@/utils/reportHelpers'
 
 const TILES = [
   { key: 'total_withdrawn', label: 'Total Withdrawn' },

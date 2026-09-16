@@ -10,17 +10,7 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 import KiosksTable from './components/KiosksTable'
 import ExportAllModal from './components/ExportAllModal'
 import DetailView from './components/DetailView'
-
-const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
-}
+import { downloadBlob } from '@/utils/reportHelpers'
 
 const KioskDepositsAdjustmentsPage = () => {
   const currentUser = useCurrentUser()

@@ -6,7 +6,7 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import ConfirmActionModal from '@/views/admin/merchants/components/ConfirmActionModal'
-import { formatAmount, formatDateTime } from '../components/format'
+import { money, formatDateTime } from '@/utils/reportHelpers'
 
 const TRANSACTION_TYPES = [
   { value: 'RELOAD', label: 'Load' },
@@ -126,7 +126,7 @@ const VoidTransactionPage = () => {
                       <td>{formatDateTime(row.timestamp)}</td>
                       <td>{row.transaction_type_label}</td>
                       <td>{row.mobile || '—'}</td>
-                      <td>{formatAmount(row.amount)}</td>
+                      <td>{money(row.amount, 'BSD ')}</td>
                       <td>
                         {row.status === 'voided' ? (
                           <Badge bg="secondary">{row.status_label || 'Voided'}</Badge>
@@ -154,7 +154,7 @@ const VoidTransactionPage = () => {
         show={Boolean(voidTarget)}
         onHide={() => setVoidTarget(null)}
         title="Void Transaction"
-        message={voidTarget ? `Are you sure you want to void transaction ${voidTarget.transaction_id} (${formatAmount(voidTarget.amount)})? This cannot be undone.` : ''}
+        message={voidTarget ? `Are you sure you want to void transaction ${voidTarget.transaction_id} (${money(voidTarget.amount, 'BSD ')})? This cannot be undone.` : ''}
         confirmLabel="Void Transaction"
         confirmVariant="danger"
         successMessage="Transaction has been voided successfully."

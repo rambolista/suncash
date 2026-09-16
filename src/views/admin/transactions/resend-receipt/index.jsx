@@ -6,7 +6,7 @@ import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import ConfirmActionModal from '@/views/admin/merchants/components/ConfirmActionModal'
-import { formatAmount, formatDateTime, triggerDownload } from '../components/format'
+import { money, formatDateTime, downloadBlob } from '@/utils/reportHelpers'
 
 const TRANSACTION_TYPES = [
   { value: 'RELOAD', label: 'Load' },
@@ -74,7 +74,7 @@ const ResendReceiptPage = () => {
 
   const downloadReceipt = (row) => {
     ApiService.generateTransactionReceipt(row.transaction_id, row.transaction_type)
-      .then(({ blob, filename }) => triggerDownload(blob, filename))
+      .then(({ blob, filename }) => downloadBlob(blob, filename))
       .catch((err) => setError(err?.message || 'Failed to generate the receipt.'))
   }
 
@@ -155,7 +155,7 @@ const ResendReceiptPage = () => {
                           placeholder="Mobile number"
                         />
                       </td>
-                      <td>{formatAmount(row.amount)}</td>
+                      <td>{money(row.amount, 'BSD ')}</td>
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           {canGenerate && (

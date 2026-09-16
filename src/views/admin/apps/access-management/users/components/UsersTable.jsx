@@ -4,7 +4,7 @@ import 'datatables.net-responsive'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Button, Card, CardBody, Col, FormControl, FormSelect, Row } from 'react-bootstrap'
-import { paginationIcons } from '../../utils/paginationIcons'
+import { baseDataTableOptions } from '../../utils/dataTableOptions'
 import { bindColumnSearchInputs } from '../../utils/dataTableColumnSearch'
 import Icon from '@/components/wrappers/Icon'
 
@@ -156,12 +156,10 @@ const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelet
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
       const item = rowMap[rowData.id] ?? rowData
       const userCellSlot = row.querySelector('.user-cell-slot')

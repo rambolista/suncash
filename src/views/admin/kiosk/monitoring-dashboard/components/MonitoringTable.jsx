@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
 import ActionButton from '../../../merchants/components/ActionButton'
-import { escapeHtml, formatDateTime, money } from './format'
+import { escapeHtml, formatDateTime, money } from '@/utils/reportHelpers'
 
 DataTable.use(DT)
 

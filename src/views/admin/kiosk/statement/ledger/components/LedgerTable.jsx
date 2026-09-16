@@ -3,11 +3,9 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo } from 'react'
 import { FormControl } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
-import { escapeHtml, formatDateTime, money } from '../../components/format'
+import { baseDataTableOptions, initTableSearchAndSort, resetDataTableContainerSpacing } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
+import { escapeHtml, formatDateTime, money } from '@/utils/reportHelpers'
 DataTable.use(DT)
 
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
@@ -23,34 +21,28 @@ const columns = [
   textCol('machine'),
   textCol('location'),
   textCol('transaction_type'),
-  { data: 'total_amount', render: (value, type) => (type === 'display' ? money(value) : value) },
+  { data: 'total_amount', render: (value, type) => (type === 'display' ? money(value, 'BSD ') : value) },
   {
     data: 'finance_type',
     render: (value, type) => (type === 'display'
       ? `<span class="badge ${ENTRY_BADGE[value] || 'bg-secondary-subtle text-secondary'} badge-label">${escapeHtml(value || '—')}</span>`
       : value),
   },
-  { data: 'balance', render: (value, type) => (type === 'display' ? money(value) : value) },
+  { data: 'balance', render: (value, type) => (type === 'display' ? money(value, 'BSD ') : value) },
 ]
 
 const headers = ['Transaction Date', 'Transaction Id', 'Machine', 'Location', 'Product', 'Total Amount', 'Entry Type', 'Balance']
 
 const LedgerTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: false,
+    ...baseDataTableOptions,
     pageLength: 25,
-    orderCellsTop: true,
     order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
-      const container = this.api().table().container()
-      container.style.marginTop = '0'
-      const controlsRow = container.querySelector(':scope > .row')
-      controlsRow?.classList.add('mb-3')
+      initTableSearchAndSort(this.api())
+      resetDataTableContainerSpacing(this.api())
     },
-    language: { paginate: paginationIcons },
   }), [])
 
   return (

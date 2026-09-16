@@ -6,7 +6,7 @@ import { createRoot } from 'react-dom/client'
 import { Button, Card, CardBody, Col, FormControl, FormSelect, Row } from 'react-bootstrap'
 import Icon from '@/components/wrappers/Icon'
 import { bindColumnSearchInputs } from '../../access-management/utils/dataTableColumnSearch'
-import { paginationIcons } from '../../access-management/utils/paginationIcons'
+import { baseDataTableOptions } from '../../access-management/utils/dataTableOptions'
 
 DataTable.use(DT)
 
@@ -100,12 +100,10 @@ const CustomersTable = ({ data, viewMode = 'list', permissions = {}, onView, onE
   }, [data])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     initComplete: function () {
       bindColumnSearchInputs(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
       const item = rowMap[rowData.id] ?? rowData
       const customerCellSlot = row.querySelector('.customer-cell-slot')

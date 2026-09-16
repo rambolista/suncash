@@ -4,12 +4,10 @@ import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Dropdown, FormControl } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
-import Icon from '@/components/wrappers/Icon'
 import ActionButton from './ActionButton'
+import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
+import Icon from '@/components/wrappers/Icon'
 DataTable.use(DT)
 
 const escapeHtml = (value) =>
@@ -102,14 +100,11 @@ const MerchantTypeQueueTable = ({ tab, data, canApprove, canEdit, onView, onAppr
   }, [tab, canApprove, canEdit, activateAlways, rowMap])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
+      initTableSearchAndSort(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow,
   }), [createdRow])
 

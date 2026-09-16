@@ -9,7 +9,7 @@ import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import ConfirmActionModal from '../components/ConfirmActionModal'
 import AmountPromptModal from '../components/AmountPromptModal'
-import { money } from '../components/format'
+import { money } from '@/utils/reportHelpers'
 import MainReserveTable from './components/MainReserveTable'
 
 const TABS = [
@@ -124,7 +124,7 @@ const MainReserveAccountPage = () => {
         show={confirmAction?.type === 'confirm'}
         onHide={() => setConfirmAction(null)}
         title="Confirm replenishment"
-        message={`This will credit ${confirmAction ? money(confirmAction.row.repl_amount) : ''} into the main reserve account balance. Continue?`}
+        message={`This will credit ${confirmAction ? money(confirmAction.row.repl_amount, 'BSD ') : ''} into the main reserve account balance. Continue?`}
         confirmLabel="Confirm"
         confirmVariant="success"
         successMessage="Replenishment confirmed successfully."

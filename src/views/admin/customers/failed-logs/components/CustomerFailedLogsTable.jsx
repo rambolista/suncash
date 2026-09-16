@@ -3,9 +3,7 @@ import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo } from 'react'
 import { FormControl } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
 DataTable.use(DT)
 
@@ -48,15 +46,12 @@ const headers = ['Timestamp', 'Customer Name', 'Mobile', 'Model', 'UUID', 'Geolo
 
 const CustomerFailedLogsTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
+      initTableSearchAndSort(this.api())
     },
-    language: { paginate: paginationIcons },
   }), [])
 
   return (

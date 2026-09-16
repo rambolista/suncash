@@ -4,9 +4,7 @@ import 'datatables.net-responsive'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge, FormControl, Modal, Nav, Spinner } from 'react-bootstrap'
 import ApiService from '@/services/ApiService'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
 DataTable.use(DT)
 
@@ -58,15 +56,12 @@ const TABS = [
 
 const TypesTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
+      initTableSearchAndSort(this.api())
     },
-    language: { paginate: paginationIcons },
   }), [])
 
   return (

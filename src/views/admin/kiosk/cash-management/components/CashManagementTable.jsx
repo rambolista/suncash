@@ -4,13 +4,11 @@ import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Form } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import { baseDataTableOptions, initTableSearchAndSort, resetDataTableContainerSpacing } from '@/views/admin/apps/access-management/utils/dataTableOptions'
+
 import DataTableColumnSearchRow from '@/views/admin/apps/access-management/utils/DataTableColumnSearchRow'
 import ActionButton from '@/views/admin/merchants/components/ActionButton'
-import { escapeHtml, money } from './format'
-
+import { escapeHtml, money } from '@/utils/reportHelpers'
 DataTable.use(DT)
 
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
@@ -105,20 +103,14 @@ const CashManagementTable = ({ data, canExecute, onAction, onView }) => {
   }, [rowMap])
 
   const options = useMemo(() => ({
-    responsive: false,
+    ...baseDataTableOptions,
     pageLength: 25,
-    orderCellsTop: true,
     order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
-      const container = this.api().table().container()
-      container.style.marginTop = '0'
-      const controlsRow = container.querySelector(':scope > .row')
-      controlsRow?.classList.add('mb-3')
+      initTableSearchAndSort(this.api())
+      resetDataTableContainerSpacing(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow,
   }), [createdRow])
 

@@ -3,9 +3,9 @@ import { createRoot } from 'react-dom/client'
 import { Badge, FormControl } from 'react-bootstrap'
 import ActionButton from '../../components/ActionButton'
 import FloatDataTable from '../../components/FloatDataTable'
-import { escapeHtml, money } from '../../components/format'
+import { escapeHtml, money } from '@/utils/reportHelpers'
 
-const moneyCol = (key) => ({ data: key, render: (value, type) => (type === 'display' ? escapeHtml(money(value)) : value) })
+const moneyCol = (key) => ({ data: key, render: (value, type) => (type === 'display' ? escapeHtml(money(value, 'BSD ')) : value) })
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
 const merchantCol = { data: 'merchant_name', render: (value) => escapeHtml(value || '—') }
 const actionCol = { data: 'id', orderable: false, searchable: false, width: '110px', className: 'text-nowrap action-cell', render: (id) => `<div class="store-float-repl-action-slot" data-id="${id}"></div>` }

@@ -11,17 +11,7 @@ import CommissionApprovalTable from './components/CommissionApprovalTable'
 import CommissionApprovalTotalsSummary from './components/CommissionApprovalTotalsSummary'
 import ApprovalFormModal from './components/ApprovalFormModal'
 import HistoryModal from './components/HistoryModal'
-
-const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
-}
+import { downloadBlob } from '@/utils/reportHelpers'
 
 const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',

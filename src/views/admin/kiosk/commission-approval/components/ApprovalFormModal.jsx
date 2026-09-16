@@ -3,7 +3,7 @@ import { Alert, Button, Col, Form, Modal, Row } from 'react-bootstrap'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import LoadingState from '@/components/LoadingState'
-import { money } from './format'
+import { money } from '@/utils/reportHelpers'
 
 const ApprovalFormModal = ({ show, onHide, transactionId, mode, onSaved }) => {
   const { showNotification } = useNotificationContext()

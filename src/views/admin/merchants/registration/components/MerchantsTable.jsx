@@ -7,7 +7,7 @@ import { Button, Card, CardBody, Col, FormControl, FormSelect, OverlayTrigger, R
 import Icon from '@/components/wrappers/Icon'
 import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
 import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import { baseDataTableOptions } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 import { ENTITY_TYPES, entityTypeLabel } from '../data/merchantReferenceData'
 
 DataTable.use(DT)
@@ -199,8 +199,7 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
   }, [filteredData])
 
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
       bindColumnSearchInputs(this.api())
@@ -212,7 +211,6 @@ const MerchantsTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onV
         })
       })
     },
-    language: { paginate: paginationIcons },
     createdRow: (row, rowData) => {
       const item = rowMap[rowData.id] ?? rowData
       const merchantCellSlot = row.querySelector('.merchant-cell-slot')

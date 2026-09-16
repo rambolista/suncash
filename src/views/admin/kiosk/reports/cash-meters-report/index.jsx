@@ -4,19 +4,9 @@ import Icon from '@/components/wrappers/Icon'
 import LoadingState from '@/components/LoadingState'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
+import { downloadBlob } from '@/utils/reportHelpers'
 
 const money = (value) => `$${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-
-const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
-}
 
 // Legacy has no date range for this lookup — pick a Branch/Terminal/Type and see the LATEST recorded meter reading.
 const KioskCashMetersReportTab = ({ canExport = true }) => {

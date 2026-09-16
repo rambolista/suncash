@@ -2,23 +2,18 @@ import DT from 'datatables.net-bs5'
 import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo } from 'react'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
+import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
 DataTable.use(DT)
 
 /** Shared DataTable shell for every Float Management list — column search/sort bindings and pagination icons, matching MerchantsTable/GeoPromoTable. */
 const FloatDataTable = ({ data, columns, createdRow, children }) => {
   const options = useMemo(() => ({
-    responsive: false,
-    orderCellsTop: true,
+    ...baseDataTableOptions,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
+      initTableSearchAndSort(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [createdRow])

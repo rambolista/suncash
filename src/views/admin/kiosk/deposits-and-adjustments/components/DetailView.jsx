@@ -5,18 +5,7 @@ import LoadingState from '@/components/LoadingState'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import AdjustmentModal from './AdjustmentModal'
-import { money } from './format'
-
-const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = filename
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.URL.revokeObjectURL(url)
-}
+import { money, downloadBlob } from '@/utils/reportHelpers'
 
 const todayValue = () => new Date().toISOString().slice(0, 10)
 

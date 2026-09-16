@@ -4,11 +4,9 @@ import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { FormControl, FormSelect } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
-import ActionButton from '@/views/admin/merchants/components/ActionButton'
+import { baseDataTableOptions, initTableSearchAndSort, resetDataTableContainerSpacing } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
+import ActionButton from '@/views/admin/merchants/components/ActionButton'
 DataTable.use(DT)
 
 const escapeHtml = (value) =>
@@ -75,20 +73,14 @@ const TerminalsTable = ({ terminals, canAdd, canEdit, canExecute, onServices, on
   }, [rowMap, canAdd, canEdit, canExecute])
 
   const options = useMemo(() => ({
-    responsive: false,
+    ...baseDataTableOptions,
     pageLength: 25,
-    orderCellsTop: true,
     order: [[0, 'asc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
-      const container = this.api().table().container()
-      container.style.marginTop = '0'
-      const controlsRow = container.querySelector(':scope > .row')
-      controlsRow?.classList.add('mb-3')
+      initTableSearchAndSort(this.api())
+      resetDataTableContainerSpacing(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow,
   }), [createdRow])
 

@@ -4,12 +4,10 @@ import 'datatables.net-responsive'
 import { useMemo, useRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { FormControl } from 'react-bootstrap'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
-import ActionButton from '@/views/admin/merchants/components/ActionButton'
-import { escapeHtml } from '../../components/format'
+import { baseDataTableOptions, initTableSearchAndSort, resetDataTableContainerSpacing } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
+import ActionButton from '@/views/admin/merchants/components/ActionButton'
+import { escapeHtml } from '@/utils/reportHelpers'
 DataTable.use(DT)
 
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
@@ -63,20 +61,14 @@ const TerminalsTable = ({ data, canEdit, canDelete, canExecute, onEdit, onDelete
   }, [rowMap, canEdit, canDelete, canExecute])
 
   const options = useMemo(() => ({
-    responsive: false,
+    ...baseDataTableOptions,
     pageLength: 25,
-    orderCellsTop: true,
     order: [[0, 'asc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
-      const container = this.api().table().container()
-      container.style.marginTop = '0'
-      const controlsRow = container.querySelector(':scope > .row')
-      controlsRow?.classList.add('mb-3')
+      initTableSearchAndSort(this.api())
+      resetDataTableContainerSpacing(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow,
   }), [createdRow])
 

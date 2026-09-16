@@ -2,12 +2,10 @@ import DT from 'datatables.net-bs5'
 import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
 import { useMemo } from 'react'
-import { bindColumnSearchInputs } from '@/views/admin/apps/access-management/utils/dataTableColumnSearch'
-import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
-import { paginationIcons } from '@/views/admin/apps/access-management/utils/paginationIcons'
-import DataTableColumnSearchRow from '@/views/admin/apps/access-management/utils/DataTableColumnSearchRow'
-import { escapeHtml, money } from './format'
+import { baseDataTableOptions, initTableSearchAndSort, resetDataTableContainerSpacing } from '@/views/admin/apps/access-management/utils/dataTableOptions'
 
+import DataTableColumnSearchRow from '@/views/admin/apps/access-management/utils/DataTableColumnSearchRow'
+import { escapeHtml, money } from '@/utils/reportHelpers'
 DataTable.use(DT)
 
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
@@ -38,20 +36,14 @@ const createdRow = (row, rowData) => {
 
 const CashExposureReportTable = ({ data }) => {
   const options = useMemo(() => ({
-    responsive: false,
+    ...baseDataTableOptions,
     pageLength: 25,
-    orderCellsTop: true,
     order: [[7, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      bindColumnSearchInputs(this.api())
-      bindSortLabels(this.api())
-      const container = this.api().table().container()
-      container.style.marginTop = '0'
-      const controlsRow = container.querySelector(':scope > .row')
-      controlsRow?.classList.add('mb-3')
+      initTableSearchAndSort(this.api())
+      resetDataTableContainerSpacing(this.api())
     },
-    language: { paginate: paginationIcons },
     createdRow,
   }), [])
 

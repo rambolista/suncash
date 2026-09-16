@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { FormControl } from 'react-bootstrap'
 import ActionButton from '../../components/ActionButton'
 import FloatDataTable from '../../components/FloatDataTable'
-import { escapeHtml, money } from '../../components/format'
+import { escapeHtml, money } from '@/utils/reportHelpers'
 
 const statusLabel = (status) => {
   if (!status || status === 'REJECTED') return { text: 'NEED TO SETUP FIRST', className: 'bg-secondary-subtle text-secondary' }
@@ -14,9 +14,9 @@ const statusLabel = (status) => {
 const columns = [
   { data: 'merchant_id' },
   { data: 'merchant_name', render: (value) => escapeHtml(value || '—') },
-  { data: 'minimum_account', render: (value, type) => (type === 'display' ? escapeHtml(money(value)) : value) },
-  { data: 'maximum_account', render: (value, type) => (type === 'display' ? escapeHtml(money(value)) : value) },
-  { data: 'amount', render: (value, type) => (type === 'display' ? escapeHtml(money(value)) : value) },
+  { data: 'minimum_account', render: (value, type) => (type === 'display' ? escapeHtml(money(value, 'BSD ')) : value) },
+  { data: 'maximum_account', render: (value, type) => (type === 'display' ? escapeHtml(money(value, 'BSD ')) : value) },
+  { data: 'amount', render: (value, type) => (type === 'display' ? escapeHtml(money(value, 'BSD ')) : value) },
   {
     data: 'status',
     render: (value, type) => {

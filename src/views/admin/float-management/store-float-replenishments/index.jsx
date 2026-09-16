@@ -8,7 +8,7 @@ import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import ConfirmActionModal from '../components/ConfirmActionModal'
-import { money } from '../components/format'
+import { money } from '@/utils/reportHelpers'
 import StoreFloatReplenishmentsTable from './components/StoreFloatReplenishmentsTable'
 
 const TABS = [
@@ -90,7 +90,7 @@ const StoreFloatReplenishmentsPage = () => {
         show={confirmAction?.type === 'approve'}
         onHide={() => setConfirmAction(null)}
         title="Approve store float replenishment"
-        message={`This will approve the ${confirmAction ? money(confirmAction.row.amount) : ''} replenishment request for ${confirmAction ? merchantName(confirmAction.row) : ''}. Continue?`}
+        message={`This will approve the ${confirmAction ? money(confirmAction.row.amount, 'BSD ') : ''} replenishment request for ${confirmAction ? merchantName(confirmAction.row) : ''}. Continue?`}
         confirmLabel="Approve"
         confirmVariant="success"
         successMessage="Replenishment approved successfully."
@@ -101,7 +101,7 @@ const StoreFloatReplenishmentsPage = () => {
         show={confirmAction?.type === 'reject'}
         onHide={() => setConfirmAction(null)}
         title="Reject store float replenishment"
-        message={`This will reject the ${confirmAction ? money(confirmAction.row.amount) : ''} replenishment request for ${confirmAction ? merchantName(confirmAction.row) : ''}. Continue?`}
+        message={`This will reject the ${confirmAction ? money(confirmAction.row.amount, 'BSD ') : ''} replenishment request for ${confirmAction ? merchantName(confirmAction.row) : ''}. Continue?`}
         confirmLabel="Reject"
         confirmVariant="danger"
         successMessage="Replenishment rejected successfully."
@@ -112,7 +112,7 @@ const StoreFloatReplenishmentsPage = () => {
         show={confirmAction?.type === 'confirm'}
         onHide={() => setConfirmAction(null)}
         title="Confirm store float replenishment"
-        message={`This will credit ${confirmAction ? money(confirmAction.row.amount) : ''} into ${confirmAction ? merchantName(confirmAction.row) : ''}'s store float balance and debit the main reserve pool. Continue?`}
+        message={`This will credit ${confirmAction ? money(confirmAction.row.amount, 'BSD ') : ''} into ${confirmAction ? merchantName(confirmAction.row) : ''}'s store float balance and debit the main reserve pool. Continue?`}
         confirmLabel="Confirm"
         confirmVariant="success"
         successMessage="Replenishment confirmed successfully."
