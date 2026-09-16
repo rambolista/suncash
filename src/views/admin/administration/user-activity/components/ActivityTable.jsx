@@ -52,6 +52,7 @@ const columns = [
   textCol('module'),
   textCol('description'),
   textCol('ip_address'),
+  textCol('location'),
   {
     data: 'id',
     orderable: false,
@@ -62,7 +63,7 @@ const columns = [
   },
 ]
 
-const headers = ['Date/Time', 'User', 'Action', 'Module', 'Description', 'IP Address', 'Details']
+const headers = ['Date/Time', 'User', 'Action', 'Module', 'Description', 'IP Address', 'Location', 'Details']
 
 const ActivityTable = ({ data, onView }) => {
   const handlers = useRef({ onView })
