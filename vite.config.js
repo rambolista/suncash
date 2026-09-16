@@ -31,6 +31,11 @@ export default defineConfig(({ mode }) => {
           target: apiProxyConnectTarget,
           changeOrigin: true,
           secure: false,
+          // Without this, every proxied request reaches Laravel as if it
+          // came from the Vite dev server itself (127.0.0.1) — xfwd adds
+          // X-Forwarded-For/-Port/-Proto carrying the browser's real address,
+          // which bootstrap/app.php's trustProxies() is configured to read.
+          xfwd: true,
           headers: {
             Host: apiProxyHost,
           },
