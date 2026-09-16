@@ -115,6 +115,15 @@
 
 .customer-profile-tabs-scroll {
     display: block;
+    // As a flex item (its parent, .card-header, is display:flex) with no
+    // flex-grow, this only ever sizes to its own content's width instead of
+    // stretching to fill the row — and since it's also overflow-x:auto, that
+    // content-fit width lands a few px short of what its nav actually needs,
+    // triggering a scrollbar with nothing real to scroll even when there's
+    // plenty of unused space beside it. width: 100% forces it to claim the
+    // full row so the (intentional, for many-tabs-on-narrow-screens) scroll
+    // only kicks in when the tabs genuinely don't fit.
+    width: 100%;
     max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;

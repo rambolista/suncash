@@ -531,7 +531,22 @@ table.table.dataTable {
 }
 
 .table-responsive {
-    >.dt-container {
+    // datatables.net-react renders an extra unclassed wrapper div between
+    // .table-responsive and .dt-container, so the direct-child combinator
+    // this rule relied on never matched — the row's Bootstrap gutter
+    // margins leaked past the container as permanent phantom scroll width.
+    //
+    // .dt-container's own -0.75rem margin-top (below) has the same problem:
+    // .table-responsive scrolls (overflow: auto), so that negative margin
+    // pulls the length/search row a couple pixels above the scroll
+    // container's own top edge — with nothing above it to scroll up to,
+    // that sliver (exactly where the controls' top border sits) is
+    // permanently clipped, not just visually thin. Resetting it to 0 here
+    // covers every table uniformly instead of relying on each one to call
+    // resetDataTableContainerSpacing from its own initComplete.
+    .dt-container {
+        margin-top: 0;
+
         >.row {
             margin: 0;
 

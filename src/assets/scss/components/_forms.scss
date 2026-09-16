@@ -8,6 +8,21 @@
     &:hover {
         border-color: $input-focus-border-color;
     }
+
+    // The `form-control-sm`/`form-select-sm` used throughout (e.g. every
+    // DataTable's length/search controls) resolve to a fractional pixel
+    // height (~30.9px), and Chromium's rasterizer drops the top 1px border
+    // at that fractional edge — left/right/bottom render fine, only the top
+    // vanishes. A matching inset box-shadow repaints it without touching
+    // layout. Both `.form-control:focus` and `.form-select:focus` reset
+    // box-shadow to `none`/a zero-size no-op (this theme skips the
+    // glow-ring focus style), which has higher specificity and silently
+    // undid this the moment a field was clicked — so it's repeated for
+    // :focus too.
+    &,
+    &:focus {
+        box-shadow: inset 0 0 0 1px var(--#{$prefix}border-color);
+    }
 }
 
 select[multiple] option {
