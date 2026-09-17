@@ -217,6 +217,7 @@ const RolesPage = () => {
         show={!!permRole}
         onHide={() => setPermRole(null)}
         role={permRole}
+        readOnly={!canEditRole}
       />
 
       <DeleteRoleModal

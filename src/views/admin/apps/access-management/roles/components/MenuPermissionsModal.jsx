@@ -55,7 +55,7 @@ const buildDisplayRows = (flat) => {
 
 // ── MenuPermissionsModal ─────────────────────────────────────────────────────
 
-const MenuPermissionsModal = ({ show, onHide, role }) => {
+const MenuPermissionsModal = ({ show, onHide, role, readOnly = false }) => {
   const { showNotification } = useNotificationContext()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(false)
@@ -132,6 +132,7 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
         <Modal.Title>
           Menu Access Control &mdash;&nbsp;
           <span className="text-warning fw-bold">{role?.name}</span>
+          {readOnly && <span className="text-muted small ms-2">(View Only)</span>}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-0">
@@ -157,7 +158,7 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
                           type="checkbox"
                           className="d-inline-block mt-1"
                           checked={allOn}
-                          disabled={eligible.length === 0}
+                          disabled={readOnly || eligible.length === 0}
                           ref={(el) => { if (el) el.indeterminate = someOn }}
                           onChange={() => toggleAll(key, !allOn)}
                           aria-label={`Toggle all ${label}`}
@@ -199,6 +200,7 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
                             <Form.Check
                               type="checkbox"
                               checked={Boolean(row[key])}
+                              disabled={readOnly}
                               onChange={() => toggleTab(row.menu_id, row.tab_id, key)}
                               className="d-inline-block"
                               aria-label={`${key} ${row.label} tab`}
@@ -219,6 +221,7 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
                             <Form.Check
                               type="checkbox"
                               checked={Boolean(row[key])}
+                              disabled={readOnly}
                               onChange={() => toggle(row.menu_id, key)}
                               className="d-inline-block"
                               aria-label={`${key} ${row.label}`}
@@ -238,13 +241,15 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide} disabled={saving}>Close</Button>
-        <Button variant="primary" onClick={handleSave} disabled={saving || loading}>
-          {saving ? (
-            <><Spinner animation="border" size="sm" className="me-1" />Saving...</>
-          ) : (
-            'Save permissions'
-          )}
-        </Button>
+        {!readOnly && (
+          <Button variant="primary" onClick={handleSave} disabled={saving || loading}>
+            {saving ? (
+              <><Spinner animation="border" size="sm" className="me-1" />Saving...</>
+            ) : (
+              'Save permissions'
+            )}
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   )
