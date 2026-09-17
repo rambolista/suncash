@@ -1145,6 +1145,9 @@ const ApiService = {
   },
   confirmKioskCashManagement: (id, data) => http.post(`/kiosk-cash-management/${id}/confirm`, data),
   deleteKioskCashManagement: (id, data) => http.post(`/kiosk-cash-management/${id}/delete`, data),
+  // Kiosk — Voucher Pin Tool
+  lookupKioskVoucherPin: (code, type) =>
+    http.get(`/kiosk-voucher-pin-tool/lookup?code=${encodeURIComponent(code)}&type=${encodeURIComponent(type)}`),
   // Kiosk — Confirm Customer Service
   getKioskConfirmCustomerService: (filters) => {
     const query = new URLSearchParams(
