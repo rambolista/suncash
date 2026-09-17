@@ -1136,6 +1136,15 @@ const ApiService = {
   },
   confirmKioskCashManagement: (id, data) => http.post(`/kiosk-cash-management/${id}/confirm`, data),
   deleteKioskCashManagement: (id, data) => http.post(`/kiosk-cash-management/${id}/delete`, data),
+  // Kiosk — Confirm Customer Service
+  getKioskConfirmCustomerService: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-confirm-customer-service?${query}`)
+  },
+  getKioskConfirmCustomerServiceSessionLogs: (sessionId) =>
+    http.get(`/kiosk-confirm-customer-service/session/${encodeURIComponent(sessionId)}`),
 
   exportKioskDepositAdjustmentTerminal: (id, filters, format) => {
     const query = new URLSearchParams(

@@ -210,6 +210,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/kiosk/cash-management')),
       },
       {
+        path: '/kiosk/confirm-customer-service',
+        Component: lazy(() => import('@/views/admin/kiosk/confirm-customer-service')),
+      },
+      {
         path: '/kiosk/reports',
         Component: lazy(() => import('@/views/admin/kiosk/reports')),
       },
