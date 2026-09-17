@@ -301,25 +301,6 @@ html[data-bs-theme="dark"] {
         }
     }
 
-    #skin-neon, #skin-pixel, #skin-retro,
-    #skin-galaxy, #skin-luxe {
-        h5 {
-            position: relative;
-
-            &::before {
-                content: "NEW";
-                position: absolute;
-                background: var(--#{$prefix}danger);
-                color: $white;
-                font-weight: $font-weight-bold;
-                padding: 3px 8px;
-                border-radius: 4px;
-                font-size: 9px;
-                top: -35px;
-                left: 8px;
-            }
-        }
-    }
 }
 
 

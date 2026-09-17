@@ -6,7 +6,8 @@ const ProjectSettingsToggler = () => {
   const currentUser = useCurrentUser()
   const navigate = useNavigate()
 
-  if (!currentUser?.super_admin) return null
+  // super_admin level 1 only unlocks the Admin Customizer; Project & Landing Setup needs level 2.
+  if (currentUser?.super_admin !== 2) return null
 
   return (
     <div className="topbar-item">

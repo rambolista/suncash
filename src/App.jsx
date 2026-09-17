@@ -188,7 +188,8 @@ const App = () => {
 
   if (pathname === '/project-setup') {
     if (!currentUser) return null
-    return currentUser.super_admin ? element : <Navigate to="/error/403" replace />
+    // super_admin level 1 only unlocks the Admin Customizer; Project & Landing Setup needs level 2.
+    return currentUser.super_admin === 2 ? element : <Navigate to="/error/403" replace />
   }
 
   // Protected route access check:

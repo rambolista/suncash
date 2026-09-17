@@ -5,6 +5,7 @@ const CustomizerToggler = () => {
   const { toggleCustomizer } = useLayoutContext()
   const currentUser = useCurrentUser()
 
+  // super_admin level 1 or 2 unlocks the Admin Customizer (level 2 additionally gets Project & Landing Setup).
   if (!currentUser?.super_admin) return null
 
   return (
