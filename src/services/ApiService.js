@@ -639,6 +639,15 @@ const ApiService = {
   deleteGeoPromo: (id) =>
     http.delete(`/promotions/geo-promo/${id}`),
 
+  getGrandDrawStatus: () =>
+    http.get('/promotions/grand-draw'),
+
+  getGrandDrawWinners: () =>
+    http.get('/promotions/grand-draw/winners'),
+
+  runGrandDraw: () =>
+    http.post('/promotions/grand-draw/run'),
+
   // Float Management
   getMainReserveAccounts: () =>
     http.get('/float-management/main-reserve-account'),

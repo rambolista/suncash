@@ -274,6 +274,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/promotions/ticket-reports')),
       },
       {
+        path: '/promotions/grand-draw',
+        Component: lazy(() => import('@/views/admin/promotions/grand-draw')),
+      },
+      {
         path: '/promotions/settings',
         Component: lazy(() => import('@/views/admin/promotions/settings')),
       },
