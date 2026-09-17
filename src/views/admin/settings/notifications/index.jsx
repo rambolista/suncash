@@ -128,6 +128,80 @@ const NotificationSettingEdit = ({ id, editable, onCancel, onSaved }) => {
   )
 }
 
+const SmsGatewaySelector = ({ editable }) => {
+  const { showNotification } = useNotificationContext()
+  const [setting, setSetting] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    ApiService.getSmsGatewaySetting()
+      .then((data) => active && setSetting(data))
+      .catch((err) => active && showNotification({ title: 'Failed', message: err?.message || 'Failed to load the SMS gateway setting.', variant: 'danger' }))
+    return () => { active = false }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleChange = async (event) => {
+    const primary = event.target.value
+    setSaving(true)
+    try {
+      const data = await ApiService.updateSmsGatewaySetting(primary)
+      setSetting(data)
+      showNotification({ title: 'Success', message: 'Primary SMS gateway updated.', variant: 'success' })
+    } catch (err) {
+      showNotification({ title: 'Failed', message: err?.message || 'Failed to update the SMS gateway.', variant: 'danger' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleFailoverToggle = async (event) => {
+    const enabled = event.target.checked
+    setSaving(true)
+    try {
+      const data = await ApiService.updateSmsGatewayFailover(enabled)
+      setSetting(data)
+      showNotification({ title: 'Success', message: `SMS gateway failover ${enabled ? 'enabled' : 'disabled'}.`, variant: 'success' })
+    } catch (err) {
+      showNotification({ title: 'Failed', message: err?.message || 'Failed to update failover.', variant: 'danger' })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (!setting) return null
+
+  return (
+    <div className="d-flex flex-wrap align-items-center gap-4 mb-3">
+      <div className="d-flex align-items-center gap-2">
+        <Form.Label className="mb-0 fw-semibold">Primary SMS Gateway</Form.Label>
+        <Form.Select
+          style={{ maxWidth: 220 }}
+          size="sm"
+          value={setting.primary}
+          disabled={!editable || saving}
+          onChange={handleChange}
+        >
+          {setting.options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}{!option.enabled ? ' (simulated — disabled in this environment)' : ''}
+            </option>
+          ))}
+        </Form.Select>
+      </div>
+      <Form.Check
+        type="switch"
+        id="sms-gateway-failover"
+        label="Fail over to the other gateway if the primary fails"
+        checked={setting.failover_enabled}
+        disabled={!editable || saving}
+        onChange={handleFailoverToggle}
+      />
+    </div>
+  )
+}
+
 const NotificationSettingsList = ({ editable, onEdit }) => {
   const { showNotification } = useNotificationContext()
   const [type, setType] = useState('email')
@@ -254,6 +328,7 @@ const NotificationSettingsList = ({ editable, onEdit }) => {
         </div>
       </Card.Header>
       <Card.Body>
+        {type === 'sms' && <SmsGatewaySelector editable={editable} />}
         {loading ? (
           <LoadingState />
         ) : (

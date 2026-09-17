@@ -560,6 +560,15 @@ const ApiService = {
   toggleNotificationSetting: (id, isEnabled) =>
     http.post(`/settings/notifications/${id}/toggle`, { is_enabled: isEnabled }),
 
+  getSmsGatewaySetting: () =>
+    http.get('/settings/sms-gateway'),
+
+  updateSmsGatewaySetting: (primary) =>
+    http.put('/settings/sms-gateway', { primary }),
+
+  updateSmsGatewayFailover: (enabled) =>
+    http.post('/settings/sms-gateway/failover', { enabled }),
+
   getCustomerAppSettings: () =>
     http.get('/settings/customer-app'),
 
