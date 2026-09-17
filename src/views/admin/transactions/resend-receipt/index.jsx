@@ -63,13 +63,19 @@ const ResendReceiptPage = () => {
       .finally(() => setLoading(false))
   }
 
-  const sendReceipt = () => {
+  const sendReceipt = async () => {
     const mobile = mobiles[rowKey(receiptTarget)] || ''
-    return ApiService.sendTransactionReceipt({
+    const data = await ApiService.sendTransactionReceipt({
       transaction_id: receiptTarget.transaction_id,
       transaction_type: receiptTarget.transaction_type,
       mobile,
     })
+    // The endpoint always returns HTTP 200, even when the SMS itself failed
+    // to send — ConfirmActionModal only treats a thrown error as failure.
+    if (!data.sent) {
+      throw new Error(data.message || 'Failed to send the receipt via text.')
+    }
+    return data
   }
 
   const downloadReceipt = (row) => {
