@@ -79,10 +79,14 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
     )
 
   const toggleAll = (perm, value) =>
-    setRows((prev) => prev.map((r) => {
-      const action = MENU_ACTIONS.find(({ key }) => key === perm)
-      return r.is_title || !r[action.capability] ? r : { ...r, [perm]: value }
-    }))
+    setRows((prev) => {
+      const { capability } = MENU_ACTIONS.find(({ key }) => key === perm)
+      return prev.map((r) => {
+        const next = r.is_title || !r[capability] ? r : { ...r, [perm]: value }
+        if (!r.tabs?.length) return next
+        return { ...next, tabs: r.tabs.map((tab) => tab[capability] ? { ...tab, [perm]: value } : tab) }
+      })
+    })
 
   const toggleTab = (menuId, tabId, permission) =>
     setRows((prev) => prev.map((row) => row.menu_id !== menuId ? row : {
@@ -139,25 +143,28 @@ const MenuPermissionsModal = ({ show, onHide, role }) => {
               <thead className="menu-permissions-table-head">
                 <tr>
                   <th style={{ minWidth: 280 }}>Menu / Page</th>
-                  {MENU_ACTIONS.map(({ key, label }) => (
-                    <th key={key} className="text-center" style={{ width: 100, minWidth: 100 }}>
-                      <div className="fw-bold">{label}</div>
-                      <div className="d-flex justify-content-center gap-1 mt-1">
-                        <button
-                          type="button"
-                          className="btn btn-sm py-0 px-1 menu-permissions-bulk-btn"
-                          style={{ fontSize: 10 }}
-                          onClick={() => toggleAll(key, true)}
-                        >All</button>
-                        <button
-                          type="button"
-                          className="btn btn-sm py-0 px-1 menu-permissions-bulk-btn"
-                          style={{ fontSize: 10 }}
-                          onClick={() => toggleAll(key, false)}
-                        >None</button>
-                      </div>
-                    </th>
-                  ))}
+                  {MENU_ACTIONS.map(({ key, label, capability }) => {
+                    const eligible = [
+                      ...rows.filter((r) => !r.is_title && r[capability]),
+                      ...rows.flatMap((r) => (r.tabs || []).filter((tab) => tab[capability])),
+                    ]
+                    const allOn = eligible.length > 0 && eligible.every((r) => r[key])
+                    const someOn = !allOn && eligible.some((r) => r[key])
+                    return (
+                      <th key={key} className="text-center" style={{ width: 100, minWidth: 100 }}>
+                        <div className="fw-bold">{label}</div>
+                        <Form.Check
+                          type="checkbox"
+                          className="d-inline-block mt-1"
+                          checked={allOn}
+                          disabled={eligible.length === 0}
+                          ref={(el) => { if (el) el.indeterminate = someOn }}
+                          onChange={() => toggleAll(key, !allOn)}
+                          aria-label={`Toggle all ${label}`}
+                        />
+                      </th>
+                    )
+                  })}
                 </tr>
               </thead>
               <tbody>

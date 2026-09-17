@@ -23,7 +23,7 @@ const UsersPage = () => {
   const [showUserModal, setShowUserModal] = useState(false)
   const [editUser, setEditUser] = useState(null)
   const [deleteUser, setDeleteUser] = useState(null)
-  const [viewMode, setViewMode] = useState('list')
+  const [viewMode, setViewMode] = useState('grid')
 
   const notify = useCallback((variant, message) => {
     showNotification({ title: variant === 'success' ? 'Success' : 'Failed', message, variant })

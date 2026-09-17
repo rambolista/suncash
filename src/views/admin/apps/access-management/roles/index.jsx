@@ -24,7 +24,7 @@ const RolesPage = () => {
   const [editRole, setEditRole] = useState(null)
   const [deleteRole, setDeleteRole] = useState(null)
   const [permRole, setPermRole] = useState(null)
-  const [viewMode, setViewMode] = useState('list')
+  const [viewMode, setViewMode] = useState('grid')
 
   const notify = useCallback((variant, message) => {
     showNotification({ title: variant === 'success' ? 'Success' : 'Failed', message, variant })
