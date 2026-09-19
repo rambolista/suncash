@@ -218,6 +218,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/kiosk/confirm-customer-service')),
       },
       {
+        path: '/kiosk/reprint-receipt',
+        Component: lazy(() => import('@/views/admin/kiosk/reprint-receipt')),
+      },
+      {
+        path: '/kiosk/reprint-replenishment-receipt',
+        Component: lazy(() => import('@/views/admin/kiosk/reprint-replenishment-receipt')),
+      },
+      {
         path: '/kiosk/reports',
         Component: lazy(() => import('@/views/admin/kiosk/reports')),
       },

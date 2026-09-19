@@ -1166,6 +1166,16 @@ const ApiService = {
   },
   getKioskConfirmCustomerServiceSessionLogs: (sessionId) =>
     http.get(`/kiosk-confirm-customer-service/session/${encodeURIComponent(sessionId)}`),
+  // Kiosk — Reprint Receipt
+  getKioskReprintReceiptTypes: () => http.get('/kiosk-reprint-receipt/types'),
+  searchKioskReprintReceipt: (transactionId, transactionType) =>
+    http.get(`/kiosk-reprint-receipt/search?transaction_id=${encodeURIComponent(transactionId)}&transaction_type=${encodeURIComponent(transactionType)}`),
+  getKioskReprintReceipt: (transactionId, transactionType) =>
+    http.get(`/kiosk-reprint-receipt/receipt?transaction_id=${encodeURIComponent(transactionId)}&transaction_type=${encodeURIComponent(transactionType)}`),
+  // Kiosk — Reprint Replenishment Receipt
+  getKioskReplenishmentReceiptFilters: () => http.get('/kiosk-reprint-replenishment-receipt/filters'),
+  searchKioskReplenishmentReceipt: (data) => http.post('/kiosk-reprint-replenishment-receipt/search', data),
+  getKioskReplenishmentReceiptDetail: (data) => http.post('/kiosk-reprint-replenishment-receipt/detail', data),
 
   exportKioskDepositAdjustmentTerminal: (id, filters, format) => {
     const query = new URLSearchParams(
@@ -1348,6 +1358,22 @@ const ApiService = {
       )
     ).toString()
     return http.download(`/kiosk-voucher-access-reports/export?${query}`)
+  },
+
+  // Kiosk — Commission Approval Report
+  getKioskCommissionApprovalReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-commission-approval-reports${query ? `?${query}` : ''}`)
+  },
+  exportKioskCommissionApprovalReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-commission-approval-reports/export?${query}`)
   },
 
   // Administration — User Activity
