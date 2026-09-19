@@ -214,7 +214,20 @@
 // pages (Kiosk Reports, Merchant Management, ...). Bootstrap's default 1px
 // active border reads as barely-there next to this app's other headings.
 .nav-tabs.module-tabs-horizontal {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .nav-item {
+        flex-shrink: 0;
+    }
+
     .nav-item .nav-link.active {
         border-bottom-width: 3px;
     }
+}
+
+// Kiosk > Reports tabs specifically — a touch taller than the shared default.
+.nav-tabs.module-tabs-horizontal.kiosk-reports-tabs {
+    --#{$prefix}nav-link-padding-y: 0.75rem;
 }

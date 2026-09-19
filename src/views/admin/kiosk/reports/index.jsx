@@ -48,7 +48,7 @@ const KioskReportsPage = () => {
       variant="tabs"
       activeKey={activeTab}
       onSelect={(key) => key && setActiveTab(key)}
-      className={`nav-bordered nav-bordered-primary${tabLayout === 'vertical' ? ' nav-tabs-vertical flex-column' : ' module-tabs-horizontal mb-3 flex-nowrap'}`}
+      className={`nav-bordered nav-bordered-primary${tabLayout === 'vertical' ? ' nav-tabs-vertical flex-column' : ' module-tabs-horizontal kiosk-reports-tabs mb-3 flex-nowrap'}`}
     >
       {visibleTabs.map((t) => (
         <Nav.Item key={t.tab_id || t.key}>
