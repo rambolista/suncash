@@ -282,6 +282,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/settings/wu')),
       },
       {
+        path: '/tools/transaction-fees',
+        Component: lazy(() => import('@/views/admin/tools/transaction-fees')),
+      },
+      {
+        path: '/tools/transaction-limits',
+        Component: lazy(() => import('@/views/admin/tools/transaction-limits')),
+      },
+      {
         path: '/promotions/ticket-reports',
         Component: lazy(() => import('@/views/admin/promotions/ticket-reports')),
       },

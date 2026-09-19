@@ -1376,6 +1376,12 @@ const ApiService = {
     return http.download(`/kiosk-commission-approval-reports/export?${query}`)
   },
 
+  // Tools — Transaction Fees / Transaction Limits
+  getTransactionFees: () => http.get('/transaction-fees'),
+  updateTransactionFee: (id, amount) => http.put(`/transaction-fees/${id}`, { amount }),
+  getTransactionLimits: () => http.get('/transaction-limits'),
+  updateTransactionLimit: (id, amount) => http.put(`/transaction-limits/${id}`, { amount }),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
