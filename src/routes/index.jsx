@@ -290,6 +290,30 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/transaction-limits')),
       },
       {
+        path: '/tools/forex-rate',
+        Component: lazy(() => import('@/views/admin/tools/forex-rate')),
+      },
+      {
+        path: '/tools/send-sms',
+        Component: lazy(() => import('@/views/admin/tools/send-sms')),
+      },
+      {
+        path: '/tools/customer-management',
+        Component: lazy(() => import('@/views/admin/tools/customer-management')),
+      },
+      {
+        path: '/tools/sms-responses',
+        Component: lazy(() => import('@/views/admin/tools/sms-responses')),
+      },
+      {
+        path: '/tools/revshare-management',
+        Component: lazy(() => import('@/views/admin/tools/revshare-management')),
+      },
+      {
+        path: '/tools/bank-accounts',
+        Component: lazy(() => import('@/views/admin/tools/bank-accounts')),
+      },
+      {
         path: '/promotions/ticket-reports',
         Component: lazy(() => import('@/views/admin/promotions/ticket-reports')),
       },

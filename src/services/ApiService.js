@@ -1382,6 +1382,50 @@ const ApiService = {
   getTransactionLimits: () => http.get('/transaction-limits'),
   updateTransactionLimit: (id, amount) => http.put(`/transaction-limits/${id}`, { amount }),
 
+  // Tools — Forex Rate
+  getForexRates: () => http.get('/forex-rates'),
+  createForexRate: (data) => http.post('/forex-rates', data),
+
+  // Tools — Send SMS
+  getSendSmsRecipientCount: () => http.get('/send-sms/recipient-count'),
+  sendSms: (data) => http.post('/send-sms', data),
+
+  // Tools — Customer Management
+  searchCustomerManagement: (filters) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/customer-management/search${query ? `?${query}` : ''}`)
+  },
+  getCustomerManagementDetail: (id) => http.get(`/customer-management/${id}`),
+  updateCustomerManagement: (id, data) => http.put(`/customer-management/${id}`, data),
+  addCustomerManagementNote: (id, data) => http.post(`/customer-management/${id}/notes`, data),
+  getCustomerManagementTransactions: (id, from, to) => http.get(`/customer-management/${id}/transactions?from=${from}&to=${to}`),
+  exportCustomerManagementTransactions: (id, format, from, to) => {
+    const query = new URLSearchParams({ format, ...(from && to ? { from, to } : {}) }).toString()
+    return http.download(`/customer-management/${id}/transactions/export?${query}`)
+  },
+  archiveCustomerManagement: (id) => http.post(`/customer-management/${id}/archive`),
+  getCustomerManagementComplyProfile: (id) => http.get(`/customer-management/${id}/comply-profile`),
+  getCustomerManagementAuthenticateStatus: (id) => http.get(`/customer-management/${id}/authenticate`),
+  requestCustomerManagementAuthenticate: (id, data) => http.post(`/customer-management/${id}/authenticate`, data),
+
+  // Tools — SMS Responses
+  getSmsResponseMerchants: () => http.get('/sms-responses/merchants'),
+  getSmsResponses: (merchantId) => http.get(`/sms-responses?merchant_id=${merchantId}`),
+  updateSmsResponse: (data) => http.put('/sms-responses', data),
+
+  // Tools — Revenue Share Management
+  getRevShareFilters: () => http.get('/revshare-management/filters'),
+  getRevShareDefinitions: (params) => {
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/revshare-management?${query}`)
+  },
+
+  // Tools — Bank Accounts
+  getBankAccountBanks: () => http.get('/bank-accounts/banks'),
+  getBankAccounts: () => http.get('/bank-accounts'),
+  createBankAccount: (data) => http.post('/bank-accounts', data),
+  updateBankAccount: (id, data) => http.put(`/bank-accounts/${id}`, data),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
