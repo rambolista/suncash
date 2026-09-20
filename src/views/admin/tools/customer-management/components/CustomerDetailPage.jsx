@@ -79,13 +79,13 @@ const CustomerDetailPage = ({ customerId, initialTab, modulePermission, onBack }
       </Card>
 
       <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => key && setActiveTab(key)} className="nav-bordered nav-bordered-primary mb-3">
-        <Nav.Item><Nav.Link eventKey="details">View Details</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="notes">Notes</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="transactions">Transaction History</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="preferences">Preferences</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="push-notification">Push Notification</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="comply">View ComplianceAdvantage Profile</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="authenticate">Authenticate User</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="details"><Icon icon="user" className="me-1" />View Details</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="notes"><Icon icon="notes" className="me-1" />Notes</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="transactions"><Icon icon="history" className="me-1" />Transaction History</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="preferences"><Icon icon="settings" className="me-1" />Preferences</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="push-notification"><Icon icon="bell" className="me-1" />Push Notification</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="comply"><Icon icon="shield-check" className="me-1" />View ComplianceAdvantage Profile</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="authenticate"><Icon icon="shield-lock" className="me-1" />Authenticate User</Nav.Link></Nav.Item>
       </Nav>
 
       {activeTab === 'details' && <DetailsTab customerId={customerId} detail={detail} canEdit={canEdit} canDelete={canDelete} onSaved={load} />}
