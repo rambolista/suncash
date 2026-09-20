@@ -1407,6 +1407,23 @@ const ApiService = {
   getCustomerManagementComplyProfile: (id) => http.get(`/customer-management/${id}/comply-profile`),
   getCustomerManagementAuthenticateStatus: (id) => http.get(`/customer-management/${id}/authenticate`),
   requestCustomerManagementAuthenticate: (id, data) => http.post(`/customer-management/${id}/authenticate`, data),
+  getCustomerManagementAccountStatusReasons: () => http.get('/customer-management/account-status-reasons'),
+  getCustomerManagementAccountStatusHistory: (id, params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/customer-management/${id}/account-status-history?${query}`)
+  },
+  updateCustomerManagementAccountStatus: (id, data) => http.post(`/customer-management/${id}/account-status`, data),
+  getCustomerManagementLinkedCards: (id) => http.get(`/customer-management/${id}/linked-cards`),
+  deleteCustomerManagementLinkedCard: (cardId) => http.delete(`/customer-management/linked-cards/${cardId}`),
+  getCustomerManagementLinkedBankAccounts: (id) => http.get(`/customer-management/${id}/linked-bank-accounts`),
+  getCustomerManagementScannedIds: (id) => http.get(`/customer-management/${id}/scanned-ids`),
+  resetCustomerManagementPin: (id) => http.post(`/customer-management/${id}/reset-pin`),
+  getCustomerManagementDropdowns: () => http.get('/customer-management/dropdowns'),
+  getCustomerManagementCitiesByIsland: (islandId) => http.get(`/customer-management/islands/${islandId}/cities`),
+  updateCustomerManagementScannedIds: (id, data) => http.put(`/customer-management/${id}/scanned-ids`, data),
+  getCustomerManagementPromoStatus: (id) => http.get(`/customer-management/${id}/promo-status`),
+  updateCustomerManagementPromoStatus: (id, isActive) => http.post(`/customer-management/${id}/promo-status`, { is_active: isActive }),
+  sendCustomerManagementPushNotification: (id, type) => http.post(`/customer-management/${id}/push-notification`, { type }),
 
   // Tools — SMS Responses
   getSmsResponseMerchants: () => http.get('/sms-responses/merchants'),

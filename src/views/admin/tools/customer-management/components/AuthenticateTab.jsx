@@ -8,36 +8,59 @@ import { formatDateTime } from '@/utils/reportHelpers'
 const REASONS = ['PIN reset', 'Email change', 'Account unlock', 'Device unlink', 'Profile update', 'Dispute', 'Other']
 const POLL_MS = 5000
 
+const formatCountdown = (seconds) => {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0')
+  const s = Math.floor(seconds % 60).toString().padStart(2, '0')
+  return `${m}:${s}`
+}
+
 const AuthenticateTab = ({ customerId, canExecute, mobile, email }) => {
   const { showNotification } = useNotificationContext()
   const [loading, setLoading] = useState(true)
   const [active, setActive] = useState(null)
+  const [countdown, setCountdown] = useState(0)
   const [method, setMethod] = useState('sms')
   const [reason, setReason] = useState(REASONS[0])
   const [reasonOther, setReasonOther] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const pollRef = useRef(null)
+  const tickRef = useRef(null)
 
   const loadStatus = () => {
     ApiService.getCustomerManagementAuthenticateStatus(customerId)
-      .then((data) => setActive(data?.data || null))
+      .then((data) => {
+        const row = data?.data || null
+        setActive(row)
+        setCountdown(row?.remaining_seconds ?? 0)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
   }
 
   useEffect(() => {
     loadStatus()
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+      if (tickRef.current) clearInterval(tickRef.current)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customerId])
 
+  // Legacy: 1s local countdown tick, re-polling the server every 5s while Pending.
   useEffect(() => {
-    if (active?.status === 'Pending') {
-      pollRef.current = setInterval(loadStatus, POLL_MS)
-    } else if (pollRef.current) {
-      clearInterval(pollRef.current)
+    if (active?.status !== 'Pending') {
+      if (pollRef.current) clearInterval(pollRef.current)
+      if (tickRef.current) clearInterval(tickRef.current)
+      return undefined
     }
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+
+    pollRef.current = setInterval(loadStatus, POLL_MS)
+    tickRef.current = setInterval(() => setCountdown((s) => Math.max(0, s - 1)), 1000)
+
+    return () => {
+      clearInterval(pollRef.current)
+      clearInterval(tickRef.current)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active?.status])
 
@@ -69,12 +92,27 @@ const AuthenticateTab = ({ customerId, canExecute, mobile, email }) => {
     <Card>
       <Card.Header><h5 className="mb-0">Authenticate User</h5></Card.Header>
       <Card.Body>
-        {active && (
-          <Alert variant={isPending ? 'warning' : 'secondary'} className="py-2 small">
-            Last request: <strong>{active.status}</strong> via {active.method} ({active.reason}) — requested {formatDateTime(active.created_at)}
-            {isPending && ' — this pending request expires automatically 3 minutes after it was sent.'}
-          </Alert>
-        )}
+        <Alert variant={isPending ? 'warning' : 'secondary'} className="mb-3">
+          <Row className="g-3">
+            <Col md={3}>
+              <div className="text-muted small">Status</div>
+              <div className="fw-semibold">{active?.status || 'No Request Yet'}</div>
+            </Col>
+            <Col md={3}>
+              <div className="text-muted small">Authentication Reason</div>
+              <div className="fw-semibold">{active?.reason || '—'}</div>
+            </Col>
+            <Col md={3}>
+              <div className="text-muted small">Channel Used</div>
+              <div className="fw-semibold text-uppercase">{active?.method || '—'}</div>
+            </Col>
+            <Col md={3}>
+              <div className="text-muted small">Countdown Timer</div>
+              <div className="fw-semibold">{isPending ? formatCountdown(countdown) : '—'}</div>
+            </Col>
+          </Row>
+          {active && <div className="text-muted small mt-2">Requested {formatDateTime(active.created_at)}</div>}
+        </Alert>
 
         <fieldset disabled={!canExecute || isPending}>
           <Form onSubmit={handleSubmit}>
@@ -100,7 +138,7 @@ const AuthenticateTab = ({ customerId, canExecute, mobile, email }) => {
               )}
             </Row>
             <Button type="submit" variant="success" className="mt-3" disabled={submitting}>
-              {submitting ? 'Sending...' : 'Authenticate User'}
+              {submitting ? 'Sending...' : 'Force Authenticate'}
             </Button>
           </Form>
         </fieldset>

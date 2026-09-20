@@ -6,17 +6,26 @@ import LoadingState from '@/components/LoadingState'
 import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import { money } from '@/utils/reportHelpers'
-import ConfirmActionModal from '../../../merchants/components/ConfirmActionModal'
 import DetailsTab from './DetailsTab'
+import NotesTab from './NotesTab'
+import TransactionHistoryTab from './TransactionHistoryTab'
+import PreferencesTab from './PreferencesTab'
+import PushNotificationTab from './PushNotificationTab'
 import ComplyTab from './ComplyTab'
 import AuthenticateTab from './AuthenticateTab'
+
+const STATUS_BADGE = {
+  A: { label: 'Active', className: 'bg-success-subtle text-success' },
+  L: { label: 'Locked', className: 'bg-danger-subtle text-danger' },
+  R: { label: 'Restricted', className: 'bg-warning-subtle text-warning' },
+  I: { label: 'Archived', className: 'bg-dark-subtle text-dark' },
+}
 
 const CustomerDetailPage = ({ customerId, initialTab, modulePermission, onBack }) => {
   const { showNotification } = useNotificationContext()
   const [activeTab, setActiveTab] = useState(initialTab || 'details')
   const [loading, setLoading] = useState(true)
   const [detail, setDetail] = useState(null)
-  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false)
 
   const canEdit = Boolean(modulePermission.can_edit)
   const canDelete = Boolean(modulePermission.can_delete)
@@ -42,7 +51,7 @@ const CustomerDetailPage = ({ customerId, initialTab, modulePermission, onBack }
   }
 
   const name = detail ? `${detail.first_name || ''} ${detail.last_name || ''}`.trim() : ''
-  const isArchived = detail?.status === 'I'
+  const badge = STATUS_BADGE[detail?.status] || STATUS_BADGE.A
 
   return (
     <>
@@ -55,7 +64,7 @@ const CustomerDetailPage = ({ customerId, initialTab, modulePermission, onBack }
         <Card.Header className="d-flex justify-content-between align-items-center">
           <h5 className="mb-0">{name || `Customer #${customerId}`}</h5>
           <div className="d-flex align-items-center gap-2">
-            {isArchived && <span className="badge bg-dark-subtle text-dark badge-label">Archived</span>}
+            <span className={`badge badge-label ${badge.className}`}>{badge.label}</span>
             <span className="badge bg-info-subtle text-info badge-label">{detail?.kyc_status}</span>
           </div>
         </Card.Header>
@@ -66,37 +75,26 @@ const CustomerDetailPage = ({ customerId, initialTab, modulePermission, onBack }
             <Col md={3}><div className="text-muted small">Merchant</div><div className="fw-semibold">{detail?.merchant || '—'}</div></Col>
             <Col md={3}><div className="text-muted small">Account Balance</div><div className="fw-semibold">{money(detail?.card_balance)}</div></Col>
           </Row>
-          {canDelete && (
-            <div className="mt-3">
-              <Button variant="danger" size="sm" disabled={isArchived} onClick={() => setShowArchiveConfirm(true)}>
-                <Icon icon="archive" className="me-1" /> {isArchived ? 'Already Archived' : 'Archive'}
-              </Button>
-            </div>
-          )}
         </Card.Body>
       </Card>
 
       <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => key && setActiveTab(key)} className="nav-bordered nav-bordered-primary mb-3">
         <Nav.Item><Nav.Link eventKey="details">View Details</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="notes">Notes</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="transactions">Transaction History</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="preferences">Preferences</Nav.Link></Nav.Item>
+        <Nav.Item><Nav.Link eventKey="push-notification">Push Notification</Nav.Link></Nav.Item>
         <Nav.Item><Nav.Link eventKey="comply">View ComplianceAdvantage Profile</Nav.Link></Nav.Item>
         <Nav.Item><Nav.Link eventKey="authenticate">Authenticate User</Nav.Link></Nav.Item>
       </Nav>
 
-      {activeTab === 'details' && <DetailsTab customerId={customerId} detail={detail} canEdit={canEdit} onSaved={load} />}
+      {activeTab === 'details' && <DetailsTab customerId={customerId} detail={detail} canEdit={canEdit} canDelete={canDelete} onSaved={load} />}
+      {activeTab === 'notes' && <NotesTab customerId={customerId} detail={detail} canEdit={canEdit} />}
+      {activeTab === 'transactions' && <TransactionHistoryTab customerId={customerId} detail={detail} />}
+      {activeTab === 'preferences' && <PreferencesTab customerId={customerId} detail={detail} canEdit={canEdit} onSaved={load} />}
+      {activeTab === 'push-notification' && <PushNotificationTab customerId={customerId} canExecute={canExecute} />}
       {activeTab === 'comply' && <ComplyTab customerId={customerId} />}
       {activeTab === 'authenticate' && <AuthenticateTab customerId={customerId} canExecute={canExecute} mobile={detail?.mobile} email={detail?.email} />}
-
-      <ConfirmActionModal
-        show={showArchiveConfirm}
-        onHide={() => setShowArchiveConfirm(false)}
-        title="Archive customer"
-        message={`Are you sure you want to archive ${name || 'this customer'}? This frees up their mobile number for reuse and deactivates their account.`}
-        confirmLabel="Archive"
-        confirmVariant="danger"
-        successMessage="Customer status has been updated."
-        onConfirm={() => ApiService.archiveCustomerManagement(customerId)}
-        onDone={load}
-      />
     </>
   )
 }
