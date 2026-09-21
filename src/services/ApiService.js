@@ -941,7 +941,7 @@ const ApiService = {
   blacklistCardVerification: (id, reason) => http.post(`/card-verification/${id}/blacklist`, { reason }),
 
   // Customers — Settlements
-  getCustomerSettlements: () => http.get('/customer-settlements'),
+  getCustomerSettlements: (status, page) => http.get(`/customer-settlements?status=${status}&page=${page}`),
 
   getCustomerSettlement: (id) => http.get(`/customer-settlements/${id}`),
 

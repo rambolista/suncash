@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Card, Nav } from 'react-bootstrap'
+import { Badge, Button, Card, Nav } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -22,7 +22,9 @@ const CustomerSettlementsPage = () => {
   const modulePermission = useMemo(() => getModulePermission(currentUser, '/customers/settlements'), [currentUser])
 
   const [tab, setTab] = useState('pending')
-  const [rows, setRows] = useState({ pending: [], approved: [], rejected: [] })
+  const [page, setPage] = useState(1)
+  const [rows, setRows] = useState([])
+  const [pageInfo, setPageInfo] = useState({ current_page: 1, last_page: 1, total: 0 })
   const [totals, setTotals] = useState({ pending: 0, approved: 0, rejected: 0 })
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState(null)
@@ -31,25 +33,23 @@ const CustomerSettlementsPage = () => {
 
   const load = () => {
     setLoading(true)
-    ApiService.getCustomerSettlements()
+    ApiService.getCustomerSettlements(tab, page)
       .then((data) => {
-        setRows({ pending: data?.pending || [], approved: data?.approved || [], rejected: data?.rejected || [] })
-        // Processed/Rejected are capped server-side to the most recent rows
-        // (they're pure history, not a to-do queue) — the badge still shows
-        // the true total via `${tab}_total`, falling back to the row count.
-        setTotals({
-          pending: data?.pending_total ?? (data?.pending || []).length,
-          approved: data?.approved_total ?? (data?.approved || []).length,
-          rejected: data?.rejected_total ?? (data?.rejected || []).length,
-        })
+        setRows(data?.data || [])
+        setPageInfo({ current_page: data?.current_page || 1, last_page: data?.last_page || 1, total: data?.total || 0 })
+        setTotals({ pending: data?.counts?.pending || 0, approved: data?.counts?.approved || 0, rejected: data?.counts?.rejected || 0 })
       })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load settlements.', variant: 'danger' }))
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [tab, page]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const activeRows = rows[tab] || []
+  const changeTab = (key) => {
+    if (key === tab) return
+    setTab(key)
+    setPage(1)
+  }
 
   if (selectedId) {
     return (
@@ -67,7 +67,7 @@ const CustomerSettlementsPage = () => {
       <Card>
         <Card.Header className="px-3 pt-3 pb-0 bg-body">
           <div className="customer-profile-tabs-scroll">
-            <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && setTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
+            <Nav variant="tabs" activeKey={tab} onSelect={(key) => key && changeTab(key)} className="nav-bordered nav-bordered-primary customer-profile-tabs flex-nowrap">
               {TABS.map((t) => {
                 const isActive = t.key === tab
                 return (
@@ -88,20 +88,32 @@ const CustomerSettlementsPage = () => {
           </div>
         </Card.Header>
         <Card.Body>
-          {!loading && tab !== 'pending' && totals[tab] > activeRows.length && (
-            <p className="text-muted small mb-3">
-              Showing the {activeRows.length} most recent of {totals[tab]} total — this tab is history, not a to-do queue, so older rows aren't loaded by default.
-            </p>
-          )}
           {loading ? (
             <LoadingState />
           ) : (
-            <SettlementsTable
-              key={tab}
-              data={activeRows}
-              tab={tab}
-              onView={(row) => setSelectedId(row.id)}
-            />
+            <>
+              <SettlementsTable
+                key={tab}
+                data={rows}
+                tab={tab}
+                onView={(row) => setSelectedId(row.id)}
+              />
+              {pageInfo.last_page > 1 && (
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                  <span className="text-muted small">
+                    Page {pageInfo.current_page} of {pageInfo.last_page} — {pageInfo.total} total
+                  </span>
+                  <div className="d-flex gap-2">
+                    <Button size="sm" variant="outline-secondary" disabled={pageInfo.current_page <= 1} onClick={() => setPage((p) => p - 1)}>
+                      <Icon icon="chevron-left" className="me-1" /> Previous
+                    </Button>
+                    <Button size="sm" variant="outline-secondary" disabled={pageInfo.current_page >= pageInfo.last_page} onClick={() => setPage((p) => p + 1)}>
+                      Next <Icon icon="chevron-right" className="ms-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </Card.Body>
       </Card>
