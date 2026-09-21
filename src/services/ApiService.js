@@ -911,7 +911,12 @@ const ApiService = {
   deactivateGiftcardProduct: (id) => http.post(`/giftcard-products/${id}/deactivate`),
 
   // Customers — KYC Upgrade
-  getKycUpgrades: () => http.get('/kyc-upgrade'),
+  getKycUpgrades: (status, page, search, columnFilters = {}) => {
+    const params = { status, page, ...(search ? { search } : {}) }
+    Object.entries(columnFilters).forEach(([key, value]) => { if (value) params[key] = value })
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/kyc-upgrade?${query}`)
+  },
 
   getKycUpgrade: (id) => http.get(`/kyc-upgrade/${id}`),
 
