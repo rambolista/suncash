@@ -23,6 +23,7 @@ const CustomerSettlementsPage = () => {
 
   const [tab, setTab] = useState('pending')
   const [rows, setRows] = useState({ pending: [], approved: [], rejected: [] })
+  const [totals, setTotals] = useState({ pending: 0, approved: 0, rejected: 0 })
   const [loading, setLoading] = useState(true)
   const [selectedId, setSelectedId] = useState(null)
 
@@ -31,7 +32,17 @@ const CustomerSettlementsPage = () => {
   const load = () => {
     setLoading(true)
     ApiService.getCustomerSettlements()
-      .then((data) => setRows({ pending: data?.pending || [], approved: data?.approved || [], rejected: data?.rejected || [] }))
+      .then((data) => {
+        setRows({ pending: data?.pending || [], approved: data?.approved || [], rejected: data?.rejected || [] })
+        // Processed/Rejected are capped server-side to the most recent rows
+        // (they're pure history, not a to-do queue) — the badge still shows
+        // the true total via `${tab}_total`, falling back to the row count.
+        setTotals({
+          pending: data?.pending_total ?? (data?.pending || []).length,
+          approved: data?.approved_total ?? (data?.approved || []).length,
+          rejected: data?.rejected_total ?? (data?.rejected || []).length,
+        })
+      })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load settlements.', variant: 'danger' }))
       .finally(() => setLoading(false))
   }
@@ -67,7 +78,7 @@ const CustomerSettlementsPage = () => {
                       </span>
                       <span className="fw-semibold text-nowrap">{t.label}</span>
                       <Badge bg={isActive ? 'primary' : 'light'} text={isActive ? undefined : 'dark'} className="rounded-pill">
-                        {rows[t.key].length}
+                        {totals[t.key]}
                       </Badge>
                     </Nav.Link>
                   </Nav.Item>
@@ -77,6 +88,11 @@ const CustomerSettlementsPage = () => {
           </div>
         </Card.Header>
         <Card.Body>
+          {!loading && tab !== 'pending' && totals[tab] > activeRows.length && (
+            <p className="text-muted small mb-3">
+              Showing the {activeRows.length} most recent of {totals[tab]} total — this tab is history, not a to-do queue, so older rows aren't loaded by default.
+            </p>
+          )}
           {loading ? (
             <LoadingState />
           ) : (
