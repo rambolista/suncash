@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, Button, Modal } from 'react-bootstrap'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
@@ -7,6 +7,13 @@ const ConfirmActionModal = ({ show, onHide, title, message, confirmLabel, confir
   const { showNotification } = useNotificationContext()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+
+  // This modal stays mounted between opens (its parent just toggles `show`),
+  // so a stale error from a previous failed attempt would otherwise still be
+  // showing the next time it's reopened, before the user has done anything.
+  useEffect(() => {
+    if (show) setError('')
+  }, [show])
 
   const handleConfirm = async () => {
     setSubmitting(true)
