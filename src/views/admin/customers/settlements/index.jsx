@@ -23,32 +23,58 @@ const CustomerSettlementsPage = () => {
 
   const [tab, setTab] = useState('pending')
   const [page, setPage] = useState(1)
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [columnFilterInputs, setColumnFilterInputs] = useState({})
+  const [columnFilters, setColumnFilters] = useState({})
   const [rows, setRows] = useState([])
   const [pageInfo, setPageInfo] = useState({ current_page: 1, last_page: 1, total: 0 })
   const [totals, setTotals] = useState({ pending: 0, approved: 0, rejected: 0 })
   const [loading, setLoading] = useState(true)
+  const [everLoaded, setEverLoaded] = useState(false)
   const [selectedId, setSelectedId] = useState(null)
 
   const canApprove = Boolean(modulePermission.can_approve)
 
+  // Debounce the search box and column filters — the actual request only fires once typing pauses.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearch(searchInput.trim())
+      setPage(1)
+    }, 400)
+    return () => clearTimeout(timeout)
+  }, [searchInput])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setColumnFilters(columnFilterInputs)
+      setPage(1)
+    }, 400)
+    return () => clearTimeout(timeout)
+  }, [columnFilterInputs])
+
   const load = () => {
     setLoading(true)
-    ApiService.getCustomerSettlements(tab, page)
+    ApiService.getCustomerSettlements(tab, page, search, columnFilters)
       .then((data) => {
         setRows(data?.data || [])
         setPageInfo({ current_page: data?.current_page || 1, last_page: data?.last_page || 1, total: data?.total || 0 })
         setTotals({ pending: data?.counts?.pending || 0, approved: data?.counts?.approved || 0, rejected: data?.counts?.rejected || 0 })
       })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load settlements.', variant: 'danger' }))
-      .finally(() => setLoading(false))
+      .finally(() => { setLoading(false); setEverLoaded(true) })
   }
 
-  useEffect(() => { load() }, [tab, page]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load() }, [tab, page, search, columnFilters]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleColumnFilterChange = (key, value) => setColumnFilterInputs((prev) => ({ ...prev, [key]: value }))
 
   const changeTab = (key) => {
     if (key === tab) return
     setTab(key)
     setPage(1)
+    setColumnFilterInputs({})
+    setColumnFilters({})
   }
 
   if (selectedId) {
@@ -88,16 +114,21 @@ const CustomerSettlementsPage = () => {
           </div>
         </Card.Header>
         <Card.Body>
-          {loading ? (
+          {!everLoaded ? (
             <LoadingState />
           ) : (
             <>
-              <SettlementsTable
-                key={tab}
-                data={rows}
-                tab={tab}
-                onView={(row) => setSelectedId(row.id)}
-              />
+              <div style={{ opacity: loading ? 0.6 : 1 }}>
+                <SettlementsTable
+                  key={tab}
+                  data={rows}
+                  tab={tab}
+                  onView={(row) => setSelectedId(row.id)}
+                  onColumnFilterChange={handleColumnFilterChange}
+                  searchValue={searchInput}
+                  onSearchChange={setSearchInput}
+                />
+              </div>
               {pageInfo.last_page > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-3">
                   <span className="text-muted small">

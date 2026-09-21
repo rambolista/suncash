@@ -941,7 +941,12 @@ const ApiService = {
   blacklistCardVerification: (id, reason) => http.post(`/card-verification/${id}/blacklist`, { reason }),
 
   // Customers — Settlements
-  getCustomerSettlements: (status, page) => http.get(`/customer-settlements?status=${status}&page=${page}`),
+  getCustomerSettlements: (status, page, search, columnFilters = {}) => {
+    const params = { status, page, ...(search ? { search } : {}) }
+    Object.entries(columnFilters).forEach(([key, value]) => { if (value) params[key] = value })
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/customer-settlements?${query}`)
+  },
 
   getCustomerSettlement: (id) => http.get(`/customer-settlements/${id}`),
 
