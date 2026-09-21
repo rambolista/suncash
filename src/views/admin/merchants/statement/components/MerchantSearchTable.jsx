@@ -21,7 +21,10 @@ const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || 'â
 
 const amountCol = (key) => ({
   data: key,
-  render: (value, type) => (type === 'display' ? `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : value),
+  // Search/sort against the same 2-decimal value that's displayed â€” the raw
+  // float can carry binary floating-point drift (e.g. 2719.510000000002),
+  // which would otherwise let a search like "10000" match unrelated rows.
+  render: (value, type) => (type === 'display' ? `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : Number(value || 0).toFixed(2)),
 })
 
 const columns = [

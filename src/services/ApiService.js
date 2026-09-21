@@ -1002,6 +1002,9 @@ const ApiService = {
 
   sendTransactionReceipt: (data) => http.post('/resend-receipt/send', data),
 
+  // Transactions — Resend Voucher
+  resendVoucher: (voucherNumber) => http.post('/resend-voucher', { voucher_number: voucherNumber }),
+
   // Kiosk — Monitoring Dashboard
   getKioskMonitoring: () => http.get('/kiosk-monitoring'),
 

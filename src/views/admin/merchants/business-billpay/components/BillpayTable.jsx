@@ -33,7 +33,11 @@ const dateCol = (key) => ({
 
 const amountCol = (key) => ({
   data: key,
-  render: (value, type) => (type === 'display' ? `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : value),
+  // Search/sort against the same 2-decimal value that's displayed — `total`
+  // is computed server-side as amount+fee and can carry PHP float-addition
+  // drift (e.g. 32.989999999999995), which would otherwise let a search
+  // like "10000" match an unrelated total.
+  render: (value, type) => (type === 'display' ? `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : Number(value || 0).toFixed(2)),
 })
 
 const columns = [

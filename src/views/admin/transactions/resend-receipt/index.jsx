@@ -8,21 +8,17 @@ import { getModulePermission } from '@/utils/modulePermissions'
 import ConfirmActionModal from '@/views/admin/merchants/components/ConfirmActionModal'
 import { money, formatDateTime, downloadBlob } from '@/utils/reportHelpers'
 
+// Matches legacy's own transaction_receipt.php <select> exactly (9 options) —
+// the backend service supports more types than this (same as legacy's model),
+// but legacy's UI never exposed them here, so neither does this page.
 const TRANSACTION_TYPES = [
   { value: 'RELOAD', label: 'Load' },
-  { value: 'SALE', label: 'Purchase' },
-  { value: 'ACTIVATION', label: 'Activation' },
-  { value: 'MONEY_TRANSFER', label: 'Money Transfer' },
-  { value: 'PHONE2PHONE', label: 'Phone to Phone' },
-  { value: 'PHONE2STORE', label: 'Phone to Store' },
-  { value: 'CASHOUT_CODE', label: 'Cashout by Code' },
   { value: 'CASHOUT_MOBILE', label: 'Cashout by Mobile' },
+  { value: 'CASHOUT_CODE', label: 'Cashout by Code' },
+  { value: 'SALE', label: 'Purchase' },
+  { value: 'MONEY_TRANSFER', label: 'Money Transfer' },
   { value: 'BILLPAY', label: 'Billpay' },
-  { value: 'BUSINESS_BILLPAY', label: 'Business Billpay' },
-  { value: 'BUSINESS_BILLPAY_STORE', label: 'Business Billpay (Store)' },
-  { value: 'CUSTOMERSPAYMENT', label: "Customer's Payment" },
   { value: 'DONATION', label: 'Donation' },
-  { value: 'CHECKCASHING', label: 'Check Cashing' },
   { value: 'TICKETS', label: 'Events Ticket' },
   { value: 'TICKETS_MOVIE', label: 'Movie Ticket' },
 ]

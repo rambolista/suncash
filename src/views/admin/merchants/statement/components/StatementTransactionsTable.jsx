@@ -29,14 +29,25 @@ const TYPE_BADGE = {
   DEBIT: 'bg-danger-subtle text-danger',
 }
 
+// Search/sort against the same 2-decimal value that's displayed — the raw
+// float can carry binary floating-point drift, which would otherwise let a
+// search like "10000" match an unrelated balance.
+const amountFilterValue = (value) => Number(value || 0).toFixed(2)
+
+// Search against both the raw ISO string (so "2023" still works) and the
+// displayed format (so "Jan" or "12:47 PM", what the user actually sees,
+// also works) — sort/type still get the plain ISO value for correct
+// chronological ordering.
+const timestampFilterValue = (value) => `${value || ''} ${formatDateTime(value)}`
+
 const columns = [
-  { data: 'timestamp', render: (value, type) => (type === 'display' ? formatDateTime(value) : value || '') },
+  { data: 'timestamp', render: (value, type) => (type === 'display' ? formatDateTime(value) : (type === 'filter' ? timestampFilterValue(value) : value || '')) },
   { data: 'transtype', render: (value, type) => (type === 'display' ? `<span class="badge ${TYPE_BADGE[value] || 'bg-secondary-subtle text-secondary'} badge-label">${escapeHtml(value)}</span>` : value) },
   { data: 'description', render: (value) => escapeHtml(value || '—') },
-  { data: 'amount', render: (value, type) => (type === 'display' ? money(value) : value) },
-  { data: 'available_balance', render: (value, type) => (type === 'display' ? money(value) : value) },
-  { data: 'onhold_balance', render: (value, type) => (type === 'display' ? money(value) : value) },
-  { data: 'running_balance', render: (value, type) => (type === 'display' ? money(value) : value) },
+  { data: 'amount', render: (value, type) => (type === 'display' ? money(value) : amountFilterValue(value)) },
+  { data: 'available_balance', render: (value, type) => (type === 'display' ? money(value) : amountFilterValue(value)) },
+  { data: 'onhold_balance', render: (value, type) => (type === 'display' ? money(value) : amountFilterValue(value)) },
+  { data: 'running_balance', render: (value, type) => (type === 'display' ? money(value) : amountFilterValue(value)) },
   { data: 'reference_no', render: (value) => escapeHtml(value || '—') },
 ]
 

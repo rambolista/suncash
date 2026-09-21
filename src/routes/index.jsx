@@ -158,6 +158,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/transactions/resend-receipt')),
       },
       {
+        path: '/transactions/resend-voucher',
+        Component: lazy(() => import('@/views/admin/transactions/resend-voucher')),
+      },
+      {
         path: '/kiosk/monitoring-dashboard',
         Component: lazy(() => import('@/views/admin/kiosk/monitoring-dashboard')),
       },
