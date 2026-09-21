@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, Card, Nav } from 'react-bootstrap'
+import { Badge, Button, Card, Nav, Spinner } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
@@ -118,16 +118,25 @@ const CustomerSettlementsPage = () => {
             <LoadingState />
           ) : (
             <>
-              <div style={{ opacity: loading ? 0.6 : 1 }}>
-                <SettlementsTable
-                  key={tab}
-                  data={rows}
-                  tab={tab}
-                  onView={(row) => setSelectedId(row.id)}
-                  onColumnFilterChange={handleColumnFilterChange}
-                  searchValue={searchInput}
-                  onSearchChange={setSearchInput}
-                />
+              <div className="position-relative">
+                <div style={{ opacity: loading ? 0.4 : 1 }}>
+                  <SettlementsTable
+                    key={tab}
+                    data={rows}
+                    tab={tab}
+                    onView={(row) => setSelectedId(row.id)}
+                    onColumnFilterChange={handleColumnFilterChange}
+                    searchValue={searchInput}
+                    onSearchChange={setSearchInput}
+                  />
+                </div>
+                {loading && (
+                  <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                    <Spinner animation="border" variant="primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
+                  </div>
+                )}
               </div>
               {pageInfo.last_page > 1 && (
                 <div className="d-flex justify-content-between align-items-center mt-3">
@@ -135,10 +144,10 @@ const CustomerSettlementsPage = () => {
                     Page {pageInfo.current_page} of {pageInfo.last_page} — {pageInfo.total} total
                   </span>
                   <div className="d-flex gap-2">
-                    <Button size="sm" variant="outline-secondary" disabled={pageInfo.current_page <= 1} onClick={() => setPage((p) => p - 1)}>
+                    <Button size="sm" variant="outline-secondary" disabled={loading || pageInfo.current_page <= 1} onClick={() => setPage((p) => p - 1)}>
                       <Icon icon="chevron-left" className="me-1" /> Previous
                     </Button>
-                    <Button size="sm" variant="outline-secondary" disabled={pageInfo.current_page >= pageInfo.last_page} onClick={() => setPage((p) => p + 1)}>
+                    <Button size="sm" variant="outline-secondary" disabled={loading || pageInfo.current_page >= pageInfo.last_page} onClick={() => setPage((p) => p + 1)}>
                       Next <Icon icon="chevron-right" className="ms-1" />
                     </Button>
                   </div>
