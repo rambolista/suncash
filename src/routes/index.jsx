@@ -310,6 +310,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/prepaynation-settings')),
       },
       {
+        path: '/tools/credit-card-approval',
+        Component: lazy(() => import('@/views/admin/tools/credit-card-approval')),
+      },
+      {
+        path: '/tools/compliance',
+        Component: lazy(() => import('@/views/admin/tools/compliance')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },

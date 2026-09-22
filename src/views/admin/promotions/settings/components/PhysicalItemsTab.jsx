@@ -7,7 +7,7 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 import PromoItemModal from './PromoItemModal'
 import PhysicalItemsTable from './PhysicalItemsTable'
 
-const PhysicalItemsTab = ({ editable }) => {
+const PhysicalItemsTab = ({ editable, onCountChange }) => {
   const { showNotification } = useNotificationContext()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -17,7 +17,11 @@ const PhysicalItemsTab = ({ editable }) => {
   const load = () => {
     setLoading(true)
     ApiService.getPromoItems()
-      .then((data) => setItems(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const rows = Array.isArray(data) ? data : []
+        setItems(rows)
+        onCountChange?.(rows.length)
+      })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load promo items.', variant: 'danger' }))
       .finally(() => setLoading(false))
   }

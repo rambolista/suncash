@@ -7,7 +7,7 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 import CashPromoModal from './CashPromoModal'
 import CashPromoTable from './CashPromoTable'
 
-const CashPromoTab = ({ editable, islands }) => {
+const CashPromoTab = ({ editable, islands, onCountChange }) => {
   const { showNotification } = useNotificationContext()
   const [settings, setSettings] = useState([])
   const [loading, setLoading] = useState(true)
@@ -17,7 +17,11 @@ const CashPromoTab = ({ editable, islands }) => {
   const load = () => {
     setLoading(true)
     ApiService.getCashPromoSettings()
-      .then((data) => setSettings(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const rows = Array.isArray(data) ? data : []
+        setSettings(rows)
+        onCountChange?.(rows.length)
+      })
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load cash promos.', variant: 'danger' }))
       .finally(() => setLoading(false))
   }

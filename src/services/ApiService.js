@@ -1425,6 +1425,21 @@ const ApiService = {
   getPrepaySettings: () => http.get('/prepaynation-settings'),
   updatePrepaySettings: (data) => http.put('/prepaynation-settings', data),
 
+  // Tools — Credit Card Approval
+  getCreditCardApprovals: (tab) => http.get(`/credit-card-approval?tab=${tab}`),
+  approveCreditCard: (id) => http.put(`/credit-card-approval/${id}/approve`),
+  rejectCreditCard: (id, reason) => http.put(`/credit-card-approval/${id}/reject`, { reason }),
+
+  // Tools — Compliance
+  getComplianceList: () => http.get('/compliance'),
+  updateComplianceEntry: (id, data) => http.put(`/compliance/${id}`, data),
+  deleteComplianceEntry: (id) => http.delete(`/compliance/${id}`),
+  importComplianceList: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post('/compliance/import', formData, true)
+  },
+
   // Tools — Send SMS
   getSendSmsRecipientCount: () => http.get('/send-sms/recipient-count'),
   sendSms: (data) => http.post('/send-sms', data),
