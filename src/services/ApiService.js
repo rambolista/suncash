@@ -1417,6 +1417,14 @@ const ApiService = {
   getAlivSettings: () => http.get('/aliv-settings'),
   updateAlivSettings: (data) => http.put('/aliv-settings', data),
 
+  // Tools — BTC Settings
+  getBtcSettings: (channel) => http.get(`/btc-settings?channel=${channel}`),
+  updateBtcSettings: (data) => http.put('/btc-settings', data),
+
+  // Tools — Prepaynation Settings
+  getPrepaySettings: () => http.get('/prepaynation-settings'),
+  updatePrepaySettings: (data) => http.put('/prepaynation-settings', data),
+
   // Tools — Send SMS
   getSendSmsRecipientCount: () => http.get('/send-sms/recipient-count'),
   sendSms: (data) => http.post('/send-sms', data),

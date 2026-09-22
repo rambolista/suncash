@@ -302,6 +302,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/aliv-settings')),
       },
       {
+        path: '/tools/btc-settings',
+        Component: lazy(() => import('@/views/admin/tools/btc-settings')),
+      },
+      {
+        path: '/tools/prepaynation-settings',
+        Component: lazy(() => import('@/views/admin/tools/prepaynation-settings')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },
