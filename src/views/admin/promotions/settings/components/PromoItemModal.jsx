@@ -15,7 +15,7 @@ const emptyForm = {
   merchant_id: '',
   branch_id: '',
   item_description: '',
-  quantity: '',
+  quantity: 1,
   draw_type: 'weekly_draw',
   draw_date: '',
   is_instant_reusable: false,
