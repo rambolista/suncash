@@ -1409,6 +1409,14 @@ const ApiService = {
   getForexRates: () => http.get('/forex-rates'),
   createForexRate: (data) => http.post('/forex-rates', data),
 
+  // Tools — Credit Card Fees
+  getCreditCardFees: () => http.get('/credit-card-fees'),
+  updateCreditCardFee: (id, amount) => http.put(`/credit-card-fees/${id}`, { amount }),
+
+  // Tools — Aliv Settings
+  getAlivSettings: () => http.get('/aliv-settings'),
+  updateAlivSettings: (data) => http.put('/aliv-settings', data),
+
   // Tools — Send SMS
   getSendSmsRecipientCount: () => http.get('/send-sms/recipient-count'),
   sendSms: (data) => http.post('/send-sms', data),

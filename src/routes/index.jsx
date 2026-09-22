@@ -294,6 +294,14 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/transaction-limits')),
       },
       {
+        path: '/tools/credit-card-fees',
+        Component: lazy(() => import('@/views/admin/tools/credit-card-fees')),
+      },
+      {
+        path: '/tools/aliv-settings',
+        Component: lazy(() => import('@/views/admin/tools/aliv-settings')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },
