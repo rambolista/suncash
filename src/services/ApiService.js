@@ -935,7 +935,12 @@ const ApiService = {
   getCustomerDocument: (id) => http.get(`/customer-documents/${id}`),
 
   // Customers — Card Verification
-  getCardVerifications: () => http.get('/card-verification'),
+  getCardVerifications: (status, page, search, columnFilters = {}) => {
+    const params = { status, page, ...(search ? { search } : {}) }
+    Object.entries(columnFilters).forEach(([key, value]) => { if (value) params[key] = value })
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/card-verification?${query}`)
+  },
 
   getCardVerification: (id) => http.get(`/card-verification/${id}`),
 
