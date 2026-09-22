@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button, Card, Col, Form, Row } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
@@ -7,24 +7,26 @@ import ApiService from '@/services/ApiService'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import CustomerLogsTable from './components/CustomerLogsTable'
 
-const today = () => new Date().toISOString().slice(0, 10)
-
 const CustomerLogsPage = () => {
   const { showNotification } = useNotificationContext()
   const [rows, setRows] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [from, setFrom] = useState(today())
-  const [to, setTo] = useState(today())
+  const [loading, setLoading] = useState(false)
+  const [searched, setSearched] = useState(false)
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
 
   const load = (fromDate = from, toDate = to) => {
+    if (!fromDate || !toDate) {
+      showNotification({ title: 'Failed', message: 'Please select a start and end date.', variant: 'danger' })
+      return
+    }
     setLoading(true)
+    setSearched(true)
     ApiService.getCustomerSuccessLogs(fromDate, toDate)
       .then((data) => setRows(Array.isArray(data?.data) ? data.data : []))
       .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load customer logs.', variant: 'danger' }))
       .finally(() => setLoading(false))
   }
-
-  useEffect(() => { load() }, [])
 
   return (
     <>
@@ -54,7 +56,13 @@ const CustomerLogsPage = () => {
           <h5 className="mb-0">Customer Login Logs</h5>
         </Card.Header>
         <Card.Body>
-          {loading ? <LoadingState /> : <CustomerLogsTable data={rows} />}
+          {loading ? (
+            <LoadingState />
+          ) : searched ? (
+            <CustomerLogsTable data={rows} />
+          ) : (
+            <div className="text-center text-muted py-4">Select a date range and click "Apply Filters" to load logs.</div>
+          )}
         </Card.Body>
       </Card>
     </>
