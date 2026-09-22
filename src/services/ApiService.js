@@ -984,7 +984,12 @@ const ApiService = {
   rejectCustomerBankLoad: (id, data) => http.post(`/customer-bank-loads/${id}/reject`, data),
 
   // Customers — Archive
-  getCustomerArchiveList: () => http.get('/customer-archive'),
+  getCustomerArchiveList: (page, search, columnFilters = {}) => {
+    const params = { page, ...(search ? { search } : {}) }
+    Object.entries(columnFilters).forEach(([key, value]) => { if (value) params[key] = value })
+    const query = new URLSearchParams(params).toString()
+    return http.get(`/customer-archive?${query}`)
+  },
 
   getCustomerArchive: (id) => http.get(`/customer-archive/${id}`),
 

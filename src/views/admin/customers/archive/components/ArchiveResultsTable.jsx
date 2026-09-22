@@ -1,11 +1,13 @@
 import DT from 'datatables.net-bs5'
 import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
-import { FormControl } from 'react-bootstrap'
+import { Form } from 'react-bootstrap'
 import ActionButton from '../../../merchants/components/ActionButton'
-import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
+import { baseDataTableOptions } from '@/views/admin/apps/access-management/utils/dataTableOptions'
+import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 
 DataTable.use(DT)
 
@@ -20,10 +22,13 @@ const escapeHtml = (value) =>
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
 
 const headers = ['First Name', 'Last Name', 'Mobile Number', 'Card Number', 'Merchant', 'Actions']
+const filterKeys = ['first_name', 'last_name', 'mobile_number', 'card_number', 'merchant', null]
 
-const ArchiveResultsTable = ({ data, onView }) => {
-  const handlers = useRef({ onView })
-  handlers.current = { onView }
+const ArchiveResultsTable = ({ data, onView, onColumnFilterChange, searchValue, onSearchChange }) => {
+  const handlers = useRef({ onView, onColumnFilterChange })
+  handlers.current = { onView, onColumnFilterChange }
+
+  const [searchSlot, setSearchSlot] = useState(null)
 
   const rowMap = useMemo(() => {
     const map = {}
@@ -62,24 +67,68 @@ const ArchiveResultsTable = ({ data, onView }) => {
 
   const options = useMemo(() => ({
     ...baseDataTableOptions,
+    // This table is one server-paginated page — DataTables' own global search
+    // box would silently only search the loaded page, so it's disabled in
+    // favor of index.jsx's search box and the server-side column filters
+    // below (both query every record, not just this page).
+    searching: false,
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      initTableSearchAndSort(this.api())
+      bindSortLabels(this.api())
+
+      // Portal our React-controlled search box into DataTables' own top-right
+      // slot (next to "entries per page"), instead of a separate row above the table.
+      const endSlot = this.api().table().container().querySelector(':scope > .row:first-child .dt-layout-end')
+      if (endSlot) setSearchSlot(endSlot)
+
+      // DataTables adopts the thead DOM on init, so these filter inputs are
+      // plain/uncontrolled — React's onChange never fires on them. Wire them
+      // with vanilla listeners instead (same approach as bindColumnSearchInputs).
+      const container = this.api().table().container()
+      const stopPropagation = (event) => event.stopPropagation()
+      container.querySelectorAll('thead tr.column-search-input-bar th').forEach((th) => {
+        th.addEventListener('click', stopPropagation)
+      })
+      container.querySelectorAll('thead tr.column-search-input-bar input[data-filter-key]').forEach((input) => {
+        const key = input.getAttribute('data-filter-key')
+        input.addEventListener('click', stopPropagation)
+        input.addEventListener('input', () => handlers.current.onColumnFilterChange(key, input.value))
+      })
     },
     createdRow,
   }), [createdRow])
 
   return (
     <div className="table-responsive">
+    {searchSlot && createPortal(
+      <div style={{ minWidth: 260 }}>
+        <Form.Control
+          size="sm"
+          type="search"
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search name, mobile, card, or merchant"
+        />
+        <Form.Text className="text-muted">Searches every record, not just the loaded page.</Form.Text>
+      </div>,
+      searchSlot,
+    )}
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
           {headers.map((header) => <th key={header}>{header}</th>)}
         </tr>
         <tr className="column-search-input-bar">
-          {headers.map((header, index) => (
-            <th key={header}>
-              {header !== 'Actions' && <FormControl size="sm" type="text" placeholder={header} className="bg-light-subtle border-light" data-col-index={index} />}
+          {filterKeys.map((key, index) => (
+            <th key={key ?? `no-filter-${index}`} className="pt-0">
+              {key && (
+                <input
+                  type="text"
+                  data-filter-key={key}
+                  placeholder="Filter…"
+                  className="form-control form-control-sm fw-normal"
+                />
+              )}
             </th>
           ))}
         </tr>
