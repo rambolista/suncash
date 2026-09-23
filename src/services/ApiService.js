@@ -920,6 +920,15 @@ const ApiService = {
     return http.download(`/customer-benefits-distribution/export?${query}`)
   },
 
+  // Tools — Card Logs
+  getCardLogs: (dateFrom, dateTo) =>
+    http.get(`/card-logs?date_from=${dateFrom}&date_to=${dateTo}`),
+
+  exportCardLogs: (dateFrom, dateTo, format) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo, format }).toString()
+    return http.download(`/card-logs/export?${query}`)
+  },
+
   // Business Billpay
   getBusinessBillpay: () =>
     http.get('/business-billpay'),

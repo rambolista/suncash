@@ -326,6 +326,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/customer-benefits-distribution')),
       },
       {
+        path: '/tools/card-logs',
+        Component: lazy(() => import('@/views/admin/tools/card-logs')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },
