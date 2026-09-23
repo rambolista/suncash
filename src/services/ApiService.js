@@ -893,6 +893,33 @@ const ApiService = {
     return http.download(`/voucher-batch-generation/export?${query}`)
   },
 
+  // Tools — Customer Benefits Distribution
+  getCustomerBenefits: () =>
+    http.get('/customer-benefits-distribution'),
+
+  getCustomerBenefitBatchRows: (batchId) =>
+    http.get(`/customer-benefits-distribution/${batchId}/rows`),
+
+  downloadCustomerBenefitsTemplate: () =>
+    http.download('/customer-benefits-distribution/template'),
+
+  importCustomerBenefits: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post('/customer-benefits-distribution/import', formData, true)
+  },
+
+  processCustomerBenefitBatch: (batchId) =>
+    http.post(`/customer-benefits-distribution/${batchId}/process`),
+
+  processCustomerBenefitRow: (rowId) =>
+    http.post(`/customer-benefits-distribution/rows/${rowId}/process`),
+
+  exportCustomerBenefits: (batchId, format) => {
+    const query = new URLSearchParams({ ...(batchId ? { batch_id: batchId } : {}), format }).toString()
+    return http.download(`/customer-benefits-distribution/export?${query}`)
+  },
+
   // Business Billpay
   getBusinessBillpay: () =>
     http.get('/business-billpay'),

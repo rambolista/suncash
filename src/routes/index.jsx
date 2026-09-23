@@ -322,6 +322,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/voucher-batch-generation')),
       },
       {
+        path: '/tools/customer-benefits-distribution',
+        Component: lazy(() => import('@/views/admin/tools/customer-benefits-distribution')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },
