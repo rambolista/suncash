@@ -1,11 +1,13 @@
 import DT from 'datatables.net-bs5'
 import DataTable from 'datatables.net-react'
 import 'datatables.net-responsive'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
-import { FormControl } from 'react-bootstrap'
+import { Form } from 'react-bootstrap'
 import ActionButton from '../../components/ActionButton'
-import { baseDataTableOptions, initTableSearchAndSort } from '@/views/admin/apps/access-management/utils/dataTableOptions'
+import { baseDataTableOptions } from '@/views/admin/apps/access-management/utils/dataTableOptions'
+import { bindSortLabels } from '@/views/admin/apps/access-management/utils/dataTableSortLabels'
 
 DataTable.use(DT)
 
@@ -36,26 +38,12 @@ const amountCol = (key) => ({
   render: (value, type) => (type === 'display' ? `BSD ${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : value),
 })
 
-const columns = [
-  dateCol('created_date'),
-  textCol('transaction_id'),
-  textCol('suntag_shortcode'),
-  textCol('dba_name'),
-  textCol('type'),
-  textCol('w_type'),
-  amountCol('amount'),
-  amountCol('fee'),
-  { data: 'due_date', render: (value) => (value ? (value === 'OverDue' ? '<span class="text-danger fw-semibold">OverDue</span>' : formatDateTime(value)) : '—') },
-  textCol('updated_by_user'),
-  { data: 'id', orderable: false, searchable: false, width: '90px', className: 'text-nowrap action-cell', render: (id) => `<div class="settlement-action-slot" data-id="${id}"></div>` },
-]
+/** Server-paginated DataTable for Merchant Settlements' Pending/Processed/Rejected tabs — mirrors Customers > Settlements. */
+const SettlementsTable = ({ data, tab, onView, onColumnFilterChange, searchValue, onSearchChange }) => {
+  const handlers = useRef({ onView, onColumnFilterChange })
+  handlers.current = { onView, onColumnFilterChange }
 
-const headers = ['Created', 'Transaction ID', 'Shortcode', 'Merchant', 'Type', 'Withdrawal Type', 'Amount', 'Fee', 'Due Date', 'Processed By', 'Action']
-
-/** Shared DataTable list for Merchant Settlements' Pending/Processed/Rejected tabs. */
-const SettlementsTable = ({ data, onView }) => {
-  const handlers = useRef({ onView })
-  handlers.current = { onView }
+  const [searchSlot, setSearchSlot] = useState(null)
 
   const rowMap = useMemo(() => {
     const map = {}
@@ -63,37 +51,125 @@ const SettlementsTable = ({ data, onView }) => {
     return map
   }, [data])
 
+  const actionCol = {
+    data: 'id',
+    orderable: false,
+    searchable: false,
+    width: '90px',
+    className: 'text-nowrap action-cell',
+    render: (id) => `<div class="merchant-settlement-action-slot" data-id="${id}"></div>`,
+  }
+
+  const columns = useMemo(() => {
+    const base = [
+      dateCol('created_date'),
+      textCol('transaction_id'),
+      textCol('suntag_shortcode'),
+      textCol('dba_name'),
+      textCol('type'),
+      textCol('w_type'),
+      amountCol('amount'),
+      amountCol('fee'),
+    ]
+
+    if (tab === 'pending') {
+      return [...base, { data: 'due_date', render: (value) => (value ? (value === 'OverDue' ? '<span class="text-danger fw-semibold">OverDue</span>' : formatDateTime(value)) : '—') }, actionCol]
+    }
+
+    return [...base, dateCol('updated_date'), textCol('updated_by_user'), actionCol]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab])
+
+  const headers = useMemo(() => {
+    const base = ['Created', 'Transaction ID', 'Shortcode', 'Merchant', 'Type', 'Withdrawal Type', 'Amount', 'Fee']
+    if (tab === 'pending') return [...base, 'Due Date', 'Action']
+    if (tab === 'approved') return [...base, 'Date Processed', 'Processed By', 'Action']
+    return [...base, 'Date Rejected', 'Rejected By', 'Action']
+  }, [tab])
+
+  // null = not filterable (Shortcode has no server-side filter key of its own — searched via "Merchant"; Due Date is computed, not stored; Action has no data).
+  const filterKeys = useMemo(() => {
+    const base = ['created_date', 'transaction_id', null, 'merchant', 'type', 'withdrawal_type', 'amount', null]
+    if (tab === 'pending') return [...base, null, null]
+    return [...base, 'updated_date', 'updated_by', null]
+  }, [tab])
+
   const createdRow = useMemo(() => (row, rowData) => {
     const item = rowMap[rowData.id] ?? rowData
-    const slot = row.querySelector('.settlement-action-slot')
+    const slot = row.querySelector('.merchant-settlement-action-slot')
     if (!slot) return
     const root = slot.__actionRoot || createRoot(slot)
     slot.__actionRoot = root
 
     root.render(<ActionButton label="View" icon="eye" onClick={() => handlers.current.onView(item)} />)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowMap])
+  }, [rowMap, tab])
 
   const options = useMemo(() => ({
     ...baseDataTableOptions,
+    // This table is one server-paginated page — DataTables' own global search
+    // box would silently only search the loaded page, so it's disabled in
+    // favor of index.jsx's search box and the server-side column filters
+    // below (both query every record, not just this page).
+    searching: false,
+    order: [[0, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
-      initTableSearchAndSort(this.api())
+      bindSortLabels(this.api())
+
+      // Portal our React-controlled search box into DataTables' own top-right
+      // slot (next to "entries per page"), instead of a separate row above the table.
+      const endSlot = this.api().table().container().querySelector(':scope > .row:first-child .dt-layout-end')
+      if (endSlot) setSearchSlot(endSlot)
+
+      // DataTables adopts the thead DOM on init, so these filter inputs are
+      // plain/uncontrolled — React's onChange never fires on them. Wire them
+      // with vanilla listeners instead (same approach as bindColumnSearchInputs).
+      const container = this.api().table().container()
+      const stopPropagation = (event) => event.stopPropagation()
+      container.querySelectorAll('thead tr.column-search-input-bar th').forEach((th) => {
+        th.addEventListener('click', stopPropagation)
+      })
+      container.querySelectorAll('thead tr.column-search-input-bar input[data-filter-key]').forEach((input) => {
+        const key = input.getAttribute('data-filter-key')
+        input.addEventListener('click', stopPropagation)
+        input.addEventListener('input', () => handlers.current.onColumnFilterChange(key, input.value))
+      })
     },
     createdRow,
   }), [createdRow])
 
   return (
     <div className="table-responsive">
+    {searchSlot && createPortal(
+      <div style={{ minWidth: 260 }}>
+        <Form.Control
+          size="sm"
+          type="search"
+          value={searchValue}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search transaction ID, merchant, or type"
+        />
+        <Form.Text className="text-muted">Searches every record in this tab, not just the loaded page.</Form.Text>
+      </div>,
+      searchSlot,
+    )}
     <DataTable data={data} columns={columns} options={options} className="table dt-responsive align-middle mb-0 w-100">
       <thead className="thead-sm text-uppercase fs-xxs">
         <tr>
           {headers.map((header) => <th key={header}>{header}</th>)}
         </tr>
         <tr className="column-search-input-bar">
-          {headers.map((header, index) => (
-            <th key={header}>
-              {header !== 'Action' && <FormControl size="sm" type="text" placeholder={header} className="bg-light-subtle border-light" data-col-index={index} />}
+          {filterKeys.map((key, index) => (
+            <th key={key ?? `no-filter-${index}`} className="pt-0">
+              {key && (
+                <input
+                  type="text"
+                  data-filter-key={key}
+                  placeholder="Filter…"
+                  className="form-control form-control-sm fw-normal"
+                />
+              )}
             </th>
           ))}
         </tr>

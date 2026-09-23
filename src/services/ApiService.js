@@ -821,8 +821,15 @@ const ApiService = {
   },
 
   // Merchant Settlements
-  getMerchantSettlements: () =>
-    http.get('/merchant-settlements'),
+  getMerchantSettlements: (status, page, search, columnFilters = {}) => {
+    const query = new URLSearchParams({
+      status,
+      page,
+      ...(search ? { search } : {}),
+      ...Object.fromEntries(Object.entries(columnFilters).filter(([, v]) => v)),
+    }).toString()
+    return http.get(`/merchant-settlements?${query}`)
+  },
 
   getMerchantSettlement: (id) =>
     http.get(`/merchant-settlements/${id}`),
