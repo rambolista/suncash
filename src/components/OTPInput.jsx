@@ -17,6 +17,15 @@ const OTPInput = ({ code, setCode, inputClassName, label, labelClassName }) => {
       inputsRef.current[idx - 1]?.focus()
     }
   }
+  const handlePaste = (e, idx) => {
+    const digits = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, code.length - idx).split('')
+    if (!digits.length) return
+    e.preventDefault()
+    const newCode = [...code]
+    digits.forEach((digit, i) => { newCode[idx + i] = digit })
+    setCode(newCode)
+    inputsRef.current[Math.min(idx + digits.length, code.length - 1)]?.focus()
+  }
   return (
     <>
       <FormLabel className={labelClassName}>
@@ -34,6 +43,7 @@ const OTPInput = ({ code, setCode, inputClassName, label, labelClassName }) => {
             value={number}
             onChange={(e) => handleChange(e, idx)}
             onKeyDown={(e) => handleKeyDown(e, idx)}
+            onPaste={(e) => handlePaste(e, idx)}
             ref={(el) => {
               inputsRef.current[idx] = el
             }}
