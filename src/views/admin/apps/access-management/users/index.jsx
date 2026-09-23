@@ -9,6 +9,7 @@ import { getModulePermission } from '@/utils/modulePermissions'
 import UsersTable from './components/UsersTable'
 import UserFormModal from './components/UserFormModal'
 import DeleteUserModal from './components/DeleteUserModal'
+import ResetPasswordConfirmModal from './components/ResetPasswordConfirmModal'
 import { useNotificationContext } from '@/context/useNotificationContext'
 
 const UsersPage = () => {
@@ -23,6 +24,8 @@ const UsersPage = () => {
   const [showUserModal, setShowUserModal] = useState(false)
   const [editUser, setEditUser] = useState(null)
   const [deleteUser, setDeleteUser] = useState(null)
+  const [resetPasswordUser, setResetPasswordUser] = useState(null)
+  const [resettingPassword, setResettingPassword] = useState(false)
   const [viewMode, setViewMode] = useState('grid')
 
   const notify = useCallback((variant, message) => {
@@ -65,6 +68,20 @@ const UsersPage = () => {
       const created = await ApiService.createUser(form)
       setUsers((prev) => [...prev, created?.data || created])
       notify('success', 'User created.')
+    }
+  }
+
+  const handleResetPassword = async () => {
+    if (!resetPasswordUser) return
+    setResettingPassword(true)
+    try {
+      const response = await ApiService.resetUserPassword(resetPasswordUser.id)
+      notify('success', response?.message || 'Password reset link sent.')
+      setResetPasswordUser(null)
+    } catch (err) {
+      notify('danger', err?.message || 'Failed to send password reset link.')
+    } finally {
+      setResettingPassword(false)
     }
   }
 
@@ -154,6 +171,7 @@ const UsersPage = () => {
             permissions={{ can_edit: canEditUser, can_delete: canDeleteUser }}
             onEdit={openEdit}
             onDelete={(user) => setDeleteUser(user)}
+            onResetPassword={(user) => setResetPasswordUser(user)}
           />
         </Card.Body>
       </Card>
@@ -171,6 +189,14 @@ const UsersPage = () => {
         onHide={() => setDeleteUser(null)}
         onConfirm={handleDeleteUser}
         user={deleteUser}
+      />
+
+      <ResetPasswordConfirmModal
+        show={!!resetPasswordUser}
+        onHide={() => setResetPasswordUser(null)}
+        onConfirm={handleResetPassword}
+        user={resetPasswordUser}
+        submitting={resettingPassword}
       />
     </>
   )

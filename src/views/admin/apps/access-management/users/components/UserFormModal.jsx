@@ -11,7 +11,7 @@ import { useNotificationContext } from '@/context/useNotificationContext'
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview)
 
-const buildSchema = (isEdit) =>
+const buildSchema = () =>
   Yup.object({
     first_name: Yup.string().trim().required('First name is required').max(255),
     middle_name: Yup.string().trim().max(255).nullable(),
@@ -19,9 +19,9 @@ const buildSchema = (isEdit) =>
     email:    Yup.string().trim().email('Invalid email address').required('Email is required'),
     mobile_number: Yup.string().trim().max(50, 'Maximum 50 characters').nullable(),
     address: Yup.string().trim().max(1000, 'Maximum 1000 characters').nullable(),
-    password: isEdit
-      ? Yup.string().min(8, 'Minimum 8 characters').nullable()
-      : Yup.string().min(8, 'Minimum 8 characters').required('Password is required'),
+    // Optional on create too — leave blank and the new user gets an e-mail
+    // link to set their own password, same as "Forgot Password".
+    password: Yup.string().min(8, 'Minimum 8 characters').nullable(),
     role_ids: Yup.array().of(Yup.number()),
     avatar: Yup.mixed().nullable(),
     clear_avatar: Yup.boolean().nullable(),
@@ -73,7 +73,7 @@ const UserFormModal = ({ show, onHide, onSave, roles, initial }) => {
 
   const formik = useFormik({
     initialValues: empty,
-    validationSchema: buildSchema(isEdit),
+    validationSchema: buildSchema(),
     enableReinitialize: false,
     onSubmit: async (values, { setErrors, setSubmitting }) => {
       try {
@@ -309,9 +309,9 @@ const UserFormModal = ({ show, onHide, onSave, roles, initial }) => {
               <Form.Group>
                 <Form.Label>
                   Password{' '}
-                  {isEdit
-                    ? <span className="text-muted small">(leave blank to keep current)</span>
-                    : <span className="text-danger">*</span>}
+                  <span className="text-muted small">
+                    {isEdit ? '(leave blank to keep current)' : '(leave blank to e-mail the user a link to set their own)'}
+                  </span>
                 </Form.Label>
                 <Form.Control
                   type="password"

@@ -518,6 +518,9 @@ const ApiService = {
   assignRolesToUser: (userId, roleIds) =>
     http.post(`/access-management/users/${userId}/roles`, { role_ids: roleIds }),
 
+  resetUserPassword: (userId) =>
+    http.post(`/access-management/users/${userId}/reset-password`),
+
   // ── Notifications ─────────────────────────────────────────────────────────
 
   getNotifications: () =>

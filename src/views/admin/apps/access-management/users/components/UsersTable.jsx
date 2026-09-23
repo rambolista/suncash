@@ -72,7 +72,7 @@ const columns = [
     data: 'id',
     orderable: false,
     searchable: false,
-    width: '95px',
+    width: '130px',
     className: 'text-nowrap action-cell',
     render: (id) => `<div class="action-slot" data-id="${id}"></div>`,
   },
@@ -88,15 +88,15 @@ const gridPageSizes = [4, 8, 12, 16, 20]
  *   onEdit   – (user) => void
  *   onDelete – (user) => void
  */
-const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelete }) => {
+const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelete, onResetPassword }) => {
   const [searchText, setSearchText] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [pageSize, setPageSize] = useState(8)
   const [page, setPage] = useState(1)
 
-  const handlers = useRef({ onEdit, onDelete })
-  handlers.current = { onEdit, onDelete }
+  const handlers = useRef({ onEdit, onDelete, onResetPassword })
+  handlers.current = { onEdit, onDelete, onResetPassword }
   const canEdit = Boolean(permissions.can_edit)
   const canDelete = Boolean(permissions.can_delete)
 
@@ -201,6 +201,11 @@ const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelet
           {canEdit && (
             <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Edit" aria-label="Edit" onClick={() => handlers.current.onEdit?.(item)}>
               <Icon icon="edit" className="fs-lg" />
+            </Button>
+          )}
+          {canEdit && (
+            <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Reset Password" aria-label="Reset Password" onClick={() => handlers.current.onResetPassword?.(item)}>
+              <Icon icon="key" className="fs-lg" />
             </Button>
           )}
           {canDelete && (
@@ -436,6 +441,11 @@ const UsersTable = ({ data, viewMode = 'list', permissions = {}, onEdit, onDelet
                           {canEdit && (
                             <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Edit" aria-label="Edit" onClick={() => onEdit(user)}>
                               <Icon icon="edit" className="fs-lg" />
+                            </Button>
+                          )}
+                          {canEdit && (
+                            <Button variant="light" size="sm" className="btn-icon rounded-circle" title="Reset Password" aria-label="Reset Password" onClick={() => onResetPassword(user)}>
+                              <Icon icon="key" className="fs-lg" />
                             </Button>
                           )}
                           {canDelete && (
