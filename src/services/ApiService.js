@@ -863,6 +863,36 @@ const ApiService = {
     return http.download(`/merchant-settlements/export?${query}`)
   },
 
+  // Tools — Voucher Batch Generation
+  getVoucherBatches: () =>
+    http.get('/voucher-batch-generation'),
+
+  getVoucherBatchRows: (batchId) =>
+    http.get(`/voucher-batch-generation/${batchId}/rows`),
+
+  downloadVoucherBatchTemplate: () =>
+    http.download('/voucher-batch-generation/template'),
+
+  importVoucherBatch: (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return http.post('/voucher-batch-generation/import', formData, true)
+  },
+
+  processVoucherBatch: (batchId) =>
+    http.post(`/voucher-batch-generation/${batchId}/process`),
+
+  resendVoucherBatch: (batchId) =>
+    http.post(`/voucher-batch-generation/${batchId}/resend`),
+
+  skipVoucherBatchRow: (rowId) =>
+    http.post(`/voucher-batch-generation/rows/${rowId}/skip`),
+
+  exportVoucherBatch: (batchId, format) => {
+    const query = new URLSearchParams({ ...(batchId ? { batch_id: batchId } : {}), format }).toString()
+    return http.download(`/voucher-batch-generation/export?${query}`)
+  },
+
   // Business Billpay
   getBusinessBillpay: () =>
     http.get('/business-billpay'),

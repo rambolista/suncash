@@ -318,6 +318,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/compliance')),
       },
       {
+        path: '/tools/voucher-batch-generation',
+        Component: lazy(() => import('@/views/admin/tools/voucher-batch-generation')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },
