@@ -929,6 +929,19 @@ const ApiService = {
     return http.download(`/card-logs/export?${query}`)
   },
 
+  // Tools — Feature Release Management
+  getFeatureReleaseIslands: () =>
+    http.get('/feature-release/islands'),
+
+  getFeatureReleases: () =>
+    http.get('/feature-release'),
+
+  createFeatureRelease: (data) =>
+    http.post('/feature-release', data),
+
+  updateFeatureRelease: (id, data) =>
+    http.put(`/feature-release/${id}`, data),
+
   // Business Billpay
   getBusinessBillpay: () =>
     http.get('/business-billpay'),

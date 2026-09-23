@@ -330,6 +330,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/card-logs')),
       },
       {
+        path: '/tools/feature-release',
+        Component: lazy(() => import('@/views/admin/tools/feature-release')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },
