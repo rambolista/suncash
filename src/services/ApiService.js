@@ -942,6 +942,13 @@ const ApiService = {
   updateFeatureRelease: (id, data) =>
     http.put(`/feature-release/${id}`, data),
 
+  // Tools — Billers Setup
+  getBillersSetup: () =>
+    http.get('/billers-setup'),
+
+  saveBillersSetup: (selectedIds) =>
+    http.post('/billers-setup', { selected_ids: selectedIds }),
+
   // Business Billpay
   getBusinessBillpay: () =>
     http.get('/business-billpay'),
