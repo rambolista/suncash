@@ -19,6 +19,17 @@ const componentBadgeHtml = (value) => {
   return `<span class="badge bg-${variant}-subtle text-${variant} badge-label">${escapeHtml(value)}</span>`
 }
 
+const cashMgmtHtml = (value) => {
+  if (!value) return '<span class="text-muted">—</span>'
+  const variant = value === 'OK' ? 'success' : 'danger'
+  return `<span class="badge bg-${variant}-subtle text-${variant} badge-label">${escapeHtml(value)}</span>`
+}
+
+const moneyOrNa = (value, type) => {
+  if (value === null || value === undefined) return type === 'display' ? '<span class="text-muted">N/A</span>' : ''
+  return type === 'display' ? money(value) : value
+}
+
 const machineCol = {
   data: 'machine_name',
   render: (value, type, row) => (type === 'display'
@@ -49,6 +60,9 @@ const columns = [
   { data: 'acceptor', render: (value, type) => (type === 'display' ? componentBadgeHtml(value) : value || '') },
   { data: 'dispenser', render: (value, type) => (type === 'display' ? componentBadgeHtml(value) : value || '') },
   { data: 'cash_reserve', render: (value, type) => (type === 'display' ? money(value) : value) },
+  { data: 'acceptor_cash', render: (value, type) => (type === 'display' ? money(value) : value) },
+  { data: 'dispenser_cash', render: moneyOrNa },
+  { data: 'cash_mgmt', render: (value, type) => (type === 'display' ? cashMgmtHtml(value) : value || '') },
   dateCol('last_seen'),
   textCol('updated_by'),
   {
@@ -61,7 +75,7 @@ const columns = [
   },
 ]
 
-const headers = ['Branch', 'Machine', 'Island', 'Location', 'Type', 'Status', 'Paper', 'Acceptor', 'Dispenser', 'Reserve Cash', 'Last Seen', 'Updated By', 'Action']
+const headers = ['Branch', 'Machine', 'Island', 'Location', 'Type', 'Status', 'Paper', 'Acceptor', 'Dispenser', 'Reserve Cash', 'Acceptor Cash', 'Dispenser Cash', 'Cash Mgmt', 'Last Seen', 'Updated By', 'Action']
 
 const MonitoringTable = ({ data, canExecute, onClear, onAcknowledge }) => {
   const handlers = useRef({ onClear, onAcknowledge })
@@ -94,7 +108,7 @@ const MonitoringTable = ({ data, canExecute, onClear, onAcknowledge }) => {
   const options = useMemo(() => ({
     responsive: false,
     pageLength: 25,
-    order: [[10, 'desc']],
+    order: [[13, 'desc']],
     columnDefs: [{ targets: '_all', orderSequence: ['asc', 'desc', ''] }],
     initComplete: function () {
       bindSortLabels(this.api())

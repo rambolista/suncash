@@ -21,7 +21,7 @@ const MonitoringDashboardPage = () => {
 
   const [tab, setTab] = useState('dashboard')
   const [rows, setRows] = useState([])
-  const [stats, setStats] = useState(null)
+  const [typeScope, setTypeScope] = useState('')
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(null)
   const [branchFilter, setBranchFilter] = useState('')
@@ -39,7 +39,6 @@ const MonitoringDashboardPage = () => {
     ApiService.getKioskMonitoring()
       .then((data) => {
         setRows(Array.isArray(data?.data) ? data.data : [])
-        setStats(data?.stats || null)
         setLastUpdated(new Date())
       })
       .catch((err) => {
@@ -67,6 +66,21 @@ const MonitoringDashboardPage = () => {
   const locations = useMemo(() => [...new Set(rows.map((r) => r.location).filter(Boolean))].sort(), [rows])
   const updatedByOptions = useMemo(() => [...new Set(rows.map((r) => r.updated_by).filter(Boolean))].sort(), [rows])
 
+  // Re-tallies the same already-computed row flags the backend's stats() sums, just scoped to
+  // the selected terminal type — no threshold logic duplicated, no extra request.
+  const scopedStats = useMemo(() => {
+    const scopedRows = typeScope ? rows.filter((r) => r.terminal_type === typeScope) : rows
+    const totals = { total: scopedRows.length, online: 0, offline: 0, kiosk: 0, atm: 0, needs_replenishment: 0, needs_cash_collection: 0, jammed: 0, printer_issue: 0, paper_low: 0 }
+    scopedRows.forEach((r) => {
+      totals[r.status === 'online' ? 'online' : 'offline']++
+      if (r.terminal_type === 'kiosk' || r.terminal_type === 'atm') totals[r.terminal_type]++
+      ;['needs_replenishment', 'needs_cash_collection', 'jammed', 'printer_issue', 'paper_low'].forEach((flag) => {
+        if (r[flag]) totals[flag]++
+      })
+    })
+    return totals
+  }, [rows, typeScope])
+
   const filteredRows = useMemo(() => rows.filter((r) => {
     if (branchFilter && r.branch_name !== branchFilter) return false
     if (typeFilter && r.terminal_type !== typeFilter) return false
@@ -78,11 +92,19 @@ const MonitoringDashboardPage = () => {
     return true
   }), [rows, branchFilter, typeFilter, islandFilter, locationFilter, updatedByFilter, statusFilter, issueFilter])
 
-  const ISSUE_LABELS = { needs_replenishment: 'Needs Replenishment', full: 'Full', jammed: 'Jammed', printer_issue: 'Printer Issues' }
+  const ISSUE_LABELS = { needs_replenishment: 'Needs Replenishment', needs_cash_collection: 'Collect Cash', jammed: 'Jammed', printer_issue: 'Printer Issues', paper_low: 'Low Paper' }
 
   const openList = (status, issue = '') => {
     setStatusFilter(status)
     setIssueFilter(issue)
+    setTypeFilter(typeScope)
+    setTab('list')
+  }
+
+  const openType = (type) => {
+    setStatusFilter('')
+    setIssueFilter('')
+    setTypeFilter(type)
     setTab('list')
   }
 
@@ -117,7 +139,7 @@ const MonitoringDashboardPage = () => {
       {tab === 'dashboard' && (
         loading ? <LoadingState message="Loading kiosk statuses..." /> : (
           <>
-            <MonitoringDashboardTab stats={stats} onOpenList={openList} />
+            <MonitoringDashboardTab stats={scopedStats} typeScope={typeScope} onTypeScopeChange={setTypeScope} onOpenList={openList} onOpenType={openType} />
             <div className="text-muted small mt-3">
               {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString()}` : '—'}
             </div>
