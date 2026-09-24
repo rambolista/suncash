@@ -884,6 +884,17 @@ const ApiService = {
     return http.download(`/reports/money-transfer/export?${query}`)
   },
 
+  // Reports — Utility Billpay
+  getUtilityBillpayReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/utility-billpay${query ? `?${query}` : ''}`)
+  },
+  getUtilityBillpayBillers: () => http.get('/reports/utility-billpay/billers'),
+  exportUtilityBillpayReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/utility-billpay/export?${query}`)
+  },
+
   // Tools — Voucher Batch Generation
   getVoucherBatches: () =>
     http.get('/voucher-batch-generation'),

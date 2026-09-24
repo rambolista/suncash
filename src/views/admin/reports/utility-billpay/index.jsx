@@ -1,29 +1,32 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Button, Card, CardBody, Col, Form, Nav, Row, Spinner } from 'react-bootstrap'
+import { useEffect, useState } from 'react'
+import { Button, Card, CardBody, Col, Form, Row, Spinner } from 'react-bootstrap'
 import PageBreadcrumb from '@/components/PageBreadcrumb'
 import LoadingState from '@/components/LoadingState'
 import Icon from '@/components/wrappers/Icon'
-import Select from '@/components/wrappers/Select'
 import ApiService from '@/services/ApiService'
 import useCurrentUser from '@/hooks/useCurrentUser'
 import { getModulePermission } from '@/utils/modulePermissions'
 import { useNotificationContext } from '@/context/useNotificationContext'
 import { downloadBlob } from '@/utils/reportHelpers'
 import ReportTotalSummary from '../components/ReportTotalSummary'
-import MoneyTransferTable from './components/MoneyTransferTable'
+import UtilityBillpayTable from './components/UtilityBillpayTable'
 
-const MoneyTransferReportPage = () => {
+// toISOString() converts to UTC first, which can shift the calendar day — format from local fields instead.
+const today = () => {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+const UtilityBillpayReportPage = () => {
   const currentUser = useCurrentUser()
   const { showNotification } = useNotificationContext()
-  const canExport = Boolean(getModulePermission(currentUser, '/reports/money-transfer').can_export)
+  const canExport = Boolean(getModulePermission(currentUser, '/reports/utility-billpay').can_export)
 
-  const [reportType, setReportType] = useState('completed')
-  const [cashiers, setCashiers] = useState([])
-  const [from, setFrom] = useState('')
-  const [to, setTo] = useState('')
-  const [cashier, setCashier] = useState('')
-  const [searchInput, setSearchInput] = useState('')
-  const [search, setSearch] = useState('')
+  const [billers, setBillers] = useState([])
+  const [from, setFrom] = useState(today())
+  const [to, setTo] = useState(today())
+  const [biller, setBiller] = useState('')
+  const [source, setSource] = useState('ALL')
   const [page, setPage] = useState(1)
   const [rows, setRows] = useState([])
   const [pageInfo, setPageInfo] = useState({ current_page: 1, last_page: 1, total: 0 })
@@ -33,27 +36,16 @@ const MoneyTransferReportPage = () => {
   const [exporting, setExporting] = useState('')
 
   useEffect(() => {
-    ApiService.getMoneyTransferCashiers()
-      .then((data) => setCashiers(Array.isArray(data?.data) ? data.data : []))
-      .catch(() => setCashiers([]))
+    ApiService.getUtilityBillpayBillers()
+      .then((data) => setBillers(Array.isArray(data?.data) ? data.data : []))
+      .catch(() => setBillers([]))
   }, [])
 
-  const cashierOptions = useMemo(() => cashiers.map((c) => ({ value: c.id, label: c.legal_name })), [cashiers])
-
-  // Debounce the search box — the request only fires once typing pauses.
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setSearch(searchInput.trim())
-      setPage(1)
-    }, 400)
-    return () => clearTimeout(timeout)
-  }, [searchInput])
-
-  const filterParams = { type: reportType, from, to, cashier, search }
+  const filterParams = { from, to, biller, source }
 
   const load = () => {
     setLoading(true)
-    ApiService.getMoneyTransferReport({ ...filterParams, page })
+    ApiService.getUtilityBillpayReport({ ...filterParams, page })
       .then((data) => {
         setRows(Array.isArray(data?.data) ? data.data : [])
         setPageInfo({ current_page: data?.current_page || 1, last_page: data?.last_page || 1, total: data?.total || 0 })
@@ -63,22 +55,14 @@ const MoneyTransferReportPage = () => {
       .finally(() => { setLoading(false); setEverLoaded(true) })
   }
 
-  useEffect(() => { load() }, [reportType, from, to, cashier, search, page]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const switchReportType = (type) => {
-    if (!type || type === reportType) return
-    setReportType(type)
-    setPage(1)
-    setRows([]) // avoid rendering stale rows (wrong shape) against the new tab's columns
-    setSummary(null)
-  }
+  useEffect(() => { load() }, [from, to, biller, source, page]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const applyFilters = () => setPage(1)
 
   const handleExport = async (format) => {
     setExporting(format)
     try {
-      const { blob, filename } = await ApiService.exportMoneyTransferReport(filterParams, format)
+      const { blob, filename } = await ApiService.exportUtilityBillpayReport(filterParams, format)
       downloadBlob(blob, filename)
     } catch (err) {
       showNotification({ title: 'Failed', message: err?.message || `Failed to export ${format.toUpperCase()}.`, variant: 'danger' })
@@ -89,12 +73,7 @@ const MoneyTransferReportPage = () => {
 
   return (
     <>
-      <PageBreadcrumb title="Money Transfer" subtitle="Reports" />
-
-      <Nav variant="tabs" activeKey={reportType} onSelect={switchReportType} className="nav-bordered nav-bordered-primary mb-3">
-        <Nav.Item><Nav.Link eventKey="completed"><Icon icon="circle-check" className="me-1" />Completed</Nav.Link></Nav.Item>
-        <Nav.Item><Nav.Link eventKey="pending"><Icon icon="clock" className="me-1" />Pending</Nav.Link></Nav.Item>
-      </Nav>
+      <PageBreadcrumb title="Utility Billpay" subtitle="Reports" />
 
       <Card className="mb-3">
         <CardBody>
@@ -107,18 +86,21 @@ const MoneyTransferReportPage = () => {
               <Form.Label className="small text-muted mb-1">End Date</Form.Label>
               <Form.Control size="sm" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
             </Col>
-            <Col md={3}>
-              <Form.Label className="small text-muted mb-1">Cashier</Form.Label>
-              <Select
-                className="react-select"
-                classNamePrefix="react-select"
-                options={cashierOptions}
-                value={cashierOptions.find((o) => o.value === cashier) || null}
-                onChange={(option) => setCashier(option?.value ?? '')}
-                placeholder="Search cashier..."
-                isSearchable
-                isClearable
-              />
+            <Col md={2}>
+              <Form.Label className="small text-muted mb-1">Biller Code</Form.Label>
+              <Form.Select size="sm" value={biller} onChange={(e) => setBiller(e.target.value)}>
+                <option value="">ALL</option>
+                {billers.map((b) => <option key={b} value={b}>{b}</option>)}
+              </Form.Select>
+            </Col>
+            <Col md={2}>
+              <Form.Label className="small text-muted mb-1">Source</Form.Label>
+              <Form.Select size="sm" value={source} onChange={(e) => setSource(e.target.value)}>
+                <option value="ALL">ALL</option>
+                <option value="CustomerApp">CustomerApp</option>
+                <option value="Kiosk">Kiosk</option>
+                <option value="WebPOS">WebPOS</option>
+              </Form.Select>
             </Col>
             <Col md="auto">
               <Button size="sm" variant="primary" onClick={applyFilters}>
@@ -147,7 +129,7 @@ const MoneyTransferReportPage = () => {
             <>
               <div className="position-relative">
                 <div style={{ opacity: loading ? 0.4 : 1 }}>
-                  <MoneyTransferTable completed={reportType === 'completed'} data={rows} searchValue={searchInput} onSearchChange={setSearchInput} />
+                  <UtilityBillpayTable data={rows} />
                 </div>
                 {loading && (
                   <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
@@ -181,10 +163,7 @@ const MoneyTransferReportPage = () => {
         <ReportTotalSummary
           lines={[
             { label: 'Total Transaction Count', value: summary.transaction_count.toLocaleString() },
-            ...summary.amounts.map((a) => ({
-              label: `Total Amount (${a.currency})`,
-              value: a.total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-            })),
+            { label: 'Total Principle Amount', value: summary.transaction_amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
           ]}
         />
       )}
@@ -192,4 +171,4 @@ const MoneyTransferReportPage = () => {
   )
 }
 
-export default MoneyTransferReportPage
+export default UtilityBillpayReportPage

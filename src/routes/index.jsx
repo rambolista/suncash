@@ -290,6 +290,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/reports/money-transfer')),
       },
       {
+        path: '/reports/utility-billpay',
+        Component: lazy(() => import('@/views/admin/reports/utility-billpay')),
+      },
+      {
         path: '/tools/transaction-fees',
         Component: lazy(() => import('@/views/admin/tools/transaction-fees')),
       },
