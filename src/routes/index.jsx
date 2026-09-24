@@ -338,6 +338,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/billers-setup')),
       },
       {
+        path: '/tools/sms-logs',
+        Component: lazy(() => import('@/views/admin/tools/sms-logs')),
+      },
+      {
         path: '/tools/forex-rate',
         Component: lazy(() => import('@/views/admin/tools/forex-rate')),
       },

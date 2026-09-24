@@ -949,6 +949,17 @@ const ApiService = {
   saveBillersSetup: (selectedIds) =>
     http.post('/billers-setup', { selected_ids: selectedIds }),
 
+  // Tools — SMS Logs
+  getSmsLogs: (dateFrom, dateTo, search, page) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo, search: search || '', page }).toString()
+    return http.get(`/sms-logs?${query}`)
+  },
+
+  exportSmsLogs: (dateFrom, dateTo, search, format) => {
+    const query = new URLSearchParams({ date_from: dateFrom, date_to: dateTo, search: search || '', format }).toString()
+    return http.download(`/sms-logs/export?${query}`)
+  },
+
   // Business Billpay
   getBusinessBillpay: () =>
     http.get('/business-billpay'),
