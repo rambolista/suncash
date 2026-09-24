@@ -15,6 +15,7 @@ import CashExposureReportTab from './cash-exposure-report'
 import PartnerSettlementReportTab from './partner-settlement-report'
 import VoucherAccessReportTab from './voucher-access-report'
 import CommissionApprovalReportTab from './commission-approval-report'
+import CreditVoucherReportTab from './credit-voucher-report'
 
 const TAB_COMPONENTS = {
   zout: ZoutReportsPage,
@@ -28,6 +29,7 @@ const TAB_COMPONENTS = {
   partner_settlement: PartnerSettlementReportTab,
   voucher_access: VoucherAccessReportTab,
   commission_approval: CommissionApprovalReportTab,
+  credit_voucher: CreditVoucherReportTab,
 }
 
 const KioskReportsPage = () => {

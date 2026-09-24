@@ -1538,6 +1538,23 @@ const ApiService = {
     return http.download(`/kiosk-commission-approval-reports/export?${query}`)
   },
 
+  // Kiosk — Credit Voucher Report
+  getKioskCreditVoucherReport: (filters) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))
+    ).toString()
+    return http.get(`/kiosk-credit-voucher-reports${query ? `?${query}` : ''}`)
+  },
+  getKioskCreditVoucherReportTerminals: (branchId) => http.get(`/kiosk-credit-voucher-reports/terminals?branch_id=${branchId}`),
+  exportKioskCreditVoucherReport: (filters, format) => {
+    const query = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== '')
+      )
+    ).toString()
+    return http.download(`/kiosk-credit-voucher-reports/export?${query}`)
+  },
+
   // Tools — Transaction Fees / Transaction Limits
   getTransactionFees: () => http.get('/transaction-fees'),
   updateTransactionFee: (id, amount) => http.put(`/transaction-fees/${id}`, { amount }),
@@ -1630,6 +1647,24 @@ const ApiService = {
   exportCustomerDebitCreditTransactions: (id, format, from, to) => {
     const query = new URLSearchParams({ format, ...(from && to ? { from, to } : {}) }).toString()
     return http.download(`/customer-debit-credit/${id}/transactions/export?${query}`)
+  },
+
+  // Tools — Payment Management
+  getPaymentManagement: (filters) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/payment-management${query ? `?${query}` : ''}`)
+  },
+  getPaymentManagementDashboard: (dateFrom, dateTo) => http.get(`/payment-management/dashboard?date_from=${dateFrom}&date_to=${dateTo}`),
+  getPaymentManagementDetail: (id) => http.get(`/payment-management/${id}`),
+  addPaymentManagement: (data) => http.post('/payment-management', data),
+  updatePaymentManagement: (id, data) => http.put(`/payment-management/${id}`, data),
+  updatePaymentManagementStatus: (id, action, reason) => http.post(`/payment-management/${id}/status`, { action, reason }),
+  clonePaymentManagementDraft: (id) => http.post(`/payment-management/${id}/clone-draft`),
+  getPaymentManagementHistory: (id) => http.get(`/payment-management/${id}/history`),
+  exportPaymentManagementHistory: (id, format) => http.download(`/payment-management/${id}/history/export?format=${format}`),
+  exportPaymentManagement: (filters, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...filters, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/payment-management/export?${query}`)
   },
 
   // Tools — SMS Responses
