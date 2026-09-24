@@ -218,7 +218,13 @@ const useMenuItems = () => {
   const isCustomerRoute = location.pathname === '/customer' || location.pathname.startsWith('/customer/')
   const [menuItems, setMenuItems] = useState([])
   const [accessibleMenuUrls, setAccessibleMenuUrls] = useState([])
-  const [flatMenus, setFlatMenus] = useState([])
+  // Lazily hydrate from the shared catalog cache so a component that remounts on every
+  // navigation (e.g. PageBreadcrumb) doesn't flash empty while Sidenav's own already-warm
+  // fetch gets re-awaited — only a genuinely cold cache should start out empty.
+  const [flatMenus, setFlatMenus] = useState(() => {
+    const cached = menuCatalogCache[isCustomerRoute ? 'customer' : 'admin'].data
+    return Array.isArray(cached) ? cached.filter((menu) => Boolean(menu.is_active)) : []
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
