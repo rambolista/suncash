@@ -27,7 +27,7 @@ const CustomerManagementPage = () => {
   const modulePermission = useMemo(() => getModulePermission(currentUser, '/tools/customer-management'), [currentUser])
 
   const [advanced, setAdvanced] = useState(false)
-  const [quickField, setQuickField] = useState(FIELD_OPTIONS[0].value)
+  const [quickField, setQuickField] = useState('mobile_number')
   const [quickValue, setQuickValue] = useState('')
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
