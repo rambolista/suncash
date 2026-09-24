@@ -13,21 +13,40 @@ DataTable.use(DT)
 const textCol = (key) => ({ data: key, render: (value) => escapeHtml(value || '—') })
 const dateCol = (key) => ({ data: key, render: (value, type) => (type === 'display' ? formatDateTime(value) : value || '') })
 
+/** legacy's textStatusClass() — same status-ok/status-warning/status-error/status-grey buckets, for the Paper/Acceptor/Dispenser text columns. */
+const TEXT_STATUS_VARIANT = {
+  ok: 'success', idle: 'success',
+  warning: 'warning', 'paper low': 'warning',
+  low: 'danger', high: 'danger', full: 'danger', 'hardware issue': 'danger', jammed: 'danger', jam: 'danger',
+  'cover open': 'danger', spooling: 'danger', 'not found or monitoring': 'danger', 'drag paper motor on': 'danger',
+  'n/a': 'secondary',
+}
+
+const badgeHtml = (variant, label) => `<span class="badge bg-${variant}-subtle text-${variant} badge-label">${escapeHtml(label)}</span>`
+
 const componentBadgeHtml = (value) => {
   if (!value) return '<span class="text-muted">—</span>'
-  const variant = value === 'OK' ? 'success' : 'danger'
-  return `<span class="badge bg-${variant}-subtle text-${variant} badge-label">${escapeHtml(value)}</span>`
+  const variant = TEXT_STATUS_VARIANT[String(value).toLowerCase()] ?? 'danger'
+  return badgeHtml(variant, value)
 }
 
-const cashMgmtHtml = (value) => {
+/** legacy's cashLevelStatusClass() bucket, already resolved server-side into acceptor_level/dispenser_level. */
+const CASH_LEVEL_VARIANT = { ok: 'success', warning: 'warning', full: 'danger', critical: 'danger', na: 'secondary' }
+
+const cashLevelHtml = (value, level) => {
+  if (value === null || value === undefined) return '<span class="text-muted">N/A</span>'
+  return badgeHtml(CASH_LEVEL_VARIANT[level] ?? 'secondary', money(value))
+}
+
+/** Reserve Cash is legacy's one hardcoded-green column (`cash_reserve_class status-ok`) — never colored by value. */
+const reserveCashHtml = (value) => `<span class="badge bg-success-subtle text-success badge-label">${escapeHtml(money(value))}</span>`
+
+const cashMgmtHtml = (value, row) => {
   if (!value) return '<span class="text-muted">—</span>'
-  const variant = value === 'OK' ? 'success' : 'danger'
-  return `<span class="badge bg-${variant}-subtle text-${variant} badge-label">${escapeHtml(value)}</span>`
-}
-
-const moneyOrNa = (value, type) => {
-  if (value === null || value === undefined) return type === 'display' ? '<span class="text-muted">N/A</span>' : ''
-  return type === 'display' ? money(value) : value
+  const variant = row.acceptor_level === 'full' || row.dispenser_level === 'critical'
+    ? 'danger'
+    : (row.acceptor_level === 'warning' || row.dispenser_level === 'warning' ? 'warning' : 'success')
+  return badgeHtml(variant, value)
 }
 
 const machineCol = {
@@ -59,10 +78,10 @@ const columns = [
   { data: 'paper', render: (value, type) => (type === 'display' ? componentBadgeHtml(value) : value || '') },
   { data: 'acceptor', render: (value, type) => (type === 'display' ? componentBadgeHtml(value) : value || '') },
   { data: 'dispenser', render: (value, type) => (type === 'display' ? componentBadgeHtml(value) : value || '') },
-  { data: 'cash_reserve', render: (value, type) => (type === 'display' ? money(value) : value) },
-  { data: 'acceptor_cash', render: (value, type) => (type === 'display' ? money(value) : value) },
-  { data: 'dispenser_cash', render: moneyOrNa },
-  { data: 'cash_mgmt', render: (value, type) => (type === 'display' ? cashMgmtHtml(value) : value || '') },
+  { data: 'cash_reserve', render: (value, type) => (type === 'display' ? reserveCashHtml(value) : value) },
+  { data: 'acceptor_cash', render: (value, type, row) => (type === 'display' ? cashLevelHtml(value, row.acceptor_level) : value) },
+  { data: 'dispenser_cash', render: (value, type, row) => (type === 'display' ? cashLevelHtml(value, row.dispenser_level) : (value ?? '')) },
+  { data: 'cash_mgmt', render: (value, type, row) => (type === 'display' ? cashMgmtHtml(value, row) : value || '') },
   dateCol('last_seen'),
   textCol('updated_by'),
   {
