@@ -354,6 +354,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/customer-management')),
       },
       {
+        path: '/tools/customer-debit-credit',
+        Component: lazy(() => import('@/views/admin/tools/customer-debit-credit')),
+      },
+      {
         path: '/tools/sms-responses',
         Component: lazy(() => import('@/views/admin/tools/sms-responses')),
       },

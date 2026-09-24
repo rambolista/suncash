@@ -1596,6 +1596,20 @@ const ApiService = {
   updateCustomerManagementPromoStatus: (id, isActive) => http.post(`/customer-management/${id}/promo-status`, { is_active: isActive }),
   sendCustomerManagementPushNotification: (id, type) => http.post(`/customer-management/${id}/push-notification`, { type }),
 
+  // Tools — Customer Debit/Credit
+  searchCustomerDebitCredit: (filters) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(filters || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/customer-debit-credit/search${query ? `?${query}` : ''}`)
+  },
+  getCustomerDebitCreditDetail: (id) => http.get(`/customer-debit-credit/${id}`),
+  getDebitCreditTransactionTypes: (orientation) => http.get(`/customer-debit-credit/transaction-types?orientation=${orientation}`),
+  processDebitCredit: (id, data) => http.post(`/customer-debit-credit/${id}/process`, data),
+  getCustomerDebitCreditTransactions: (id, from, to) => http.get(`/customer-debit-credit/${id}/transactions?from=${from}&to=${to}`),
+  exportCustomerDebitCreditTransactions: (id, format, from, to) => {
+    const query = new URLSearchParams({ format, ...(from && to ? { from, to } : {}) }).toString()
+    return http.download(`/customer-debit-credit/${id}/transactions/export?${query}`)
+  },
+
   // Tools — SMS Responses
   getSmsResponseMerchants: () => http.get('/sms-responses/merchants'),
   getSmsResponses: (merchantId) => http.get(`/sms-responses?merchant_id=${merchantId}`),
