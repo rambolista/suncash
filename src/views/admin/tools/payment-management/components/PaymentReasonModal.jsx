@@ -49,7 +49,7 @@ const PaymentReasonModal = ({ show, onHide, title, prompt, confirmLabel, confirm
         </Form.Group>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide} disabled={submitting}>Cancel</Button>
+        <Button variant="secondary" onClick={onHide} disabled={submitting}>Close</Button>
         <Button variant={confirmVariant} onClick={handleConfirm} disabled={submitting}>
           {submitting ? 'Please wait...' : confirmLabel}
         </Button>
