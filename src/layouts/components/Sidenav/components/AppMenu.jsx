@@ -1,10 +1,15 @@
 import Icon from '@/components/wrappers/Icon'
-import useMenuItems from '@/hooks/useMenuItems'
+import useFavorites from '@/hooks/useFavorites'
+import useMenuItems, { buildTree, normalizeMenuPath } from '@/hooks/useMenuItems'
 import { scrollToElement } from '@/utils/layout'
 import clsx from 'clsx'
-import { Fragment, useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import { Collapse } from 'react-bootstrap'
 import { Link, useLocation } from 'react-router'
+
+// Past this many favorites, list them under a single collapsible "Favorites" menu instead of flat at the top.
+const FAVORITES_SUBMENU_THRESHOLD = 4
+
 const MenuItemWithChildren = ({ item, openMenuKey, setOpenMenuKey, level = 0 }) => {
   const pathname = useLocation().pathname
   const isTopLevel = level === 0
@@ -112,7 +117,18 @@ const MenuSkeleton = () => (
 
 const AppMenu = () => {
   const [openMenuKey, setOpenMenuKey] = useState(null)
-  const { menuItems, loading } = useMenuItems()
+  const { menuItems, flatMenus, accessibleMenuUrls, loading } = useMenuItems()
+  const { favoriteIds } = useFavorites()
+
+  const favoriteItems = useMemo(() => {
+    const accessible = new Set(accessibleMenuUrls)
+    const favorites = flatMenus.filter((menu) => favoriteIds.has(menu.id) && accessible.has(normalizeMenuPath(menu.url)))
+
+    return buildTree(favorites.map((menu) => ({ ...menu, parent_id: null })))
+  }, [flatMenus, favoriteIds, accessibleMenuUrls])
+
+  const favoritesMenuItem = useMemo(() => ({ slug: 'favorites', label: 'Favorites', icon: 'star', children: favoriteItems }), [favoriteItems])
+
   const scrollToActiveLink = () => {
     const activeItem = document.querySelector('.side-nav-link.active')
     if (activeItem) {
@@ -130,6 +146,16 @@ const AppMenu = () => {
     <MenuSkeleton />
   ) : (
     <ul className="side-nav">
+      {favoriteItems.length > 0 && (
+        favoriteItems.length > FAVORITES_SUBMENU_THRESHOLD ? (
+          <MenuItemWithChildren item={favoritesMenuItem} openMenuKey={openMenuKey} setOpenMenuKey={setOpenMenuKey} />
+        ) : (
+          <Fragment>
+            <li className="side-nav-title mt-2">Favorites</li>
+            {favoriteItems.map((item) => <MenuItem key={`favorite-${item.slug}`} item={item} />)}
+          </Fragment>
+        )
+      )}
       {menuItems.map((item, idx) => (
         <Fragment key={idx}>
           {item.isTitle && <li className="side-nav-title mt-2">{item.label}</li>}

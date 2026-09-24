@@ -277,6 +277,16 @@ const ApiService = {
   getCustomerMenus: () =>
     http.get('/customer-menus'),
 
+  // ── Favorites ──────────────────────────────────────────────────────────────
+
+  /** Ids of the current user's favorited menus. */
+  getFavorites: () =>
+    http.get('/favorites'),
+
+  /** Toggle favorite state for a menu, returns { is_favorite }. */
+  toggleFavorite: (menuId) =>
+    http.post(`/favorites/${menuId}/toggle`),
+
   getAllCustomerMenus: () =>
     http.get('/access-management/customer-menus?all=1'),
 

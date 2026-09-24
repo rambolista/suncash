@@ -151,6 +151,25 @@ const filterTreeByAccess = (nodes = [], accessibleMenuIds = []) => {
   return nodes.map(visit).filter(Boolean)
 }
 
+/**
+ * Which menu a given pathname belongs to — exact url match first, else the
+ * longest menu url that's a prefix of the path (same rule AppMenu already
+ * uses for active-state highlighting), so a detail/sub-route like
+ * .../archive/123 still resolves back to its parent list menu.
+ */
+const findMenuByPath = (flatMenus = [], pathname) => {
+  const normalizedPath = normalizeMenuPath(pathname)
+  if (!normalizedPath) return null
+
+  const candidates = flatMenus.filter((menu) => !menu.is_title && normalizeMenuPath(menu.url))
+  const exact = candidates.find((menu) => normalizeMenuPath(menu.url) === normalizedPath)
+  if (exact) return exact
+
+  return candidates
+    .filter((menu) => normalizedPath.startsWith(normalizeMenuPath(menu.url)))
+    .sort((a, b) => b.url.length - a.url.length)[0] ?? null
+}
+
 const findFirstMenuUrl = (nodes = []) => {
   for (const node of nodes) {
     if (node.url) {
@@ -199,6 +218,7 @@ const useMenuItems = () => {
   const isCustomerRoute = location.pathname === '/customer' || location.pathname.startsWith('/customer/')
   const [menuItems, setMenuItems] = useState([])
   const [accessibleMenuUrls, setAccessibleMenuUrls] = useState([])
+  const [flatMenus, setFlatMenus] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -231,6 +251,8 @@ const useMenuItems = () => {
         const flatMenuList = Array.isArray(flatMenus)
           ? flatMenus.filter((menu) => Boolean(menu.is_active))
           : []
+
+        setFlatMenus(flatMenuList)
 
         // Prefer the freshly fetched user; fall back to the one in session storage
         if (isCustomerRoute) {
@@ -277,8 +299,8 @@ const useMenuItems = () => {
     }
   }, [isCustomerRoute])
 
-  return { menuItems, accessibleMenuUrls, loading, error, setMenuItems }
+  return { menuItems, accessibleMenuUrls, flatMenus, loading, error, setMenuItems }
 }
 
-export { buildTree, filterTreeByAccess, findFirstMenuUrl, getAccessibleMenuIds, getAccessibleMenuUrls, normalizeMenuPath, resolveFirstAccessibleMenuUrl }
+export { buildTree, filterTreeByAccess, findFirstMenuUrl, findMenuByPath, getAccessibleMenuIds, getAccessibleMenuUrls, normalizeMenuPath, resolveFirstAccessibleMenuUrl }
 export default useMenuItems
