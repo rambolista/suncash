@@ -286,6 +286,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/settings/wu')),
       },
       {
+        path: '/reports/money-transfer',
+        Component: lazy(() => import('@/views/admin/reports/money-transfer')),
+      },
+      {
         path: '/tools/transaction-fees',
         Component: lazy(() => import('@/views/admin/tools/transaction-fees')),
       },

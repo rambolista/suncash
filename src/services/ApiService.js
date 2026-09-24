@@ -873,6 +873,17 @@ const ApiService = {
     return http.download(`/merchant-settlements/export?${query}`)
   },
 
+  // Reports — Money Transfer
+  getMoneyTransferReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/money-transfer${query ? `?${query}` : ''}`)
+  },
+  getMoneyTransferCashiers: () => http.get('/reports/money-transfer/cashiers'),
+  exportMoneyTransferReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/money-transfer/export?${query}`)
+  },
+
   // Tools — Voucher Batch Generation
   getVoucherBatches: () =>
     http.get('/voucher-batch-generation'),
