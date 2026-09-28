@@ -58,6 +58,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/apps/access-management/users')),
       },
       {
+        path: '/apps/access-management/general-settings',
+        Component: lazy(() => import('@/views/admin/apps/access-management/general-settings')),
+      },
+      {
         path: '/apps/customers',
         Component: lazy(() => import('@/views/admin/apps/customers')),
       },

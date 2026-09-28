@@ -108,6 +108,14 @@ class HttpService {
       throw { status: 401, message: json?.message ?? 'Unauthorized', ...json }
     }
 
+    // Mandatory 2FA setup (Access Management > General Settings) wasn't
+    // completed and the caller tried some other endpoint directly (e.g. a
+    // stale tab, or navigating straight to a dashboard URL) — the backend
+    // blocks it; send them to the setup page rather than surfacing a raw 403.
+    if (response.status === 403 && json?.two_factor_setup_required && !window.location.pathname.startsWith('/auth/two-factor')) {
+      window.location.href = '/auth/two-factor?mandatory=1'
+    }
+
     if (!response.ok) {
       throw { status: response.status, ...json }
     }

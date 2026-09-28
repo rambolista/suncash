@@ -26,6 +26,14 @@ export const useAuth = () => {
       return
     }
 
+    // Access Management > General Settings > Mandatory Two-Factor
+    // Authentication — sent here instead of the dashboard until they set it up.
+    if (data.two_factor_setup_required) {
+      clearTwoFactorChallenge()
+      navigate('/auth/two-factor?mandatory=1', { replace: true })
+      return
+    }
+
     const redirectPath = await resolveFirstAccessibleMenuUrl(nextUser)
     clearTwoFactorChallenge()
     navigate(redirectPath, { replace: true })

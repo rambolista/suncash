@@ -8,7 +8,7 @@ import { getStoredCurrentUser } from '@/utils/currentUser'
 import { getTwoFactorChallenge } from '@/utils/twoFactorChallenge'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Form, Spinner } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import QRCode from 'qrcode'
 
 const emptyCode = () => Array(6).fill('')
@@ -17,7 +17,9 @@ const errorMessage = (error, field) =>
 
 const TwoFactorForm = () => {
   const navigate = useNavigate()
-  const { verifyTwoFactor, loading: verifying, error: verificationError } = useAuth()
+  const [searchParams] = useSearchParams()
+  const mandatory = searchParams.get('mandatory') === '1'
+  const { verifyTwoFactor, logout, loading: verifying, error: verificationError } = useAuth()
   const { showNotification } = useNotificationContext()
   const loginChallenge = getTwoFactorChallenge()
   const authenticated = Boolean(getToken())
@@ -194,8 +196,8 @@ const TwoFactorForm = () => {
             {submitting ? 'Confirming...' : 'Enable Two-Factor Authentication'}
           </Button>
           <Button variant="link" type="button" onClick={() => setSetup(null)}>Cancel</Button>
-          <Button variant="outline-secondary" type="button" onClick={goToApplication}>
-            Back to Application
+          <Button variant="outline-secondary" type="button" onClick={mandatory ? logout : goToApplication}>
+            {mandatory ? 'Log Out' : 'Back to Application'}
           </Button>
         </div>
       </Form>
@@ -226,6 +228,11 @@ const TwoFactorForm = () => {
 
   return (
     <Form onSubmit={handleSetup}>
+      {mandatory && (
+        <Alert variant="warning">
+          Your administrator requires two-factor authentication for all accounts. Set it up below to continue.
+        </Alert>
+      )}
       <Form.Group className="mb-3">
         <Form.Label>Verification method</Form.Label>
         <Form.Select value={method} onChange={(event) => setMethod(event.target.value)}>
@@ -241,8 +248,8 @@ const TwoFactorForm = () => {
         <Button type="submit" disabled={submitting}>
           {submitting ? 'Starting setup...' : 'Set Up Two-Factor Authentication'}
         </Button>
-        <Button variant="outline-secondary" type="button" onClick={goToApplication}>
-          Back to Application
+        <Button variant="outline-secondary" type="button" onClick={mandatory ? logout : goToApplication}>
+          {mandatory ? 'Log Out' : 'Back to Application'}
         </Button>
       </div>
     </Form>

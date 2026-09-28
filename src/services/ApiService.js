@@ -264,6 +264,12 @@ const ApiService = {
   updateAvatar: (formData) =>
     http.post('/user/avatar', formData, true),
 
+  // ── Access Management — General Settings ────────────────────────────────────
+  getGeneralSettings: () =>
+    http.get('/general-settings'),
+  updateGeneralSettings: (mandatory2fa) =>
+    http.put('/general-settings', { mandatory_2fa: mandatory2fa }),
+
   // ── Access Management — Menus ─────────────────────────────────────────────
 
   /** Fetch all menu items (flat list, ordered by sort_order). */
