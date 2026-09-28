@@ -48,7 +48,7 @@ const GeneralSettingsPage = () => {
             <>
               <h5 className="mb-1">Mandatory Two-Factor Authentication</h5>
               <p className="text-muted mb-3">
-                When on, every admin without two-factor authentication is required to set it up immediately after login before they can use the app.
+                When on, every user without two-factor authentication is required to set it up immediately after login before they can use the web app.
               </p>
               <Form.Check
                 type="switch"
