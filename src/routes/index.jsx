@@ -350,6 +350,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/wu-blacklist')),
       },
       {
+        path: '/tools/card-blacklist',
+        Component: lazy(() => import('@/views/admin/tools/card-blacklist')),
+      },
+      {
         path: '/tools/feature-release',
         Component: lazy(() => import('@/views/admin/tools/feature-release')),
       },

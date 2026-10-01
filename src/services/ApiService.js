@@ -987,6 +987,14 @@ const ApiService = {
   inactivateWuBlacklist: (id) => http.post(`/wu-blacklist/${id}/inactivate`),
   exportWuBlacklist: (format) => http.download(`/wu-blacklist/export?format=${format}`),
 
+  // Tools — Card Blacklist
+  getCardBlacklist: () => http.get('/card-blacklist'),
+  createCardBlacklist: (data) => http.post('/card-blacklist', data),
+  updateCardBlacklist: (id, data) => http.put(`/card-blacklist/${id}`, data),
+  activateCardBlacklist: (id) => http.post(`/card-blacklist/${id}/activate`),
+  inactivateCardBlacklist: (id) => http.post(`/card-blacklist/${id}/inactivate`),
+  exportCardBlacklist: (format) => http.download(`/card-blacklist/export?format=${format}`),
+
   // Tools — Feature Release Management
   getFeatureReleaseIslands: () =>
     http.get('/feature-release/islands'),
