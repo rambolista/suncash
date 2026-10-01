@@ -386,6 +386,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/bank-accounts')),
       },
       {
+        path: '/tools/sanddollar-activation',
+        Component: lazy(() => import('@/views/admin/tools/sanddollar-activation')),
+      },
+      {
         path: '/promotions/ticket-reports',
         Component: lazy(() => import('@/views/admin/promotions/ticket-reports')),
       },

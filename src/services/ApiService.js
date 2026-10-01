@@ -1691,6 +1691,11 @@ const ApiService = {
   createBankAccount: (data) => http.post('/bank-accounts', data),
   updateBankAccount: (id, data) => http.put(`/bank-accounts/${id}`, data),
 
+  // Tools — Sanddollar Activation
+  getSanddollarMerchants: () => http.get('/sanddollar-activation/merchants'),
+  getSanddollarAccounts: () => http.get('/sanddollar-activation'),
+  activateSanddollarAccount: (data) => http.post('/sanddollar-activation', data),
+
   // Administration — User Activity
   getUserActivity: (filters = {}) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(filters).filter(([, v]) => v !== '' && v != null))).toString()
