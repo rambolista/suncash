@@ -116,7 +116,7 @@ const PromoItemModal = ({ show, onHide, item, onSaved }) => {
           <Col md={12}>
             <Form.Group>
               <Form.Label>Item Description *</Form.Label>
-              <Form.Control value={values.item_description} onChange={(e) => set('item_description', e.target.value)} isInvalid={!!errors.item_description} />
+              <Form.Control value={values.item_description} onChange={(e) => set('item_description', e.target.value)} isInvalid={!!errors.item_description} maxLength={255} />
               <Form.Control.Feedback type="invalid">{errors.item_description}</Form.Control.Feedback>
             </Form.Group>
           </Col>
