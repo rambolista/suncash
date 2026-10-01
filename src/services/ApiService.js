@@ -995,6 +995,11 @@ const ApiService = {
   inactivateCardBlacklist: (id) => http.post(`/card-blacklist/${id}/inactivate`),
   exportCardBlacklist: (format) => http.download(`/card-blacklist/export?format=${format}`),
 
+  // Tools — Instant Winners
+  getInstantWinners: () => http.get('/instant-winners'),
+  addInstantWinner: (data) => http.post('/instant-winners', data),
+  exportInstantWinners: (format) => http.download(`/instant-winners/export?format=${format}`),
+
   // Tools — Feature Release Management
   getFeatureReleaseIslands: () =>
     http.get('/feature-release/islands'),

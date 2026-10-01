@@ -354,6 +354,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/card-blacklist')),
       },
       {
+        path: '/tools/instant-winners',
+        Component: lazy(() => import('@/views/admin/tools/instant-winners')),
+      },
+      {
         path: '/tools/feature-release',
         Component: lazy(() => import('@/views/admin/tools/feature-release')),
       },
