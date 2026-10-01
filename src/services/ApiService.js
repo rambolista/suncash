@@ -980,6 +980,13 @@ const ApiService = {
 
   deleteCustomerDeviceUuid: (id) => http.delete(`/customer-device-uuid/${id}`),
 
+  // Tools — WU Blacklist
+  getWuBlacklist: () => http.get('/wu-blacklist'),
+  addWuBlacklist: (name) => http.post('/wu-blacklist', { name }),
+  activateWuBlacklist: (id) => http.post(`/wu-blacklist/${id}/activate`),
+  inactivateWuBlacklist: (id) => http.post(`/wu-blacklist/${id}/inactivate`),
+  exportWuBlacklist: (format) => http.download(`/wu-blacklist/export?format=${format}`),
+
   // Tools — Feature Release Management
   getFeatureReleaseIslands: () =>
     http.get('/feature-release/islands'),

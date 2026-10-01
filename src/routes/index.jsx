@@ -346,6 +346,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/customer-device-uuid')),
       },
       {
+        path: '/tools/wu-blacklist',
+        Component: lazy(() => import('@/views/admin/tools/wu-blacklist')),
+      },
+      {
         path: '/tools/feature-release',
         Component: lazy(() => import('@/views/admin/tools/feature-release')),
       },
