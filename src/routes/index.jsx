@@ -342,6 +342,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/tools/card-logs')),
       },
       {
+        path: '/tools/customer-device-uuid',
+        Component: lazy(() => import('@/views/admin/tools/customer-device-uuid')),
+      },
+      {
         path: '/tools/feature-release',
         Component: lazy(() => import('@/views/admin/tools/feature-release')),
       },

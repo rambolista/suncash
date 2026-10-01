@@ -967,6 +967,19 @@ const ApiService = {
     return http.download(`/card-logs/export?${query}`)
   },
 
+  // Tools — Customer Device UUID
+  getCustomerDeviceUuids: (dateFrom, dateTo) => {
+    const query = new URLSearchParams({ ...(dateFrom ? { date_from: dateFrom } : {}), ...(dateTo ? { date_to: dateTo } : {}) }).toString()
+    return http.get(`/customer-device-uuid?${query}`)
+  },
+
+  exportCustomerDeviceUuids: (dateFrom, dateTo, format) => {
+    const query = new URLSearchParams({ ...(dateFrom ? { date_from: dateFrom } : {}), ...(dateTo ? { date_to: dateTo } : {}), format }).toString()
+    return http.download(`/customer-device-uuid/export?${query}`)
+  },
+
+  deleteCustomerDeviceUuid: (id) => http.delete(`/customer-device-uuid/${id}`),
+
   // Tools — Feature Release Management
   getFeatureReleaseIslands: () =>
     http.get('/feature-release/islands'),
