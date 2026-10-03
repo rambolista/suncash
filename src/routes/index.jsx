@@ -454,6 +454,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/promotions/settings')),
       },
       {
+        path: '/promotions/ticket-settings',
+        Component: lazy(() => import('@/views/admin/promotions/ticket-settings')),
+      },
+      {
         path: '/promotions/signup',
         Component: lazy(() => import('@/views/admin/promotions/signup')),
       },

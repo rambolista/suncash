@@ -636,6 +636,18 @@ const ApiService = {
   deleteCashPromoSetting: (id) =>
     http.delete(`/promotions/cash-promos/${id}`),
 
+  getTicketPromoSettings: () =>
+    http.get('/promotions/ticket-settings'),
+
+  createTicketPromoSetting: (data) =>
+    http.post('/promotions/ticket-settings', data),
+
+  updateTicketPromoSetting: (id, data) =>
+    http.put(`/promotions/ticket-settings/${id}`, data),
+
+  deleteTicketPromoSetting: (id) =>
+    http.delete(`/promotions/ticket-settings/${id}`),
+
   getPromoItems: () =>
     http.get('/promotions/promo-items'),
 
@@ -924,6 +936,17 @@ const ApiService = {
     return http.download(`/reports/voucher/export?${query}`)
   },
 
+  // Reports — Mobile Top Up
+  getMobileTopupReportOptions: () => http.get('/reports/mobile-topup/options'),
+  getMobileTopupReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/mobile-topup${query ? `?${query}` : ''}`)
+  },
+  exportMobileTopupReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/mobile-topup/export?${query}`)
+  },
+
   // Reports — Void
   getVoidReportOptions: () => http.get('/reports/void/options'),
   getVoidReport: (tab, params) => {
@@ -936,17 +959,6 @@ const ApiService = {
   },
 
   // Reports — Cash Management
-  // Reports — Mobile Top Up
-  getMobileTopupReportOptions: () => http.get('/reports/mobile-topup/options'),
-  getMobileTopupReport: (params) => {
-    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
-    return http.get(`/reports/mobile-topup${query ? `?${query}` : ''}`)
-  },
-  exportMobileTopupReport: (params, format) => {
-    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
-    return http.download(`/reports/mobile-topup/export?${query}`)
-  },
-
   getCashManagementReport: (tab, params) => {
     const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
     return http.get(`/reports/cash-management/${tab}${query ? `?${query}` : ''}`)
