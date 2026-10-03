@@ -11,7 +11,7 @@ import { escapeHtml } from '@/utils/reportHelpers'
 DataTable.use(DT)
 
 // Values arrive display-formatted ("1,234.50", "10.00 BSD"): sort on the number, show the text.
-const NUMERIC = ['balance', 'amount', 'fee', 'count']
+const NUMERIC = ['balance', 'amount', 'fee', 'count', 'vat', 'total', 'sales', 'commission', 'transaction_count']
 const toNumber = (value) => parseFloat(String(value).replace(/[^0-9.-]/g, '')) || 0
 
 const NO_IMAGE = '<span class="d-inline-flex align-items-center justify-content-center bg-body-secondary text-muted rounded small" style="width:100px;height:100px">No image</span>'

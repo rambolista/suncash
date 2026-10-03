@@ -61,6 +61,17 @@ const UserClientReportTab = ({ tabKey, label, canExport, options = {}, config = 
   useEffect(() => { load(initial, false) }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }))
+
+  // A select can narrow another one (`dependent: { key, load(value) -> options }`, e.g. Merchant -> its Branches);
+  // clearing it leaves the other list as it is, as legacy did.
+  const [narrowed, setNarrowed] = useState({})
+  const change = (s, value) => {
+    set(s.key, value)
+    if (!s.dependent || value === '') return
+    s.dependent.load(value)
+      .then((list) => { setNarrowed((n) => ({ ...n, [s.dependent.key]: list })); set(s.dependent.key, '') })
+      .catch((err) => showNotification({ title: 'Failed', message: err?.message || 'Failed to load the list.', variant: 'danger' }))
+  }
   const apply = () => {
     if (cfg.requireDates && (!form.from || !form.to)) return showNotification({ title: 'Missing dates', message: 'Please fill up date from and date to.', variant: 'warning' })
     if (cfg.requireDates && form.from > form.to) return showNotification({ title: 'Invalid dates', message: 'End date should be greater than Start date.', variant: 'warning' })
@@ -113,9 +124,9 @@ const UserClientReportTab = ({ tabKey, label, canExport, options = {}, config = 
           {selects.map((s) => (
             <Col md={2} key={s.key}>
               <Form.Label className="small text-muted mb-1">{s.label}</Form.Label>
-              <Form.Select size="sm" value={form[s.key]} onChange={(e) => set(s.key, e.target.value)}>
+              <Form.Select size="sm" value={form[s.key]} onChange={(e) => change(s, e.target.value)}>
                 {!s.noEmpty && <option value="">{s.placeholder}</option>}
-                {(options[s.options] || []).filter((o) => o !== null && o !== '').map(toOption).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                {(narrowed[s.key] || options[s.options] || []).filter((o) => o !== null && o !== '').map(toOption).map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </Form.Select>
             </Col>
           ))}

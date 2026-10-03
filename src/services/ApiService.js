@@ -936,6 +936,26 @@ const ApiService = {
     return http.download(`/reports/voucher/export?${query}`)
   },
 
+  // Reports — Agent Management / Global Sales
+  getAgentManagementReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/agent-management${query ? `?${query}` : ''}`)
+  },
+  exportAgentManagementReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/agent-management/export?${query}`)
+  },
+  getGlobalSalesReportOptions: () => http.get('/reports/global-sales/options'),
+  getGlobalSalesBranches: (merchant) => http.get(`/reports/global-sales/branches?merchant=${encodeURIComponent(merchant)}`),
+  getGlobalSalesReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/global-sales${query ? `?${query}` : ''}`)
+  },
+  exportGlobalSalesReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/global-sales/export?${query}`)
+  },
+
   // Reports — Mobile Top Up
   getMobileTopupReportOptions: () => http.get('/reports/mobile-topup/options'),
   getMobileTopupReport: (params) => {
