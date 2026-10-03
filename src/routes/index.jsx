@@ -298,6 +298,10 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/reports/utility-billpay')),
       },
       {
+        path: '/reports/auditors-report',
+        Component: lazy(() => import('@/views/admin/reports/auditors-report')),
+      },
+      {
         path: '/reports/agent-management',
         Component: lazy(() => import('@/views/admin/reports/agent-management')),
       },

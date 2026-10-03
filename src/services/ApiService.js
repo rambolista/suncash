@@ -925,6 +925,17 @@ const ApiService = {
   },
   getUserClientCustomerTransactions: (id) => http.get(`/reports/user-client-management/customers/${id}/transactions`),
 
+  // Reports — Auditor's Report
+  getAuditorReportOptions: () => http.get('/reports/auditors-report/options'),
+  getAuditorReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/auditors-report?${query}`)
+  },
+  exportAuditorReport: (params, format = 'xlsx') => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/auditors-report/export?${query}`)
+  },
+
   // Reports — Voucher
   getVoucherReportOptions: () => http.get('/reports/voucher/options'),
   getVoucherReport: (params) => {

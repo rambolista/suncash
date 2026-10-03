@@ -28,7 +28,7 @@ const UserClientTable = ({ columns: apiColumns, data, onTransactions }) => {
   const columns = useMemo(() => {
     const cols = apiColumns.map(({ key, type }) => {
       if (type === 'image') return { data: key, orderable: false, searchable: false, className: 'text-center', render: (value, t) => (t === 'display' ? image(value) : '') }
-      if (NUMERIC.includes(key)) return { data: key, render: (value, t) => (t === 'display' ? escapeHtml(value) : toNumber(value)) }
+      if (type === 'number' || NUMERIC.includes(key)) return { data: key, render: (value, t) => (t === 'display' ? escapeHtml(value) : toNumber(value)) }
       return { data: key, render: (value) => escapeHtml(value ?? '') }
     })
     if (withAction) cols.push({ data: 'id', orderable: false, searchable: false, className: 'text-center', render: () => '<div class="uc-action-slot"></div>' })
