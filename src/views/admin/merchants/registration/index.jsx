@@ -26,12 +26,14 @@ const MerchantManagementPage = () => {
 
   const [merchants, setMerchants] = useState([])
   const [loading, setLoading] = useState(false)
-  const [view, setView] = useState('list') // 'list' | 'create' | 'edit' | 'manage'
+  // `?view=<merchant id>` (e.g. from Reports > Client Summary) opens that merchant straight into the read-only panel.
+  const deepLinkId = Number(searchParams.get('view')) || null
+  const [view, setView] = useState(deepLinkId ? 'manage' : 'list') // 'list' | 'create' | 'edit' | 'manage'
   // Always opens in the list layout — a Dashboard drill-down filter is applied via
   // the list's own column-header dropdowns, not by switching to the grid layout.
   const [viewMode, setViewMode] = useState('list') // table layout: 'list' | 'grid'
-  const [selectedMerchantId, setSelectedMerchantId] = useState(null)
-  const [manageReadOnly, setManageReadOnly] = useState(false)
+  const [selectedMerchantId, setSelectedMerchantId] = useState(deepLinkId)
+  const [manageReadOnly, setManageReadOnly] = useState(Boolean(deepLinkId))
   const [deactivateMerchant, setDeactivateMerchant] = useState(null)
   const [resetPasswordMerchant, setResetPasswordMerchant] = useState(null)
 

@@ -298,6 +298,38 @@ export const routes = [
         Component: lazy(() => import('@/views/admin/reports/utility-billpay')),
       },
       {
+        path: '/reports/voucher',
+        Component: lazy(() => import('@/views/admin/reports/voucher')),
+      },
+      {
+        path: '/reports/void',
+        Component: lazy(() => import('@/views/admin/reports/void')),
+      },
+      {
+        path: '/reports/cash-management',
+        Component: lazy(() => import('@/views/admin/reports/cash-management')),
+      },
+      {
+        path: '/reports/user-client-management',
+        Component: lazy(() => import('@/views/admin/reports/user-client-management')),
+      },
+      {
+        path: '/reports/vat',
+        Component: lazy(() => import('@/views/admin/reports/vat')),
+      },
+      {
+        path: '/reports/settlement',
+        Component: lazy(() => import('@/views/admin/reports/settlement')),
+      },
+      {
+        path: '/reports/client-summary',
+        Component: lazy(() => import('@/views/admin/reports/client-summary')),
+      },
+      {
+        path: '/reports/transactions',
+        Component: lazy(() => import('@/views/admin/reports/transactions')),
+      },
+      {
         path: '/tools/transaction-fees',
         Component: lazy(() => import('@/views/admin/tools/transaction-fees')),
       },

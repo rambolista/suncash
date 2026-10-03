@@ -901,6 +901,81 @@ const ApiService = {
     return http.download(`/reports/utility-billpay/export?${query}`)
   },
 
+  // Reports — Users / Client Management
+  getUserClientReportOptions: () => http.get('/reports/user-client-management/options'),
+  getUserClientReport: (tab, params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/user-client-management/${tab}${query ? `?${query}` : ''}`)
+  },
+  exportUserClientReport: (tab, params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/user-client-management/${tab}/export?${query}`)
+  },
+  getUserClientCustomerTransactions: (id) => http.get(`/reports/user-client-management/customers/${id}/transactions`),
+
+  // Reports — Voucher
+  getVoucherReportOptions: () => http.get('/reports/voucher/options'),
+  getVoucherReport: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/voucher${query ? `?${query}` : ''}`)
+  },
+  exportVoucherReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/voucher/export?${query}`)
+  },
+
+  // Reports — Void
+  getVoidReportOptions: () => http.get('/reports/void/options'),
+  getVoidReport: (tab, params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/void/${tab}${query ? `?${query}` : ''}`)
+  },
+  exportVoidReport: (tab, params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/void/${tab}/export?${query}`)
+  },
+
+  // Reports — Cash Management
+  getCashManagementReport: (tab, params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/cash-management/${tab}${query ? `?${query}` : ''}`)
+  },
+  exportCashManagementReport: (tab, params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/cash-management/${tab}/export?${query}`)
+  },
+
+  // Reports — VAT
+  getVatReport: (params) => http.get(`/reports/vat?${new URLSearchParams(params)}`),
+
+  // Reports — Settlement
+  getSettlementSummary: (params) => http.get(`/reports/settlement/summary?${new URLSearchParams(params)}`),
+  getSettlementDetails: (params) => http.get(`/reports/settlement/details?${new URLSearchParams(params)}`),
+
+  // Reports — Client Summary
+  getClientSummaryClients: () => http.get('/reports/client-summary/clients'),
+  getClientSummary: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/client-summary${query ? `?${query}` : ''}`)
+  },
+
+  // Reports — Transactions
+  getTransactionsReportOptions: () => http.get('/reports/transactions/options'),
+  getTransactionsReportScope: (params) => http.get(`/reports/transactions/scope?${new URLSearchParams(params)}`),
+  getTransactionsReportSummary: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/transactions/summary?${query}`)
+  },
+  getTransactionsReportDetails: (params) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries(params || {}).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.get(`/reports/transactions/details?${query}`)
+  },
+  exportTransactionsReport: (params, format) => {
+    const query = new URLSearchParams(Object.fromEntries(Object.entries({ ...params, format }).filter(([, v]) => v !== null && v !== undefined && v !== ''))).toString()
+    return http.download(`/reports/transactions/export?${query}`)
+  },
+  getTransactionsReportReceipt: (params) => http.download(`/reports/transactions/receipt?${new URLSearchParams(params)}`),
+
   // Tools — Voucher Batch Generation
   getVoucherBatches: () =>
     http.get('/voucher-batch-generation'),
